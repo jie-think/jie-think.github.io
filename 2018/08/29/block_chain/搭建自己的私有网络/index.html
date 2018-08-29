@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>搭建自己的私有网络 | Jie-Think</title>
+  <meta name="description" content="jie blog" />
+  <meta name="keywords" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" href="/">
+  <link rel="alternate" href="/atom.xml" title="Jie-Think">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="目标 创建私有的以太网 在私有网部署一个简单的智能合约 使用该公约发起交易  注意事项： 机子内存要2G及以上 setp1:  安装环境记录坑：通过 apt-get install geth 安装的环境只有 geth 命令，无 bootnode,  evm,  disasm,  rlpdump,  ethtest这些命令。 Ubuntu安装方式：1234sudo apt-get install s">
+<meta name="keywords" content="blockchain,以太坊">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搭建自己的私有网络">
+<meta property="og:url" content="http://yoursite.com/2018/08/29/block_chain/搭建自己的私有网络/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="目标 创建私有的以太网 在私有网部署一个简单的智能合约 使用该公约发起交易  注意事项： 机子内存要2G及以上 setp1:  安装环境记录坑：通过 apt-get install geth 安装的环境只有 geth 命令，无 bootnode,  evm,  disasm,  rlpdump,  ethtest这些命令。 Ubuntu安装方式：1234sudo apt-get install s">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-29T13:24:21.195Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="搭建自己的私有网络">
+<meta name="twitter:description" content="目标 创建私有的以太网 在私有网部署一个简单的智能合约 使用该公约发起交易  注意事项： 机子内存要2G及以上 setp1:  安装环境记录坑：通过 apt-get install geth 安装的环境只有 geth 命令，无 bootnode,  evm,  disasm,  rlpdump,  ethtest这些命令。 Ubuntu安装方式：1234sudo apt-get install s">
+
+  <link rel="shortcut icon" href="" />
+  <link rel="icon" href="" />
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata|Titillium+Web" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='//cdn.bootcss.com/node-waves/0.7.5/waves.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+
+  <script>setLoadingBarProgress(20)</script>
+  <header class="l_header">
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+			<a class="logo flat-box" href='/' >
+				<!-- <i class="fa fa-home"></i> -->
+				Jie-Think
+			</a>
+
+				<div class='menu'>
+					<ul class='h-list'>
+						
+							<li>
+								<a class='flat-box nav-about' href='/'>
+									<i class="fa fa-home fa-fw"></i>
+									主页
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-projects' href='https://github.com/jie-think'>
+									<i class="fa fa-cube fa-fw"></i>
+									项目
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-archives' href='/archives'>
+									<i class="fa fa-archive fa-fw"></i>
+									归档
+								</a>
+							</li>
+						
+					</ul>
+					<div class='underline'></div>
+				</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="Search" />
+						<span class="icon"><i class="fa fa-search fa-fw"></i></span>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a href='javascript:void(0)'><i class="fa fa-search fa-fw"></i></span></a></li>
+				
+				<li class='s-menu'><a href='javascript:void(0)'><i class="fa fa-navicon fa-fw"></i></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo" class="flat-box" href='javascript:void(0)'>
+				xaoxuu
+			</a>
+
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a href='javascript:void(0)'><i class="fa fa-comments fa-fw"></i></a></li>
+				<li class='s-top'><a href='javascript:void(0)'><i class="fa fa-arrow-up fa-fw"></i></a></li>
+				<li class='s-toc'><a href='javascript:void(0)'><i class="fa fa-list-ul fa-fw"></i></a></li>
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+        <div class="header">Jie-Think</div>
+		<nav>
+			
+				<a href="/" class="nav-about nav">
+					<i class="fa fa-home"></i>
+					主页
+				</a>
+			
+				<a href="https://github.com/jie-think" class="nav-projects nav">
+					<i class="fa fa-cube"></i>
+					项目
+				</a>
+			
+				<a href="/archives" class="nav-archives nav">
+					<i class="fa fa-archive"></i>
+					归档
+				</a>
+			
+		</nav>
+	</aside>
+
+    <script>setLoadingBarProgress(40);</script>
+  <div class="l_body">
+    <div class='container clearfix'>
+      <div class='l_main'>
+        <article id="post-block_chain/搭建自己的私有网络" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    <section class='meta'>
+        <h1 class="title">
+            
+                搭建自己的私有网络
+            
+        </h1>
+        <time>
+            2018-08-29 Wednesday&nbsp;&nbsp;
+            <i class="fa fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span id="busuanzi_value_page_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/backend/">backend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+
+        <div class="article-entry" itemprop="articleBody">
+            <h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ol>
+<li>创建私有的以太网</li>
+<li>在私有网部署一个简单的智能合约</li>
+<li>使用该公约发起交易</li>
+</ol>
+<p><strong>注意事项：</strong> 机子内存要2G及以上</p>
+<h2 id="setp1-安装环境"><a href="#setp1-安装环境" class="headerlink" title="setp1:  安装环境"></a>setp1:  安装环境</h2><p><strong>记录坑：</strong><br>通过 <code>apt-get install geth</code> 安装的环境只有 <code>geth</code> 命令，无 <code>bootnode</code>,  <code>evm</code>,  <code>disasm</code>,  <code>rlpdump</code>,  <code>ethtest</code>这些命令。</p>
+<p>Ubuntu安装方式：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install software-properties-common</span><br><span class="line">sudo add-apt-repository -y ppa:ethereum/ethereum</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install ethereum</span><br></pre></td></tr></table></figure></p>
+<p>可以选择源码安装：(前提是需要 golang &gt; 1.7)<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ethereum/go-ethereum</span><br><span class="line"><span class="built_in">cd</span> go-ethereum</span><br><span class="line">make geth</span><br></pre></td></tr></table></figure></p>
+<h2 id="step2-创建创世块"><a href="#step2-创建创世块" class="headerlink" title="step2: 创建创世块"></a>step2: 创建创世块</h2><p>创世块是区块链的第一个块并且参数被指定在<em>genesis.json</em>文件中，内容如下：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"config"</span>: &#123;</span><br><span class="line"> <span class="attr">"chainId"</span>: <span class="number">15</span>,</span><br><span class="line"> <span class="attr">"homesteadBlock"</span>: <span class="number">0</span>,</span><br><span class="line"> <span class="attr">"eip155Block"</span>: <span class="number">0</span>,</span><br><span class="line"> <span class="attr">"eip158Block"</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line"> <span class="attr">"alloc"</span>  : &#123;</span><br><span class="line"> <span class="attr">"0x0000000000000000000000000000000000000001"</span>: &#123;<span class="attr">"balance"</span>: <span class="string">"111111111"</span>&#125;,</span><br><span class="line"> <span class="attr">"0x0000000000000000000000000000000000000002"</span>: &#123;<span class="attr">"balance"</span>: <span class="string">"222222222"</span>&#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line"> <span class="attr">"coinbase"</span>  : <span class="string">"0x0000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"difficulty"</span> : <span class="string">"0x00001"</span>,</span><br><span class="line"> <span class="attr">"extraData"</span>  : <span class="string">""</span>,</span><br><span class="line"> <span class="attr">"gasLimit"</span>  : <span class="string">"0x2fefd8"</span>,</span><br><span class="line"> <span class="attr">"nonce"</span>  : <span class="string">"0x0000000000000107"</span>,</span><br><span class="line"> <span class="attr">"mixhash"</span>  : <span class="string">"0x0000000000000000000000000000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"parentHash"</span> : <span class="string">"0x0000000000000000000000000000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"timestamp"</span>  : <span class="string">"0x00"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>注意：</strong> <code>chainId=1</code> 指向的是以太坊的主链上。因此为您的网络创建唯一的<code>chainId</code>非常重要，这样您的客户端就不会混淆私有区块链和主网络.为了说明和测试，将采矿难度(<code>difficulty</code>)设置为较低值。还要确保你指定一个唯一的随机数来开始(<code>nonce</code>)。<code>alloc</code>字段允许您使用Ether预先填充帐户。<br>现在到您创建的<code>genesis.json</code>文件的目录并初始化<code>bootnode</code>节点，您的以太坊客户端可通过该节点加入您的专用网络并与连接到您的专用网络的其他节点进行交互。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/ucsfnet/data</span><br><span class="line">geth --datadir=learn init genesis.json </span><br><span class="line">bootnode --genkey=boot.key </span><br><span class="line">bootnode --nodekey=boot.key</span><br></pre></td></tr></table></figure>
+<p>没有bootnode的原因：see  step1</p>
+<h2 id="step3-连接到bootnode上"><a href="#step3-连接到bootnode上" class="headerlink" title="step3: 连接到bootnode上"></a>step3: 连接到bootnode上</h2><p>开一个新终端：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh root@101.102.103.104</span><br><span class="line">geth --datadir=/root/ucsfnet/data --bootnodes=enode://148f3....@101.102.103.104:3031</span><br></pre></td></tr></table></figure></p>
+<p>将<code>148f3....</code>替换为 <code>step2</code> 生成的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ bootnode --nodekey=boot.key</span><br><span class="line">INFO [03-14|16:30:33] UDP listener up                          self=enode://c591c837ff804c4bdb6a5a8d02e5343d5f96fbf6e198aaf05f91aeb0a9b781e3b6fb95124ac8e4ee1b99ca64df2c93052c54bc02ee1dada70d38bd4a956d4ac4@[::]:30301</span><br></pre></td></tr></table></figure></p>
+<h2 id="step4-创建一个新账号并查询余额"><a href="#step4-创建一个新账号并查询余额" class="headerlink" title="step4: 创建一个新账号并查询余额"></a>step4: 创建一个新账号并查询余额</h2><p>新开一个终端：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">geth attach /root/ucsfnet/data/geth.ipc</span><br></pre></td></tr></table></figure></p>
+<p>连接到网络中：<br>查看有哪些账户,   创建一个新账号密码为：<em>mypassword</em> ,  查询用户余额<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; eth.accounts</span><br><span class="line">[]</span><br><span class="line"></span><br><span class="line">&gt; personal.newAccount(<span class="string">"mypassword"</span>)</span><br><span class="line"><span class="string">"0x73c62b30d6dbe998313384f1c98528c1d372b075"</span></span><br><span class="line"></span><br><span class="line">&gt; web3.fromWei(eth.getBalance(eth.accounts\[0\]), <span class="string">"ether"</span>)</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
+<p>那个<code>0x</code>打头的就是账户地址：<em>0x73c62b30d6dbe998313384f1c98528c1d372b075</em></p>
+<h2 id="step5-在私链上挖矿"><a href="#step5-在私链上挖矿" class="headerlink" title="step5: 在私链上挖矿"></a>step5: 在私链上挖矿</h2><p>挖矿有2目的：</p>
+<blockquote>
+<ol>
+<li>需要为矿工的算力，提供gas</li>
+<li>采矿需要将你的交易写到区块链中</li>
+</ol>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">geth --datadir=/root/ucsfnet/data --mine --minerthreads=1 --etherbase=0x...</span><br></pre></td></tr></table></figure>
+<p><em>etherbase</em> 参数应该是<code>step4</code>中的钱包地址<br><em>开始挖矿后会有一段时间加载数据，耗CPU比较严重。</em></p>
+<h2 id="step6-开发一个简单的智能合约"><a href="#step6-开发一个简单的智能合约" class="headerlink" title="step6: 开发一个简单的智能合约"></a>step6: 开发一个简单的智能合约</h2><p>首先需要安装编译器：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:ethereum/ethereum</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install solc</span><br></pre></td></tr></table></figure></p>
+<p>其次，创建合约，并命名为 <code>greeter.sol</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">contract mortal &#123;</span><br><span class="line"></span><br><span class="line">/* Define variable owner of the type address*/</span><br><span class="line"> address owner;</span><br><span class="line"></span><br><span class="line">/* this function is executed at initialization and sets the owner of the contract */</span><br><span class="line"> function mortal() &#123; owner = msg.sender; &#125;</span><br><span class="line"></span><br><span class="line">/* Function to recover the funds on the contract */</span><br><span class="line"> function kill() &#123; if (msg.sender == owner) selfdestruct(owner); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract greeter is mortal &#123;</span><br><span class="line"> /* define variable greeting of the type string */</span><br><span class="line"> string greeting;</span><br><span class="line"></span><br><span class="line">/* this runs when the contract is executed */</span><br><span class="line"> function greeter(string _greeting) public &#123;</span><br><span class="line"> greeting = &quot;UCSFnet lives!&quot;;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">/* main function */</span><br><span class="line"> function greet() constant returns (string) &#123;</span><br><span class="line"> return greeting;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译合约：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">solc --bin --abi  -o /root/<span class="built_in">test</span> /root/<span class="built_in">test</span>/greeter.sol</span><br><span class="line"></span><br><span class="line"><span class="comment">## 输出文件</span></span><br><span class="line">$ ls</span><br><span class="line">greeter.abi  greeter.bin  greeter.sol  mortal.abi  mortal.bin</span><br></pre></td></tr></table></figure></p>
+<p>在编译命令行中， <code>--bin --abi</code> 是分别生成 EVM（Ethereum Virtual Machine：以太坊虚拟机）字节码 和 ABI（Application Binary Inferface：应用二进制接口）文件。 <code>-o</code> 指定生成后存放的路径</p>
+<p><strong>合约内容先不研究</strong></p>
+<h2 id="step7-部署GREETER合约到私网"><a href="#step7-部署GREETER合约到私网" class="headerlink" title="step7: 部署GREETER合约到私网"></a>step7: 部署GREETER合约到私网</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _greeting = <span class="string">'Jie lives!'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> browser_ballot_sol_greeterContract = web3.eth.contract([&#123;</span><br><span class="line">    <span class="string">"constant"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"inputs"</span>: [],</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"kill"</span>,</span><br><span class="line">    <span class="string">"outputs"</span>: [],</span><br><span class="line">    <span class="string">"payable"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"function"</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">    <span class="string">"constant"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">"inputs"</span>: [],</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"greet"</span>,</span><br><span class="line">    <span class="string">"outputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">""</span>, <span class="string">"type"</span>: <span class="string">"string"</span>&#125;],</span><br><span class="line">    <span class="string">"payable"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"function"</span></span><br><span class="line">&#125;, &#123;<span class="string">"inputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">"_greeting"</span>, <span class="string">"type"</span>: <span class="string">"string"</span>&#125;], <span class="string">"payable"</span>: <span class="literal">false</span>, <span class="string">"type"</span>: <span class="string">"constructor"</span>&#125;]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> browser_ballot_sol_greeter = browser_ballot_sol_greeterContract.new(</span><br><span class="line">    _greeting,</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">from</span>: web3.eth.accounts[<span class="number">0</span>],</span><br><span class="line"></span><br><span class="line">        data: <span class="string">'0x6060604052341561000f57600080fd5b6040516103dd3803806103dd833981016040528080518201919050505b5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505b6040805190810160405280600d81526020017f48656c6c6f2c20576f726c642100000000000000000000000000000000000000815250600190805190602001906100b99291906100c1565b505b50610166565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061010257805160ff1916838001178555610130565b82800160010185558215610130579182015b8281111561012f578251825591602001919060010190610114565b5b50905061013d9190610141565b5090565b61016391905b8082111561015f576000816000905550600101610147565b5090565b90565b610268806101756000396000f30060606040526000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806341c0e1b514610049578063cfae32171461005e575b600080fd5b341561005457600080fd5b61005c6100ed565b005b341561006957600080fd5b61007161017f565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100b25780820151818401525b602081019050610096565b50505050905090810190601f1680156100df5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561017c576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b5b565b610187610228565b60018054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561021d5780601f106101f25761010080835404028352916020019161021d565b820191906000526020600020905b81548152906001019060200180831161020057829003601f168201915b505050505090505b90565b6020604051908101604052806000815250905600a165627a7a7230582069d50e4318daa30d3f74bb817c3b0cb732c4ec6a493eb108266c548906c8b6d70029'</span>,</span><br><span class="line"></span><br><span class="line">        gas: <span class="string">'1000000'</span></span><br><span class="line"></span><br><span class="line">    &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">e, contract</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">console</span>.log(e, contract);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> contract.address !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'Contract mined! address: '</span> + contract.address + <span class="string">' transactionHash: '</span> + contract.transactionHash);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+<p>数据看着填吧，启动一个终端，连接到私链上<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh root@101.102.103.104 </span><br><span class="line">geth attach /root/ucsfnet/data/geth.ipc </span><br><span class="line">&gt; web3.fromWei(eth.getBalance(eth.accounts[0]), <span class="string">"ether"</span>)</span><br><span class="line">&gt; personal.unlockAccount(eth.accounts[0], <span class="string">"mypassword"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>部署合约需要account上有余额，且account处于unlock状态下。<br>使用下面的命令载入合约：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loadScript(<span class="string">'myContract.js'</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>注意：</strong>需要有矿工挖矿保证交易被挖到<br>将会得到如下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Contract mined! address: 0xa76d017c3035dcf15e28b315477f3f19ae275433 transactionHash: 0x732e84efc03638767efc9a46738161c04d561a92cc2e631c63287e63ef38995b</span><br></pre></td></tr></table></figure></p>
+<p>这样合约就部署完成了</p>
+<h2 id="与合同的交换"><a href="#与合同的交换" class="headerlink" title="与合同的交换"></a>与合同的交换</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">var</span> abi = <span class="string">'[&#123;"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"type":"function"&#125;,&#123;"constant":true,"inputs":[],"name":"greet","outputs":[&#123;"name":"","type":"string"&#125;],"payable":false,"type":"function"&#125;,&#123;"inputs":[&#123;"name":"_greeting","type":"string"&#125;],"payable":false,"type":"constructor"&#125;]'</span></span><br><span class="line">&gt; <span class="keyword">var</span> abi = <span class="built_in">JSON</span>.parse(abi)</span><br><span class="line">&gt; <span class="keyword">var</span> contract = web3.eth.contract(abi)</span><br><span class="line">&gt; <span class="keyword">var</span> c = contract.at(<span class="string">"0xa76d017c3035dcf15e28b315477f3f19ae275433"</span>)</span><br><span class="line">&gt; c.greet()</span><br></pre></td></tr></table></figure>
+<p>会有一个输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UCSFnet lives!</span><br></pre></td></tr></table></figure></p>
+<p> 我这输出的是：”Hello, World!”  ….</p>
+<h2 id="博客推荐"><a href="#博客推荐" class="headerlink" title="博客推荐"></a>博客推荐</h2><p><a href="https://ocalog.com/post/10/" target="_blank" rel="noopener">Nice low-level description of networking in Ethereum (uses the Python-based client):</a></p>
+<p><a href="https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster" target="_blank" rel="noopener">Setting up private network or local cluster</a></p>
+<p><a href="https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts" target="_blank" rel="noopener">Managing your accounts</a></p>
+<p><a href="https://github.com/ethereum/go-ethereum/wiki/Connecting-to-the-network" target="_blank" rel="noopener">Connecting to the network</a></p>
+<p><a href="https://github.com/ethereum/go-ethereum" target="_blank" rel="noopener">The Go Ethereum client</a></p>
+<p><a href="https://ethereum.org/cli" target="_blank" rel="noopener">Official Ethereum command line tool documentation</a></p>
+<p>参考（算是翻译）：<br><a href="https://omarmetwally.blog/2017/07/25/how-to-create-a-private-ethereum-network/" target="_blank" rel="noopener">How to create a private Ethereum network</a></p>
+<h2 id="下一个目标"><a href="#下一个目标" class="headerlink" title="下一个目标"></a>下一个目标</h2><p><a href="https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/" target="_blank" rel="noopener">https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/</a></p>
+
+        </div>
+
+        
+            <div class="article-tags tags">
+                
+                    <a href="/tags/blockchain/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;blockchain</a>
+                
+                    <a href="/tags/以太坊/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;以太坊</a>
+                
+            </div>
+        
+
+        
+            <div class="prev-next">
+                
+                    <section class="prev" >
+                        <span class="art-item-left">
+                            <h6><i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;上一篇</h6>
+                            <h4>
+                                <a href="/2018/08/29/backend/java/spring_aop/" rel="prev" title="spring aop 切向编程">
+                                    spring aop 切向编程
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>java
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>spring aop
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+                
+                    <section class="next">
+                        <span class="art-item-right" aria-hidden="true">
+                            <h6>下一篇&nbsp;<i class="fa fa-chevron-right" aria-hidden="true"></i></h6>
+                            <h4>
+                                <a href="/2018/08/29/block_chain/在私有网络上搭建3个以上节点/" rel="prev" title="">
+                                    
+                                </a>
+                            </h4>
+                            
+                        </span>
+                    </section>
+                
+            </div>
+        
+
+    </section>
+
+</article>
+
+<br>
+
+<!-- 显示推荐文章和评论 -->
+
+    <article class="post white-box comments">
+        <section class="article typo">
+
+            
+                
+
+    <div class="recommended_posts">
+        <h4><i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>&nbsp;你可能感兴趣的文章</h4>
+        <ul>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/java/Lombok原理分析与功能实现/">Lombok原理分析与功能实现</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/java/spring_aop/">spring aop 切向编程</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/block_chain/在私有网络上搭建3个以上节点/"></a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/">Zombie T3</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a></li>
+            
+        </ul>
+    </div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+
+
+            
+
+            
+
+                
+
+                
+
+                
+            
+
+        </section>
+    </article>
+
+
+<script>
+    window.subData = {
+        title: '搭建自己的私有网络',
+        tools: true
+    }
+</script>
+
+
+      </div>
+      <aside class='l_side'>
+        
+  <section class='m_widget about'>
+    <div class='header'>
+        
+            <img class='avatar' src='https://github.com/jie-think/github_blog_prd/blob/master/img/heard.jpg' />
+        
+    </div>
+    <div class='content'>
+        
+        <div>
+            <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
+            
+                hello word!!
+            
+        </div>
+    </div>
+    
+        <div class="social-wrapper">
+          
+            
+                <a href="qq646958863@163.com" class="social envelope"
+                    target="_blank" rel="external">
+                <i class="fa fa-envelope fa-fw"></i>
+                </a>
+            
+          
+            
+                <a href="https://github.com/jie-think" class="social github"
+                    target="_blank" rel="external">
+                <i class="fa fa-github fa-fw"></i>
+                </a>
+            
+          
+            
+          
+            
+          
+            
+          
+            
+          
+        </div>
+    
+
+</section>
+
+
+  <section class='m_widget categories'>
+<div class='header'><i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;分类</div>
+<div class='content'>
+    
+    <ul class="entry">
+    
+        <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>7</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/build-your-own-x/"><div class='name'>build-your-own-x</div><div class='badge'>0</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
+    
+    </ul>
+    
+</div>
+</section>
+
+
+  
+<section class="m_widget tagcloud">
+    <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
+    <div class='content'>
+        <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+    </div>
+</section>
+
+
+
+  
+
+
+  
+
+
+  
+    <section class="m_widget toc-wrapper">
+        <div class="header"><i class="fa fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;目录</div>
+        <div class='content'>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#目标"><span class="toc-text">目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setp1-安装环境"><span class="toc-text">setp1:  安装环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step2-创建创世块"><span class="toc-text">step2: 创建创世块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step3-连接到bootnode上"><span class="toc-text">step3: 连接到bootnode上</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step4-创建一个新账号并查询余额"><span class="toc-text">step4: 创建一个新账号并查询余额</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step5-在私链上挖矿"><span class="toc-text">step5: 在私链上挖矿</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step6-开发一个简单的智能合约"><span class="toc-text">step6: 开发一个简单的智能合约</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#step7-部署GREETER合约到私网"><span class="toc-text">step7: 部署GREETER合约到私网</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#与合同的交换"><span class="toc-text">与合同的交换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#博客推荐"><span class="toc-text">博客推荐</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#下一个目标"><span class="toc-text">下一个目标</span></a></li></ol>
+        </div>
+    </section>
+
+
+
+
+      </aside>
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+  </div>
+  <footer id="footer" class="clearfix">
+    <div class="social-wrapper">
+      
+        
+            <a href="qq646958863@163.com" class="social envelope flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-envelope fa-fw"></i>
+            </a>
+        
+      
+        
+            <a href="https://github.com/jie-think" class="social github flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-github fa-fw"></i>
+            </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <br>
+    <div>博客内容遵循 <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="licenses">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></div>
+    <div>本站使用 <a href="https://github.com/xaoxuu/hexo-theme-material-x" target="_blank" class="codename">Material-X</a> 作为主题，
+		总访问量为 <span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span> 次。
+    </div>
+
+</footer>
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+  <script>setLoadingBarProgress(80);</script>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src='//cdn.bootcss.com/node-waves/0.7.5/waves.min.js'></script>
+<script src="//cdn.bootcss.com/scrollReveal.js/3.3.2/scrollreveal.min.js"></script>
+<!-- 访问统计 -->
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+var ALGOLIA_API_KEY = "";
+var ALGOLIA_APP_ID = "";
+var ALGOLIA_INDEX_NAME = "";
+var AZURE_SERVICE_NAME = "";
+var AZURE_INDEX_NAME = "";
+var AZURE_QUERY_KEY = "";
+var BAIDU_API_ID = "";
+var SEARCH_SERVICE = "hexo";
+var ROOT = "/"||"/";
+if(!ROOT.endsWith('/'))ROOT += '/';
+</script>
+<script src="/js/search.js"></script>
+<script src="/js/app.js"></script>
+
+
+    
+    
+    
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

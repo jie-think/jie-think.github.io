@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>Build a Simple Database - Introduction and Setting up the REPL | Jie-Think</title>
+  <meta name="description" content="jie blog" />
+  <meta name="keywords" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" href="/">
+  <link rel="alternate" href="/atom.xml" title="Jie-Think">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Part 1 - Introduction and Setting up the REPLSqliteThere’s lots of documentation of sqlite internals on their website, plus I’ve got a copy of SQLite Database System: Design and Implementation.   sqli">
+<meta name="keywords" content="database,db原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build a Simple Database - Introduction and Setting up the REPL">
+<meta property="og:url" content="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Part 1 - Introduction and Setting up the REPLSqliteThere’s lots of documentation of sqlite internals on their website, plus I’ve got a copy of SQLite Database System: Design and Implementation.   sqli">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/arch1.gif">
+<meta property="og:updated_time" content="2018-08-29T13:39:50.089Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Build a Simple Database - Introduction and Setting up the REPL">
+<meta name="twitter:description" content="Part 1 - Introduction and Setting up the REPLSqliteThere’s lots of documentation of sqlite internals on their website, plus I’ve got a copy of SQLite Database System: Design and Implementation.   sqli">
+<meta name="twitter:image" content="https://cstack.github.io/db_tutorial/assets/images/arch1.gif">
+
+  <link rel="shortcut icon" href="" />
+  <link rel="icon" href="" />
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata|Titillium+Web" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='//cdn.bootcss.com/node-waves/0.7.5/waves.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+
+  <script>setLoadingBarProgress(20)</script>
+  <header class="l_header">
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+			<a class="logo flat-box" href='/' >
+				<!-- <i class="fa fa-home"></i> -->
+				Jie-Think
+			</a>
+
+				<div class='menu'>
+					<ul class='h-list'>
+						
+							<li>
+								<a class='flat-box nav-about' href='/'>
+									<i class="fa fa-home fa-fw"></i>
+									主页
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-projects' href='https://github.com/jie-think'>
+									<i class="fa fa-cube fa-fw"></i>
+									项目
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-archives' href='/archives'>
+									<i class="fa fa-archive fa-fw"></i>
+									归档
+								</a>
+							</li>
+						
+					</ul>
+					<div class='underline'></div>
+				</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="Search" />
+						<span class="icon"><i class="fa fa-search fa-fw"></i></span>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a href='javascript:void(0)'><i class="fa fa-search fa-fw"></i></span></a></li>
+				
+				<li class='s-menu'><a href='javascript:void(0)'><i class="fa fa-navicon fa-fw"></i></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo" class="flat-box" href='javascript:void(0)'>
+				xaoxuu
+			</a>
+
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a href='javascript:void(0)'><i class="fa fa-comments fa-fw"></i></a></li>
+				<li class='s-top'><a href='javascript:void(0)'><i class="fa fa-arrow-up fa-fw"></i></a></li>
+				<li class='s-toc'><a href='javascript:void(0)'><i class="fa fa-list-ul fa-fw"></i></a></li>
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+        <div class="header">Jie-Think</div>
+		<nav>
+			
+				<a href="/" class="nav-about nav">
+					<i class="fa fa-home"></i>
+					主页
+				</a>
+			
+				<a href="https://github.com/jie-think" class="nav-projects nav">
+					<i class="fa fa-cube"></i>
+					项目
+				</a>
+			
+				<a href="/archives" class="nav-archives nav">
+					<i class="fa fa-archive"></i>
+					归档
+				</a>
+			
+		</nav>
+	</aside>
+
+    <script>setLoadingBarProgress(40);</script>
+  <div class="l_body">
+    <div class='container clearfix'>
+      <div class='l_main'>
+        <article id="post-build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    <section class='meta'>
+        <h1 class="title">
+            
+                Build a Simple Database - Introduction and Setting up the REPL
+            
+        </h1>
+        <time>
+            2018-05-17 Thursday&nbsp;&nbsp;
+            <i class="fa fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span id="busuanzi_value_page_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/build-own-x/">build-own-x</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+
+        <div class="article-entry" itemprop="articleBody">
+            <h1 id="Part-1-Introduction-and-Setting-up-the-REPL"><a href="#Part-1-Introduction-and-Setting-up-the-REPL" class="headerlink" title="Part 1 - Introduction and Setting up the REPL"></a>Part 1 - Introduction and Setting up the REPL</h1><h1 id="Sqlite"><a href="#Sqlite" class="headerlink" title="Sqlite"></a>Sqlite</h1><p>There’s lots of <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">documentation of sqlite internals</a> on their website, plus I’ve got a copy of <a href="https://play.google.com/store/books/details?id=9Z6IQQnX1JEC" target="_blank" rel="noopener">SQLite Database System: Design and Implementation</a>.</p>
+<p> <img src="https://cstack.github.io/db_tutorial/assets/images/arch1.gif" alt="https://cstack.github.io/db_tutorial/assets/images/arch1.gif"></p>
+<p>sqlite architecture (<a href="https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki" target="_blank" rel="noopener">https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki</a>)</p>
+<p>分成前后端:</p>
+<p>前端部分:</p>
+<ul>
+<li>tokenizer</li>
+<li>parser</li>
+<li>code generator</li>
+</ul>
+<p>后端部分:</p>
+<ul>
+<li>virtual machine</li>
+<li>B-tree</li>
+<li>pager</li>
+<li>os interface</li>
+</ul>
+<p><a href="https://en.wiktionary.org/wiki/a_journey_of_a_thousand_miles_begins_with_a_single_step" target="_blank" rel="noopener">A journey of a thousand miles begins with a single step(千里之行始于足下)</a>, so let’s start with something a little more straightforward: the REPL.</p>
+<p><strong>REPL:</strong> <em>read-execute-print</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~ sqlite3</span><br><span class="line">SQLite version <span class="number">3.16</span><span class="number">.0</span> <span class="number">2016</span><span class="number">-11</span><span class="number">-04</span> <span class="number">19</span>:<span class="number">09</span>:<span class="number">39</span></span><br><span class="line">Enter <span class="string">".help"</span> <span class="keyword">for</span> usage hints.</span><br><span class="line">Connected to a transient in-memory database.</span><br><span class="line">Use <span class="string">".open FILENAME"</span> to reopen on a persistent database.</span><br><span class="line">sqlite&gt; create table users (id int, username varchar(255), email varchar(255));</span><br><span class="line">sqlite&gt; .tables</span><br><span class="line">users</span><br><span class="line">sqlite&gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <div class="article-tags tags">
+                
+                    <a href="/tags/database/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;database</a>
+                
+                    <a href="/tags/db原理/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;db原理</a>
+                
+            </div>
+        
+
+        
+            <div class="prev-next">
+                
+                    <section class="prev" >
+                        <span class="art-item-left">
+                            <h6><i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;上一篇</h6>
+                            <h4>
+                                <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" rel="prev" title="Build a Simple Database - 模块功能概述">
+                                    Build a Simple Database - 模块功能概述
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>database
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>db原理
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+                
+                    <section class="next">
+                        <span class="art-item-right" aria-hidden="true">
+                            <h6>下一篇&nbsp;<i class="fa fa-chevron-right" aria-hidden="true"></i></h6>
+                            <h4>
+                                <a href="/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" rel="prev" title="Dual pivot Quicksort">
+                                    Dual pivot Quicksort
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>sorting
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+            </div>
+        
+
+    </section>
+
+</article>
+
+<br>
+
+<!-- 显示推荐文章和评论 -->
+
+    <article class="post white-box comments">
+        <section class="article typo">
+
+            
+                
+
+    <div class="recommended_posts">
+        <h4><i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>&nbsp;你可能感兴趣的文章</h4>
+        <ul>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/">grpc start learn</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/">goose learn start</a></li>
+            
+                <li><a href="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/">Build a Simple Database - 模块功能概述</a></li>
+            
+                <li><a href="http://yoursite.com/2018/04/27/alg/sorting/Dual_pivot_Quicksort/">Dual pivot Quicksort</a></li>
+            
+        </ul>
+    </div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+
+
+            
+
+            
+
+                
+
+                
+
+                
+            
+
+        </section>
+    </article>
+
+
+<script>
+    window.subData = {
+        title: 'Build a Simple Database - Introduction and Setting up the REPL',
+        tools: true
+    }
+</script>
+
+
+      </div>
+      <aside class='l_side'>
+        
+  <section class='m_widget about'>
+    <div class='header'>
+        
+            <img class='avatar' src='https://github.com/jie-think/github_blog_prd/blob/master/img/heard.jpg' />
+        
+    </div>
+    <div class='content'>
+        
+        <div>
+            <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
+            
+                hello word!!
+            
+        </div>
+    </div>
+    
+        <div class="social-wrapper">
+          
+            
+                <a href="qq646958863@163.com" class="social envelope"
+                    target="_blank" rel="external">
+                <i class="fa fa-envelope fa-fw"></i>
+                </a>
+            
+          
+            
+                <a href="https://github.com/jie-think" class="social github"
+                    target="_blank" rel="external">
+                <i class="fa fa-github fa-fw"></i>
+                </a>
+            
+          
+            
+          
+            
+          
+            
+          
+            
+          
+        </div>
+    
+
+</section>
+
+
+  <section class='m_widget categories'>
+<div class='header'><i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;分类</div>
+<div class='content'>
+    
+    <ul class="entry">
+    
+        <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>7</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/build-your-own-x/"><div class='name'>build-your-own-x</div><div class='badge'>0</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
+    
+    </ul>
+    
+</div>
+</section>
+
+
+  
+<section class="m_widget tagcloud">
+    <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
+    <div class='content'>
+        <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+    </div>
+</section>
+
+
+
+  
+
+
+  
+
+
+  
+    <section class="m_widget toc-wrapper">
+        <div class="header"><i class="fa fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;目录</div>
+        <div class='content'>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-1-Introduction-and-Setting-up-the-REPL"><span class="toc-text">Part 1 - Introduction and Setting up the REPL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Sqlite"><span class="toc-text">Sqlite</span></a></li></ol>
+        </div>
+    </section>
+
+
+
+
+      </aside>
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+  </div>
+  <footer id="footer" class="clearfix">
+    <div class="social-wrapper">
+      
+        
+            <a href="qq646958863@163.com" class="social envelope flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-envelope fa-fw"></i>
+            </a>
+        
+      
+        
+            <a href="https://github.com/jie-think" class="social github flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-github fa-fw"></i>
+            </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <br>
+    <div>博客内容遵循 <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="licenses">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></div>
+    <div>本站使用 <a href="https://github.com/xaoxuu/hexo-theme-material-x" target="_blank" class="codename">Material-X</a> 作为主题，
+		总访问量为 <span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span> 次。
+    </div>
+
+</footer>
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+  <script>setLoadingBarProgress(80);</script>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src='//cdn.bootcss.com/node-waves/0.7.5/waves.min.js'></script>
+<script src="//cdn.bootcss.com/scrollReveal.js/3.3.2/scrollreveal.min.js"></script>
+<!-- 访问统计 -->
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+var ALGOLIA_API_KEY = "";
+var ALGOLIA_APP_ID = "";
+var ALGOLIA_INDEX_NAME = "";
+var AZURE_SERVICE_NAME = "";
+var AZURE_INDEX_NAME = "";
+var AZURE_QUERY_KEY = "";
+var BAIDU_API_ID = "";
+var SEARCH_SERVICE = "hexo";
+var ROOT = "/"||"/";
+if(!ROOT.endsWith('/'))ROOT += '/';
+</script>
+<script src="/js/search.js"></script>
+<script src="/js/app.js"></script>
+
+
+    
+    
+    
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>
