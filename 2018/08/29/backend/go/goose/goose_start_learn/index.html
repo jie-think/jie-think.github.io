@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>goose learn start | Jie-Think</title>
+  <meta name="description" content="jie blog" />
+  <meta name="keywords" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" href="/">
+  <link rel="alternate" href="/atom.xml" title="Jie-Think">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="what goose goose is a database migration tool.You can manage your database’s evolution by creating incremental SQL or Go scripts.  install这个前提是需要安装 golang, 并会就 goose 命令生成到 $GOPATH/bin 目录下.1$ go get bi">
+<meta name="keywords" content="go,goose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="goose learn start">
+<meta property="og:url" content="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="what goose goose is a database migration tool.You can manage your database’s evolution by creating incremental SQL or Go scripts.  install这个前提是需要安装 golang, 并会就 goose 命令生成到 $GOPATH/bin 目录下.1$ go get bi">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-29T12:13:18.646Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="goose learn start">
+<meta name="twitter:description" content="what goose goose is a database migration tool.You can manage your database’s evolution by creating incremental SQL or Go scripts.  install这个前提是需要安装 golang, 并会就 goose 命令生成到 $GOPATH/bin 目录下.1$ go get bi">
+
+  <link rel="shortcut icon" href="" />
+  <link rel="icon" href="" />
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata|Titillium+Web" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='//cdn.bootcss.com/node-waves/0.7.5/waves.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+
+  <script>setLoadingBarProgress(20)</script>
+  <header class="l_header">
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+			<a class="logo flat-box" href='/' >
+				<!-- <i class="fa fa-home"></i> -->
+				Jie-Think
+			</a>
+
+				<div class='menu'>
+					<ul class='h-list'>
+						
+							<li>
+								<a class='flat-box nav-about' href='/'>
+									<i class="fa fa-home fa-fw"></i>
+									主页
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-projects' href='https://github.com/jie-think'>
+									<i class="fa fa-cube fa-fw"></i>
+									项目
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-archives' href='/archives'>
+									<i class="fa fa-archive fa-fw"></i>
+									归档
+								</a>
+							</li>
+						
+					</ul>
+					<div class='underline'></div>
+				</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="Search" />
+						<span class="icon"><i class="fa fa-search fa-fw"></i></span>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a href='javascript:void(0)'><i class="fa fa-search fa-fw"></i></span></a></li>
+				
+				<li class='s-menu'><a href='javascript:void(0)'><i class="fa fa-navicon fa-fw"></i></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo" class="flat-box" href='javascript:void(0)'>
+				xaoxuu
+			</a>
+
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a href='javascript:void(0)'><i class="fa fa-comments fa-fw"></i></a></li>
+				<li class='s-top'><a href='javascript:void(0)'><i class="fa fa-arrow-up fa-fw"></i></a></li>
+				<li class='s-toc'><a href='javascript:void(0)'><i class="fa fa-list-ul fa-fw"></i></a></li>
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+        <div class="header">Jie-Think</div>
+		<nav>
+			
+				<a href="/" class="nav-about nav">
+					<i class="fa fa-home"></i>
+					主页
+				</a>
+			
+				<a href="https://github.com/jie-think" class="nav-projects nav">
+					<i class="fa fa-cube"></i>
+					项目
+				</a>
+			
+				<a href="/archives" class="nav-archives nav">
+					<i class="fa fa-archive"></i>
+					归档
+				</a>
+			
+		</nav>
+	</aside>
+
+    <script>setLoadingBarProgress(40);</script>
+  <div class="l_body">
+    <div class='container clearfix'>
+      <div class='l_main'>
+        <article id="post-backend/go/goose/goose_start_learn" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    <section class='meta'>
+        <h1 class="title">
+            
+                goose learn start
+            
+        </h1>
+        <time>
+            2018-08-29 Wednesday&nbsp;&nbsp;
+            <i class="fa fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span id="busuanzi_value_page_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/backend/">backend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+
+        <div class="article-entry" itemprop="articleBody">
+            <h2 id="what-goose"><a href="#what-goose" class="headerlink" title="what goose"></a>what goose</h2><blockquote>
+<p>goose is a database migration tool.<br>You can manage your database’s evolution by creating incremental SQL or Go scripts.</p>
+</blockquote>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><p>这个前提是需要安装 golang, 并会就 <code>goose</code> 命令生成到 <code>$GOPATH/bin</code> 目录下.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go get bitbucket.org/liamstask/goose/cmd/goose</span><br></pre></td></tr></table></figure></p>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> goose</span><br><span class="line"></span><br><span class="line">goose is a database migration management system for Go projects.</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line">    goose [options] &lt;subcommand&gt; [subcommand options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  -env string</span><br><span class="line">    	which DB environment to use (default "development")</span><br><span class="line">  -path string</span><br><span class="line">    	folder containing db info (default "db")</span><br><span class="line">  -pgschema string</span><br><span class="line">    	which postgres-schema to migrate (default = none)</span><br><span class="line"></span><br><span class="line">Commands:</span><br><span class="line">    up         Migrate the DB to the most recent version available</span><br><span class="line">    down       Roll back the version by 1</span><br><span class="line">    redo       Re-run the latest migration</span><br><span class="line">    status     dump the migration status for the current DB</span><br><span class="line">    create     Create the scaffolding for a new migration</span><br><span class="line">    dbversion  Print the current version of the database</span><br></pre></td></tr></table></figure>
+<h3 id="create"><a href="#create" class="headerlink" title="create"></a>create</h3><p>创建一个新的 migration , 这个创建的是 go migration<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose create AddSomeColumns</span><br></pre></td></tr></table></figure></p>
+<p>如果是创建 sql migration 的话, 在后边加个 sql 即可.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose create AddSomeColumns sql</span><br></pre></td></tr></table></figure></p>
+<h3 id="up"><a href="#up" class="headerlink" title="up"></a>up</h3><p>应用所有可用的 migrations</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose up</span><br></pre></td></tr></table></figure>
+<h3 id="down"><a href="#down" class="headerlink" title="down"></a>down</h3><p>从当前版本回滚单个 migrations<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose down</span><br></pre></td></tr></table></figure></p>
+<h3 id="redo"><a href="#redo" class="headerlink" title="redo"></a>redo</h3><p>回滚最近应用的 migrations ，然后再次运行它。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose redo</span><br></pre></td></tr></table></figure>
+<h3 id="status"><a href="#status" class="headerlink" title="status"></a>status</h3><p>打印所有 migrations 的状态：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose status</span><br></pre></td></tr></table></figure>
+<h3 id="dbversion"><a href="#dbversion" class="headerlink" title="dbversion"></a>dbversion</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose dbversion</span><br></pre></td></tr></table></figure>
+<h2 id="个人实验数据"><a href="#个人实验数据" class="headerlink" title="个人实验数据"></a>个人实验数据</h2><h3 id="配置如下"><a href="#配置如下" class="headerlink" title="配置如下:"></a>配置如下:</h3><p>目录结构:</p>
+<p>jieLearn/<br>├── dbconf.yml<br>└── migrations<br>    ├── 20180829163647_jieTest.sql<br>    └── 20180829165529_addC4Col.sql</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat dbconf.yml</span><br><span class="line"></span><br><span class="line">development:</span><br><span class="line">    driver: mysql</span><br><span class="line">    open: root:password@tcp(127.0.0.1:3306)/jie_test?timeout=200ms&amp;parseTime=true&amp;loc=Local</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cat jieLearn/migrations/20180829163647_jieTest.sql</span><br><span class="line"></span><br><span class="line">-- +goose Up</span><br><span class="line">-- SQL in section 'Up' is executed when this migration is applied</span><br><span class="line">CREATE TABLE `jie_test`.`test_table` (</span><br><span class="line">  `c1` INT NOT NULL,</span><br><span class="line">  `c2` VARCHAR(45) NULL,</span><br><span class="line">  `c3` VARCHAR(45) NULL,</span><br><span class="line">  PRIMARY KEY (`c1`));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- +goose Down</span><br><span class="line">-- SQL section 'Down' is executed when this migration is rolled back</span><br><span class="line">DROP TABLE `jie_test`.`test_table`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cat jieLearn/migrations/20180829165529_addC4Col.sql</span><br><span class="line"></span><br><span class="line">-- +goose Up</span><br><span class="line">-- SQL in section 'Up' is executed when this migration is applied</span><br><span class="line">ALTER TABLE `jie_test`.`test_table`</span><br><span class="line">ADD COLUMN `c4` VARCHAR(45) NULL AFTER `c3`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- +goose Down</span><br><span class="line">-- SQL section 'Down' is executed when this migration is rolled back</span><br><span class="line">ALTER TABLE `jie_test`.`test_table`</span><br><span class="line">DROP COLUMN `c4`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> goose -path "jieLearn" up</span><br><span class="line"><span class="meta">$</span> goose -path "jieLearn" down</span><br></pre></td></tr></table></figure>
+<h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><p>new table: goose_db_version, test_table</p>
+<p>goose_db_version: content<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1	0	1	2018-08-29 08:33:23</span><br><span class="line">2	20180829163647	1	2018-08-29 08:33:23</span><br><span class="line">3	20180829163647	0	2018-08-29 08:34:53</span><br><span class="line">4	20180829163647	1	2018-08-29 08:35:35</span><br><span class="line">5	20180829165529	1	2018-08-29 08:42:39</span><br><span class="line">6	20180829165529	0	2018-08-29 08:43:00</span><br></pre></td></tr></table></figure></p>
+<p>参考: <a href="https://bitbucket.org/liamstask/goose" target="_blank" rel="noopener">https://bitbucket.org/liamstask/goose</a></p>
+
+        </div>
+
+        
+            <div class="article-tags tags">
+                
+                    <a href="/tags/go/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;go</a>
+                
+                    <a href="/tags/goose/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;goose</a>
+                
+            </div>
+        
+
+        
+            <div class="prev-next">
+                
+                    <section class="prev" >
+                        <span class="art-item-left">
+                            <h6><i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;上一篇</h6>
+                            <h4>
+                                <a href="/2018/08/29/backend/go/grpc/grpc_start_learn/" rel="prev" title="grpc start learn">
+                                    grpc start learn
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>go
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>grpc
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+                
+            </div>
+        
+
+    </section>
+
+</article>
+
+<br>
+
+<!-- 显示推荐文章和评论 -->
+
+    <article class="post white-box comments">
+        <section class="article typo">
+
+            
+                
+
+    <div class="recommended_posts">
+        <h4><i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>&nbsp;你可能感兴趣的文章</h4>
+        <ul>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/">grpc start learn</a></li>
+            
+        </ul>
+    </div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+
+
+            
+
+            
+
+                
+
+                
+
+                
+            
+
+        </section>
+    </article>
+
+
+<script>
+    window.subData = {
+        title: 'goose learn start',
+        tools: true
+    }
+</script>
+
+
+      </div>
+      <aside class='l_side'>
+        
+  <section class='m_widget about'>
+    <div class='header'>
+        
+            <img class='avatar' src='https://github.com/jie-think/github_blog_prd/blob/master/img/heard.jpg' />
+        
+    </div>
+    <div class='content'>
+        
+        <div>
+            <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
+            
+                hello word!!
+            
+        </div>
+    </div>
+    
+        <div class="social-wrapper">
+          
+            
+                <a href="qq646958863@163.com" class="social envelope"
+                    target="_blank" rel="external">
+                <i class="fa fa-envelope fa-fw"></i>
+                </a>
+            
+          
+            
+                <a href="https://github.com/jie-think" class="social github"
+                    target="_blank" rel="external">
+                <i class="fa fa-github fa-fw"></i>
+                </a>
+            
+          
+            
+          
+            
+          
+            
+          
+            
+          
+        </div>
+    
+
+</section>
+
+
+  <section class='m_widget categories'>
+<div class='header'><i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;分类</div>
+<div class='content'>
+    
+    <ul class="entry">
+    
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>3</div></a></li>
+    
+    </ul>
+    
+</div>
+</section>
+
+
+  
+<section class="m_widget tagcloud">
+    <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
+    <div class='content'>
+        <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a>
+    </div>
+</section>
+
+
+
+  
+
+
+  
+
+
+  
+    <section class="m_widget toc-wrapper">
+        <div class="header"><i class="fa fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;目录</div>
+        <div class='content'>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#what-goose"><span class="toc-text">what goose</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#install"><span class="toc-text">install</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Usage"><span class="toc-text">Usage</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#create"><span class="toc-text">create</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#up"><span class="toc-text">up</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#down"><span class="toc-text">down</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redo"><span class="toc-text">redo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#status"><span class="toc-text">status</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dbversion"><span class="toc-text">dbversion</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#个人实验数据"><span class="toc-text">个人实验数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#配置如下"><span class="toc-text">配置如下:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据库"><span class="toc-text">数据库</span></a></li></ol></li></ol>
+        </div>
+    </section>
+
+
+
+
+      </aside>
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+  </div>
+  <footer id="footer" class="clearfix">
+    <div class="social-wrapper">
+      
+        
+            <a href="qq646958863@163.com" class="social envelope flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-envelope fa-fw"></i>
+            </a>
+        
+      
+        
+            <a href="https://github.com/jie-think" class="social github flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-github fa-fw"></i>
+            </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <br>
+    <div>博客内容遵循 <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="licenses">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></div>
+    <div>本站使用 <a href="https://github.com/xaoxuu/hexo-theme-material-x" target="_blank" class="codename">Material-X</a> 作为主题，
+		总访问量为 <span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span> 次。
+    </div>
+
+</footer>
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+  <script>setLoadingBarProgress(80);</script>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src='//cdn.bootcss.com/node-waves/0.7.5/waves.min.js'></script>
+<script src="//cdn.bootcss.com/scrollReveal.js/3.3.2/scrollreveal.min.js"></script>
+<!-- 访问统计 -->
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+var ALGOLIA_API_KEY = "";
+var ALGOLIA_APP_ID = "";
+var ALGOLIA_INDEX_NAME = "";
+var AZURE_SERVICE_NAME = "";
+var AZURE_INDEX_NAME = "";
+var AZURE_QUERY_KEY = "";
+var BAIDU_API_ID = "";
+var SEARCH_SERVICE = "hexo";
+var ROOT = "/"||"/";
+if(!ROOT.endsWith('/'))ROOT += '/';
+</script>
+<script src="/js/search.js"></script>
+<script src="/js/app.js"></script>
+
+
+    
+    
+    
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

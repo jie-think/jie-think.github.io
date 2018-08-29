@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>grpc start learn | Jie-Think</title>
+  <meta name="description" content="jie blog" />
+  <meta name="keywords" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" href="/">
+  <link rel="alternate" href="/atom.xml" title="Jie-Think">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ex helloworld start基本流程建立流程:  建 proto3 文件, 定义 service service 开发 client 开发  1. proto 文件123456789101112131415// The greeting service definition.service Greeter &amp;#123;  // Sends a greeting  rpc SayHello">
+<meta name="keywords" content="go,grpc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grpc start learn">
+<meta property="og:url" content="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="ex helloworld start基本流程建立流程:  建 proto3 文件, 定义 service service 开发 client 开发  1. proto 文件123456789101112131415// The greeting service definition.service Greeter &amp;#123;  // Sends a greeting  rpc SayHello">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-29T12:22:49.760Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="grpc start learn">
+<meta name="twitter:description" content="ex helloworld start基本流程建立流程:  建 proto3 文件, 定义 service service 开发 client 开发  1. proto 文件123456789101112131415// The greeting service definition.service Greeter &amp;#123;  // Sends a greeting  rpc SayHello">
+
+  <link rel="shortcut icon" href="" />
+  <link rel="icon" href="" />
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata|Titillium+Web" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='//cdn.bootcss.com/node-waves/0.7.5/waves.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+
+  <script>setLoadingBarProgress(20)</script>
+  <header class="l_header">
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+			<a class="logo flat-box" href='/' >
+				<!-- <i class="fa fa-home"></i> -->
+				Jie-Think
+			</a>
+
+				<div class='menu'>
+					<ul class='h-list'>
+						
+							<li>
+								<a class='flat-box nav-about' href='/'>
+									<i class="fa fa-home fa-fw"></i>
+									主页
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-projects' href='https://github.com/jie-think'>
+									<i class="fa fa-cube fa-fw"></i>
+									项目
+								</a>
+							</li>
+						
+							<li>
+								<a class='flat-box nav-archives' href='/archives'>
+									<i class="fa fa-archive fa-fw"></i>
+									归档
+								</a>
+							</li>
+						
+					</ul>
+					<div class='underline'></div>
+				</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="Search" />
+						<span class="icon"><i class="fa fa-search fa-fw"></i></span>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a href='javascript:void(0)'><i class="fa fa-search fa-fw"></i></span></a></li>
+				
+				<li class='s-menu'><a href='javascript:void(0)'><i class="fa fa-navicon fa-fw"></i></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo" class="flat-box" href='javascript:void(0)'>
+				xaoxuu
+			</a>
+
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a href='javascript:void(0)'><i class="fa fa-comments fa-fw"></i></a></li>
+				<li class='s-top'><a href='javascript:void(0)'><i class="fa fa-arrow-up fa-fw"></i></a></li>
+				<li class='s-toc'><a href='javascript:void(0)'><i class="fa fa-list-ul fa-fw"></i></a></li>
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+        <div class="header">Jie-Think</div>
+		<nav>
+			
+				<a href="/" class="nav-about nav">
+					<i class="fa fa-home"></i>
+					主页
+				</a>
+			
+				<a href="https://github.com/jie-think" class="nav-projects nav">
+					<i class="fa fa-cube"></i>
+					项目
+				</a>
+			
+				<a href="/archives" class="nav-archives nav">
+					<i class="fa fa-archive"></i>
+					归档
+				</a>
+			
+		</nav>
+	</aside>
+
+    <script>setLoadingBarProgress(40);</script>
+  <div class="l_body">
+    <div class='container clearfix'>
+      <div class='l_main'>
+        <article id="post-backend/go/grpc/grpc_start_learn" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    <section class='meta'>
+        <h1 class="title">
+            
+                grpc start learn
+            
+        </h1>
+        <time>
+            2018-08-29 Wednesday&nbsp;&nbsp;
+            <i class="fa fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span id="busuanzi_value_page_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/backend/">backend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+
+        <div class="article-entry" itemprop="articleBody">
+            <h1 id="ex-helloworld-start"><a href="#ex-helloworld-start" class="headerlink" title="ex helloworld start"></a>ex helloworld start</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>建立流程:</p>
+<ol>
+<li>建 proto3 文件, 定义 service</li>
+<li>service 开发</li>
+<li>client 开发</li>
+</ol>
+<h2 id="1-proto-文件"><a href="#1-proto-文件" class="headerlink" title="1. proto 文件"></a>1. proto 文件</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The greeting service definition.</span></span><br><span class="line">service Greeter &#123;</span><br><span class="line">  <span class="comment">// Sends a greeting</span></span><br><span class="line">  rpc SayHello (HelloRequest) returns (HelloReply) &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request message containing the user's name.</span></span><br><span class="line">message HelloRequest &#123;</span><br><span class="line">  <span class="keyword">string</span> name = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response message containing the greetings</span></span><br><span class="line">message HelloReply &#123;</span><br><span class="line">  <span class="keyword">string</span> message = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义了一个 service Greeter , 参数: SayHello, return: HelloReply</p>
+<h2 id="2-service-开发"><a href="#2-service-开发" class="headerlink" title="2. service 开发"></a>2. service 开发</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	port = <span class="string">":50051"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// server is used to implement helloworld.GreeterServer.</span></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现 helloworld.GreeterServer 方法</span></span><br><span class="line"><span class="comment">// SayHello implements helloworld.GreeterServer</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span> <span class="title">SayHello</span><span class="params">(ctx context.Context, in *pb.HelloRequest)</span> <span class="params">(*pb.HelloReply, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;pb.HelloReply&#123;Message: <span class="string">"Hello "</span> + in.Name&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lis, err := net.Listen(<span class="string">"tcp"</span>, port)         <span class="comment">// 开启监听</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"failed to listen: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	s := grpc.NewServer()                       <span class="comment">// 建一个 grpc Server</span></span><br><span class="line">	pb.RegisterGreeterServer(s, &amp;server&#123;&#125;)      <span class="comment">// 将 RegisterGreeterServer 服务绑定到 grpc 上</span></span><br><span class="line">	<span class="comment">// Register reflection service on gRPC server.</span></span><br><span class="line">	reflection.Register(s)                      <span class="comment">// 将服务注册到 rpc 上</span></span><br><span class="line">	<span class="keyword">if</span> err := s.Serve(lis); err != <span class="literal">nil</span> &#123;        <span class="comment">// s.Serve(lis) 是将 grpc 服务绑定监听端口</span></span><br><span class="line">		log.Fatalf(<span class="string">"failed to serve: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程:</p>
+<blockquote>
+<ol>
+<li>开一个监听端口</li>
+<li>建立一个 rpc 服务</li>
+<li>将服务绑定到 rpc 上</li>
+<li>将服务注册到 rpc 上</li>
+<li>绑定 grpc 服务 和 端口监听</li>
+</ol>
+</blockquote>
+<h2 id="3-client-使用-grpc-服务"><a href="#3-client-使用-grpc-服务" class="headerlink" title="3. client 使用 grpc 服务"></a>3. client 使用 grpc 服务</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"golang.org/x/net/context"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc"</span></span><br><span class="line">	pb <span class="string">"google.golang.org/grpc/examples/helloworld/helloworld"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	address     = <span class="string">"localhost:50051"</span></span><br><span class="line">	defaultName = <span class="string">"jie"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Set up a connection to the server.</span></span><br><span class="line">	conn, err := grpc.Dial(address, grpc.WithInsecure()) <span class="comment">// 创建客户端</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()                                  <span class="comment">// 延迟关闭连接</span></span><br><span class="line">	c := pb.NewGreeterClient(conn)                      <span class="comment">// 新建一个Greeter连接客户端</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Contact the server and print out its response.</span></span><br><span class="line">	name := defaultName</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(os.Args) &gt; <span class="number">1</span> &#123;</span><br><span class="line">		name = os.Args[<span class="number">1</span>]</span><br><span class="line">	&#125;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.Background(), time.Second) <span class="comment">// 设置超时 时间</span></span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line">	r, err := c.SayHello(ctx, &amp;pb.HelloRequest&#123;Name: name&#125;) <span class="comment">// 使用客户端调用远程方法</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"could not greet: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">"Greeting: %s"</span>, r.Message)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程: </p>
+<blockquote>
+<ol>
+<li>创建客户端</li>
+<li>新建一个Greeter连接客户端</li>
+<li>设置超时 时间</li>
+<li>使用客户端调用远程方法</li>
+<li>cloes客户端连接 and cancel()</li>
+</ol>
+</blockquote>
+<p>总结:</p>
+
+        </div>
+
+        
+            <div class="article-tags tags">
+                
+                    <a href="/tags/go/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;go</a>
+                
+                    <a href="/tags/grpc/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;grpc</a>
+                
+            </div>
+        
+
+        
+            <div class="prev-next">
+                
+                    <section class="prev" >
+                        <span class="art-item-left">
+                            <h6><i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;上一篇</h6>
+                            <h4>
+                                <a href="/2018/08/29/backend/go/redis/redis_start_learn/" rel="prev" title="redis ops learn">
+                                    redis ops learn
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>go
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>redis
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+                
+                    <section class="next">
+                        <span class="art-item-right" aria-hidden="true">
+                            <h6>下一篇&nbsp;<i class="fa fa-chevron-right" aria-hidden="true"></i></h6>
+                            <h4>
+                                <a href="/2018/08/29/backend/go/goose/goose_start_learn/" rel="prev" title="goose learn start">
+                                    goose learn start
+                                </a>
+                            </h4>
+                            
+                                <div class="tags">
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>go
+                                    
+                                        <i class="fa fa-tag fa-fw"></i>goose
+                                    
+                                </div>
+                            
+                        </span>
+                    </section>
+                
+            </div>
+        
+
+    </section>
+
+</article>
+
+<br>
+
+<!-- 显示推荐文章和评论 -->
+
+    <article class="post white-box comments">
+        <section class="article typo">
+
+            
+                
+
+    <div class="recommended_posts">
+        <h4><i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>&nbsp;你可能感兴趣的文章</h4>
+        <ul>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a></li>
+            
+                <li><a href="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/">goose learn start</a></li>
+            
+        </ul>
+    </div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+
+
+            
+
+            
+
+                
+
+                
+
+                
+            
+
+        </section>
+    </article>
+
+
+<script>
+    window.subData = {
+        title: 'grpc start learn',
+        tools: true
+    }
+</script>
+
+
+      </div>
+      <aside class='l_side'>
+        
+  <section class='m_widget about'>
+    <div class='header'>
+        
+            <img class='avatar' src='https://github.com/jie-think/github_blog_prd/blob/master/img/heard.jpg' />
+        
+    </div>
+    <div class='content'>
+        
+        <div>
+            <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
+            
+                hello word!!
+            
+        </div>
+    </div>
+    
+        <div class="social-wrapper">
+          
+            
+                <a href="qq646958863@163.com" class="social envelope"
+                    target="_blank" rel="external">
+                <i class="fa fa-envelope fa-fw"></i>
+                </a>
+            
+          
+            
+                <a href="https://github.com/jie-think" class="social github"
+                    target="_blank" rel="external">
+                <i class="fa fa-github fa-fw"></i>
+                </a>
+            
+          
+            
+          
+            
+          
+            
+          
+            
+          
+        </div>
+    
+
+</section>
+
+
+  <section class='m_widget categories'>
+<div class='header'><i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;分类</div>
+<div class='content'>
+    
+    <ul class="entry">
+    
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>3</div></a></li>
+    
+    </ul>
+    
+</div>
+</section>
+
+
+  
+<section class="m_widget tagcloud">
+    <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
+    <div class='content'>
+        <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a>
+    </div>
+</section>
+
+
+
+  
+
+
+  
+
+
+  
+    <section class="m_widget toc-wrapper">
+        <div class="header"><i class="fa fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;目录</div>
+        <div class='content'>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ex-helloworld-start"><span class="toc-text">ex helloworld start</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本流程"><span class="toc-text">基本流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-proto-文件"><span class="toc-text">1. proto 文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-service-开发"><span class="toc-text">2. service 开发</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-client-使用-grpc-服务"><span class="toc-text">3. client 使用 grpc 服务</span></a></li></ol></li></ol>
+        </div>
+    </section>
+
+
+
+
+      </aside>
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+  </div>
+  <footer id="footer" class="clearfix">
+    <div class="social-wrapper">
+      
+        
+            <a href="qq646958863@163.com" class="social envelope flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-envelope fa-fw"></i>
+            </a>
+        
+      
+        
+            <a href="https://github.com/jie-think" class="social github flat-box"
+                target="_blank" rel="external">
+            <i class="fa fa-github fa-fw"></i>
+            </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <br>
+    <div>博客内容遵循 <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="licenses">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></div>
+    <div>本站使用 <a href="https://github.com/xaoxuu/hexo-theme-material-x" target="_blank" class="codename">Material-X</a> 作为主题，
+		总访问量为 <span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span> 次。
+    </div>
+
+</footer>
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+  <script>setLoadingBarProgress(80);</script>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src='//cdn.bootcss.com/node-waves/0.7.5/waves.min.js'></script>
+<script src="//cdn.bootcss.com/scrollReveal.js/3.3.2/scrollreveal.min.js"></script>
+<!-- 访问统计 -->
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+var ALGOLIA_API_KEY = "";
+var ALGOLIA_APP_ID = "";
+var ALGOLIA_INDEX_NAME = "";
+var AZURE_SERVICE_NAME = "";
+var AZURE_INDEX_NAME = "";
+var AZURE_QUERY_KEY = "";
+var BAIDU_API_ID = "";
+var SEARCH_SERVICE = "hexo";
+var ROOT = "/"||"/";
+if(!ROOT.endsWith('/'))ROOT += '/';
+</script>
+<script src="/js/search.js"></script>
+<script src="/js/app.js"></script>
+
+
+    
+    
+    
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>
