@@ -150,6 +150,195 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
+            <a href="/2018/08/30/backend/docker/docker_构建最小_go_app/">
+                
+                    docker 构建最小 go app
+                
+            </a>
+        </h2>
+        <time>
+            2018-08-30 Thursday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/backend/">backend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>参考: <a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/" target="_blank" rel="noopener">https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/</a></p>
+<h2 id="写应用"><a href="#写应用" class="headerlink" title="写应用"></a>写应用</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io/ioutil"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    resp, err := http.Get(<span class="string">"http://www.baidu.com"</span>)</span><br><span class="line">    check(err)</span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    check(err)</span><br><span class="line">    fmt.Println(<span class="built_in">len</span>(body))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">check</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        os.Exit(<span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Dockerize"><a href="#Dockerize" class="headerlink" title="Dockerize"></a>Dockerize</h2><p>basic image</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="keyword">onbuild</span></span><br></pre></td></tr></table></figure>
+<p>compile Dockerfile</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:latest </span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir /app </span></span><br><span class="line"><span class="bash">ADD . /app/ </span></span><br><span class="line"><span class="bash">WORKDIR /app </span></span><br><span class="line"><span class="bash">RUN go build -o main . </span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/app/main"</span>]</span></span><br></pre></td></tr></table></figure>
+<p>这个构建出来需要500M</p>
+<p>因为 <code>golang:latest</code> 是从 <code>Debian Jessie</code> 构建出来的, 底层是操作系统, so 导致镜像特别大.</p>
+<h2 id="Compile"><a href="#Compile" class="headerlink" title="Compile!!"></a>Compile!!</h2><ol>
+<li>先编译工程</li>
+<li>构建镜像</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go build -o main .</span><br><span class="line">docker build -t example-scratch:v1 -f Dockerfile.scratch .</span><br></pre></td></tr></table></figure>
+<p>Dockerfile.scratch 内容:<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> main /</span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/main"</span>]</span></span><br></pre></td></tr></table></figure></p>
+<p>这样构建是无法工作的, 原因就在于生产的 main 是需要系统的动态链接库.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it example-scratch:v1</span><br><span class="line">standard_init_linux.go:178: <span class="built_in">exec</span> user process caused <span class="string">"exec format error"</span></span><br></pre></td></tr></table></figure>
+<p>解决方法:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .</span><br></pre></td></tr></table></figure>
+<p>禁用cgo，生产一个静态二进制文件, 我们还将操作系统设置为Linux, -a标志意味着重建我们正在使用的所有软件包，这意味着所有导入都将在cgo禁用的情况下重建。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t example-scratch:v2 -f Dockerfile.scratch .</span><br><span class="line">$ docker run -it example-scratch:v2</span><br><span class="line">  118146 <span class="comment"># it work</span></span><br></pre></td></tr></table></figure>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/docker/"><i class="fa fa-tag fa-fw"></i>&nbsp;docker</a>
+                
+                    <a href="/tags/docker-app/"><i class="fa fa-tag fa-fw"></i>&nbsp;docker app</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
+            <a href="/2018/08/29/frontend/css/basic_1_0_css_position/">
+                
+                    basic css learn - 1. css display grid
+                
+            </a>
+        </h2>
+        <time>
+            2018-08-29 Wednesday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/frontend/">frontend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>参考: <a href="https://atomiks.github.io/30-seconds-of-css/" target="_blank" rel="noopener">https://atomiks.github.io/30-seconds-of-css/</a></p>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/css/"><i class="fa fa-tag fa-fw"></i>&nbsp;css</a>
+                
+                    <a href="/tags/css-grid/"><i class="fa fa-tag fa-fw"></i>&nbsp;css grid</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
+            <a href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/">
+                
+                    Program for Fibonacci numbers
+                
+            </a>
+        </h2>
+        <time>
+            2018-08-29 Wednesday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/alg/">alg</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>来源：<a href="https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/</a></p>
+<p>The Fibonacci numbers are the numbers in the following integer sequence.</p>
+<p>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ……..</p>
+<p>In mathematical terms, the sequence Fn of Fibonacci numbers is defined by the recurrence relation</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fn = Fn-1 + Fn-2</span><br></pre></td></tr></table></figure>
+<p>with seed values</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">F0 = 0 and F1 = 1.</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.geeksforgeeks.org/wp-content/uploads/fibonacci-sequence.png" alt="fibonacci-sequence"></p>
+<p>Given a number n, print n-th Fibonacci Number.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input  : n = 2</span><br><span class="line">Output : 1</span><br><span class="line"></span><br><span class="line">Input  : n = 9</span><br><span class="line">Output : 34</span><br></pre></td></tr></table></figure>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/动态规划/"><i class="fa fa-tag fa-fw"></i>&nbsp;动态规划</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
+            <a href="/2018/08/29/alg/DynamicProgramming/动态规划总结/">
+                
+                    动态规划
+                
+            </a>
+        </h2>
+        <time>
+            2018-08-29 Wednesday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/alg/">alg</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>动态规划求解的一般思路： <br><br>　　判断问题的子结构（也可看作状态），当具有最优子结构时，动态规划可能适用。<br><br>　　求解重叠子问题。一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。分治法则不同，每次递归都产生新的问题。<br><br>　　重新构造一个最优解。<br></p>
+<p><strong>最优子结构?</strong></p>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/动态规划/"><i class="fa fa-tag fa-fw"></i>&nbsp;动态规划</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
             <a href="/2018/08/29/alg/DynamicProgramming/题集/">
                 
                     动态规划题集
@@ -968,94 +1157,6 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
-            <a href="/2018/08/29/alg/DynamicProgramming/动态规划总结/">
-                
-                    动态规划
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/alg/">alg</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <p>动态规划求解的一般思路： <br><br>　　判断问题的子结构（也可看作状态），当具有最优子结构时，动态规划可能适用。<br><br>　　求解重叠子问题。一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。分治法则不同，每次递归都产生新的问题。<br><br>　　重新构造一个最优解。<br></p>
-<p><strong>最优子结构?</strong></p>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/动态规划/"><i class="fa fa-tag fa-fw"></i>&nbsp;动态规划</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/">
-                
-                    Program for Fibonacci numbers
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/alg/">alg</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <p>来源：<a href="https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/</a></p>
-<p>The Fibonacci numbers are the numbers in the following integer sequence.</p>
-<p>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ……..</p>
-<p>In mathematical terms, the sequence Fn of Fibonacci numbers is defined by the recurrence relation</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fn = Fn-1 + Fn-2</span><br></pre></td></tr></table></figure>
-<p>with seed values</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">F0 = 0 and F1 = 1.</span><br></pre></td></tr></table></figure>
-<p><img src="https://www.geeksforgeeks.org/wp-content/uploads/fibonacci-sequence.png" alt="fibonacci-sequence"></p>
-<p>Given a number n, print n-th Fibonacci Number.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input  : n = 2</span><br><span class="line">Output : 1</span><br><span class="line"></span><br><span class="line">Input  : n = 9</span><br><span class="line">Output : 34</span><br></pre></td></tr></table></figure>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/动态规划/"><i class="fa fa-tag fa-fw"></i>&nbsp;动态规划</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
             <a href="/2018/08/29/devops/supervisor_learn/">
                 
                     supervisor 使用
@@ -1371,150 +1472,6 @@
 
         </div>
     
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/">
-                
-                    Zombie T3
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/backend/">backend</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <p>涉及内容：<code>智能协议的所有权</code>，<code>Gas的花费</code>，<code>代码优化</code>，和<code>代码安全</code></p>
-<h2 id="ch1-智能协议的永固性"><a href="#ch1-智能协议的永固性" class="headerlink" title="ch1. 智能协议的永固性"></a>ch1. 智能协议的永固性</h2><p>在你把智能协议传上以太坊之后，它就变得<code>不可更改</code>, 这种永固性意味着你的代码永远不能被调整或更新。</p>
-<p><strong>尽量不要写死代码</strong></p>
-<h2 id="ch2-Ownable-Contracts"><a href="#ch2-Ownable-Contracts" class="headerlink" title="ch2. Ownable Contracts"></a>ch2. Ownable Contracts</h2><p>OpenZeppelin库的Ownable 合约：OpenZeppelin 是主打安保和社区审查的智能合约库，您可以在自己的 DApps中引用。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @title Ownable</span><br><span class="line"> * @dev The Ownable contract has an owner address, and provides basic authorization control</span><br><span class="line"> * functions, this simplifies the implementation of &quot;user permissions&quot;.</span><br><span class="line"> */</span><br><span class="line">contract Ownable &#123;</span><br><span class="line">  address public owner;</span><br><span class="line">  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev The Ownable constructor sets the original `owner` of the contract to the sender</span><br><span class="line">   * account.</span><br><span class="line">   */</span><br><span class="line">  function Ownable() public &#123;</span><br><span class="line">    owner = msg.sender;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Throws if called by any account other than the owner.</span><br><span class="line">   */</span><br><span class="line">  modifier onlyOwner() &#123;</span><br><span class="line">    require(msg.sender == owner);</span><br><span class="line">    _;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Allows the current owner to transfer control of the contract to a newOwner.</span><br><span class="line">   * @param newOwner The address to transfer ownership to.</span><br><span class="line">   */</span><br><span class="line">  function transferOwnership(address newOwner) public onlyOwner &#123;</span><br><span class="line">    require(newOwner != address(0));</span><br><span class="line">    OwnershipTransferred(owner, newOwner);</span><br><span class="line">    owner = newOwner;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>构造函数: <code>function Ownable()</code> 是一个 constructor (构造函数)，构造函数不是必须的，它与合约同名，构造函数一生中唯一的一次执行，就是在合约最初被创建的时候。</p>
-</li>
-<li><p>函数修饰符：<code>modifier onlyOwner()</code> 修饰符跟函数很类似，不过是用来修饰其他已有函数用的， 在其他语句执行前，为它检查下先验条件。<code>_;</code> 类似于 ruby 中的 <code>yield</code></p>
-</li>
-</ul>
-<p>所以<code>Ownable</code>合约基本都会这么干：</p>
-<ol>
-<li>合约创建，构造函数先行，将其 owner 设置为msg.sender（其部署者）</li>
-<li>为它加上一个修饰符 onlyOwner，它会限制陌生人的访问，将访问某些函数的权限锁定在 owner 上。</li>
-<li>允许将合约所有权转让给他人。</li>
-</ol>
-<h2 id="ch4-Gas"><a href="#ch4-Gas" class="headerlink" title="ch4. Gas"></a>ch4. Gas</h2><p><strong>重要概念：</strong> <code>Gas - 驱动以太坊DApps的能源</code></p>
-<p>在 Solidity 中，你的用户想要每次执行你的 DApp 都需要支付一定的 gas，gas 可以用以太币购买，因此，用户每次跑 DApp 都得花费以太币。</p>
-<p>一个 DApp 收取多少 gas 取决于功能逻辑的复杂程度。每个操作背后，都在计算完成这个操作所需要的计算资源，（比如，存储数据就比做个加法运算贵得多）， 一次操作所需要花费的 gas 等于这个操作背后的所有运算花销的总和。</p>
-<p>由于运行你的程序需要花费用户的真金白银，在以太坊中代码的编程语言，比其他任何编程语言都更强调优化。同样的功能，使用笨拙的代码开发的程序，比起经过精巧优化的代码来，运行花费更高，这显然会给成千上万的用户带来大量不必要的开销。</p>
-<h3 id="为什么要用-gas-来驱动？"><a href="#为什么要用-gas-来驱动？" class="headerlink" title="为什么要用 gas 来驱动？"></a>为什么要用 gas 来驱动？</h3><p>以太坊就像一个巨大、缓慢、但非常安全的电脑。当你运行一个程序的时候，网络上的每一个节点都在进行相同的运算，以验证它的输出 —— 这就是所谓的”去中心化“ 由于数以千计的节点同时在验证着每个功能的运行，这可以确保它的数据不会被被监控，或者被刻意修改。</p>
-<p>可能会有用户用无限循环堵塞网络，抑或用密集运算来占用大量的网络资源，为了防止这种事情的发生，以太坊的创建者为以太坊上的资源制定了价格，想要在以太坊上运算或者存储，你需要先付费。</p>
-<h3 id="省-gas-的招数：结构封装-（Struct-packing）"><a href="#省-gas-的招数：结构封装-（Struct-packing）" class="headerlink" title="省 gas 的招数：结构封装 （Struct packing）"></a>省 gas 的招数：结构封装 （Struct packing）</h3><p>在第1课中，我们提到除了基本版的 uint 外，还有其他变种 uint：uint8，uint16，uint32等。</p>
-<p>通常情况下我们不会考虑使用 unit 变种，因为无论如何定义 uint的大小，Solidity 为它保留256位的存储空间。例如，使用 uint8 而不是uint（uint256）不会为你节省任何 gas。</p>
-<p>除非，把 unit 绑定到 struct 里面。</p>
-<p>如果一个 struct 中有多个 uint，则尽可能使用较小的 uint, Solidity 会将这些 uint 打包在一起，从而占用较少的存储空间。例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct NormalStruct &#123;</span><br><span class="line">  uint a;</span><br><span class="line">  uint b;</span><br><span class="line">  uint c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct MiniMe &#123;</span><br><span class="line">  uint32 a;</span><br><span class="line">  uint32 b;</span><br><span class="line">  uint c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>// 因为使用了结构打包，<code>mini</code> 比 <code>normal</code> 占用的空间更少<br>NormalStruct normal = NormalStruct(10, 20, 30);<br>MiniMe mini = MiniMe(10, 20, 30);<br>所以，当 uint 定义在一个 struct 中的时候，尽量使用最小的整数子类型以节约空间。 并且把同样类型的变量放一起（即在 struct 中将把变量按照类型依次放置），这样 Solidity 可以将存储空间最小化。例如，有两个 struct：</p>
-<p>uint c; uint32 a; uint32 b; 和 uint32 a; uint c; uint32 b;</p>
-<p>前者比后者需要的gas更少，因为前者把uint32放一起了。</p>
-<h2 id="ch5-时间单位"><a href="#ch5-时间单位" class="headerlink" title="ch5. 时间单位"></a>ch5. 时间单位</h2><p>Solidity 使用自己的本地时间单位。</p>
-<p>变量 <code>now</code> 将返回当前的unix时间戳（自1970年1月1日以来经过的秒数）。</p>
-<p>Solidity 还包含秒(seconds)，分钟(minutes)，小时(hours)，天(days)，周(weeks) 和 年(years) 等时间单位。它们都会转换成对应的秒数放入 uint 中。所以 1分钟 就是 60，1小时是 3600（60秒×60分钟），1天是86400（24小时×60分钟×60秒），以此类推。</p>
-<p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">uint lastUpdated;</span><br><span class="line"></span><br><span class="line">// 将‘上次更新时间’ 设置为 ‘现在’</span><br><span class="line">function updateTimestamp() public &#123;</span><br><span class="line">  lastUpdated = now;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果到上次`updateTimestamp` 超过5分钟，返回 &apos;true&apos;</span><br><span class="line">// 不到5分钟返回 &apos;false&apos;</span><br><span class="line">function fiveMinutesHavePassed() public view returns (bool) &#123;</span><br><span class="line">  return (now &gt;= (lastUpdated + 5 minutes));</span><br></pre></td></tr></table></figure></p>
-<h2 id="ch6-结构体作为参数传入"><a href="#ch6-结构体作为参数传入" class="headerlink" title="ch6. 结构体作为参数传入"></a>ch6. 结构体作为参数传入</h2><p>由于结构体的存储指针可以以参数的方式传递给一个 private 或 internal 的函数，因此结构体可以在多个函数之间相互传递。</p>
-<p>遵循这样的语法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function _doStuff(Zombie storage _zombie) internal &#123;</span><br><span class="line">  // do stuff with _zombie</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="ch7-公有函数和安全性"><a href="#ch7-公有函数和安全性" class="headerlink" title="ch7. 公有函数和安全性"></a>ch7. 公有函数和安全性</h2><p>你必须仔细地检查所有声明为 public 和 external的函数，一个个排除用户滥用它们的可能，谨防安全漏洞。请记住，如果这些函数没有类似 onlyOwner 这样的函数修饰符，用户能利用各种可能的参数去调用它们。</p>
-<h2 id="ch8-进一步了解函数修饰符"><a href="#ch8-进一步了解函数修饰符" class="headerlink" title="ch8. 进一步了解函数修饰符"></a>ch8. 进一步了解函数修饰符</h2><h3 id="带参数的函数修饰符"><a href="#带参数的函数修饰符" class="headerlink" title="带参数的函数修饰符"></a>带参数的函数修饰符</h3><p>之前我们已经读过一个简单的函数修饰符了：onlyOwner。函数修饰符也可以带参数。例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 存储用户年龄的映射</span><br><span class="line">mapping (uint =&gt; uint) public age;</span><br><span class="line"></span><br><span class="line">// 限定用户年龄的修饰符</span><br><span class="line">modifier olderThan(uint _age, uint _userId) &#123;</span><br><span class="line">  require(age[_userId] &gt;= _age);</span><br><span class="line">  _;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 必须年满16周岁才允许开车 (至少在美国是这样的).</span><br><span class="line">// 我们可以用如下参数调用`olderThan` 修饰符:</span><br><span class="line">function driveCar(uint _userId) public olderThan(16, _userId) &#123;</span><br><span class="line">  // 其余的程序逻辑</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>看到了吧， olderThan 修饰符可以像函数一样接收参数，是“宿主”函数 driveCar 把参数传递给它的修饰符的。</p>
-<h2 id="ch10-利用-‘View’-函数节省-Gas"><a href="#ch10-利用-‘View’-函数节省-Gas" class="headerlink" title="ch10. 利用 ‘View’ 函数节省 Gas"></a>ch10. 利用 ‘View’ 函数节省 Gas</h2><h3 id="“view”-函数不花-“gas”"><a href="#“view”-函数不花-“gas”" class="headerlink" title="“view” 函数不花 “gas”"></a>“view” 函数不花 “gas”</h3><p>当玩家从外部调用一个view函数，是不需要支付一分 gas 的。</p>
-<p>这是因为 view 函数不会真正改变区块链上的任何数据 - <code>它们只是读取</code>。因此用 view 标记一个函数，意味着告诉 web3.js，<code>运行这个函数只需要查询你的本地以太坊节点</code>，而不需要在区块链上创建一个事务（事务需要运行在每个节点上，因此花费 gas）。</p>
-<p>稍后我们将介绍如何在自己的节点上设置 web3.js。但现在，你关键是要记住，在所能只读的函数上标记上表示“只读”的“external view 声明，就能为你的玩家减少在 DApp 中 gas 用量。</p>
-<p>注意：如果一个 view 函数在另一个函数的内部被调用，而调用函数与 view 函数的不属于同一个合约，也会产生调用成本。这是因为如果主调函数在以太坊创建了一个事务，它仍然需要逐个节点去验证。所以标记为 view 的函数只有在外部调用时才是免费的。</p>
-<h2 id="ch11-存储非常昂贵"><a href="#ch11-存储非常昂贵" class="headerlink" title="ch11. 存储非常昂贵"></a>ch11. 存储非常昂贵</h2><p>Solidity 使用storage(存储)是相当昂贵的，”写入“操作尤其贵。</p>
-<p>这是因为，无论是写入还是更改一段数据， 这都将永久性地写入区块链。”永久性“啊！需要在全球数千个节点的硬盘上存入这些数据，随着区块链的增长，拷贝份数更多，存储量也就越大。这是需要成本的！</p>
-<p>为了降低成本，不到万不得已，避免将数据写入存储。这也会导致效率低下的编程逻辑 - 比如每次调用一个函数，都需要在 memory(内存) 中重建一个数组，而不是简单地将上次计算的数组给存储下来以便快速查找。</p>
-<p>在大多数编程语言中，遍历大数据集合都是昂贵的。但是在 Solidity 中，使用一个标记了external view的函数，遍历比 storage 要便宜太多，因为 view 函数不会产生任何花销。 （gas可是真金白银啊！）。</p>
-<p>我们将在下一章讨论for循环，现在我们来看一下看如何如何在内存中声明数组。</p>
-<p>在内存中声明数组<br>在数组后面加上 memory关键字， 表明这个数组是仅仅在内存中创建，不需要写入外部存储，并且在函数调用结束时它就解散了。与在程序结束时把数据保存进 storage 的做法相比，内存运算可以大大节省gas开销 – 把这数组放在view里用，完全不用花钱。</p>
-<p>以下是申明一个内存数组的例子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function getArray() external pure returns(uint[]) &#123;</span><br><span class="line">  // 初始化一个长度为3的内存数组</span><br><span class="line">  uint[] memory values = new uint[](3);</span><br><span class="line">  // 赋值</span><br><span class="line">  values.push(1);</span><br><span class="line">  values.push(2);</span><br><span class="line">  values.push(3);</span><br><span class="line">  // 返回数组</span><br><span class="line">  return values;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个小例子展示了一些语法规则，下一章中，我们将通过一个实际用例，展示它和 for 循环结合的做法。</p>
-<p>注意：内存数组 必须 用长度参数（在本例中为3）创建。目前不支持 array.push()之类的方法调整数组大小，在未来的版本可能会支持长度修改。</p>
-<h2 id="使用-for-循环"><a href="#使用-for-循环" class="headerlink" title="使用 for 循环"></a>使用 for 循环</h2><p>for循环的语法在 Solidity 和 JavaScript 中类似。</p>
-<p>来看一个创建偶数数组的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function getEvens() pure external returns(uint[]) &#123;</span><br><span class="line">  uint[] memory evens = new uint[](5);</span><br><span class="line">  // 在新数组中记录序列号</span><br><span class="line">  uint counter = 0;</span><br><span class="line">  // 在循环从1迭代到10：</span><br><span class="line">  for (uint i = 1; i &lt;= 10; i++) &#123;</span><br><span class="line">    // 如果 `i` 是偶数...</span><br><span class="line">    if (i % 2 == 0) &#123;</span><br><span class="line">      // 把它加入偶数数组</span><br><span class="line">      evens[counter] = i;</span><br><span class="line">      //索引加一， 指向下一个空的‘even’</span><br><span class="line">      counter++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return evens;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这个函数将返回一个形为 [2,4,6,8,10] 的数组。</p>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/blockchain/"><i class="fa fa-tag fa-fw"></i>&nbsp;blockchain</a>
-                
-                    <a href="/tags/智能合约/"><i class="fa fa-tag fa-fw"></i>&nbsp;智能合约</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/08/29/backend/go/redis/redis_start_learn/">
-                
-                    redis ops learn
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/backend/">backend</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <h2 id="连接测试"><a href="#连接测试" class="headerlink" title="连接测试"></a>连接测试</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"github.com/go-redis/redis"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	client := redis.NewClient(&amp;redis.Options&#123;</span><br><span class="line">		Addr: <span class="string">"localhost:6379"</span>,</span><br><span class="line">		Password: <span class="string">""</span>,      <span class="comment">//默认空密码</span></span><br><span class="line">		DB: <span class="number">0</span>,             <span class="comment">//使用默认数据库</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> client.Close()       <span class="comment">//最后关闭</span></span><br><span class="line"></span><br><span class="line">	pong, err := client.Ping().Result()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"Connected result: "</span>, pong)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="ops-strings"><a href="#ops-strings" class="headerlink" title="ops: strings"></a>ops: strings</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ops: strings</span></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">client.Set(<span class="string">"hello"</span>, <span class="string">"hello redis"</span>,<span class="number">0</span>) <span class="comment">//忽略错误</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//// get string</span></span><br><span class="line">str := client.Get(<span class="string">"hello"</span>)</span><br><span class="line">fmt.Println(str)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// del string</span></span><br><span class="line">client.Del(<span class="string">"strtest"</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="ops-lists"><a href="#ops-lists" class="headerlink" title="ops: lists"></a>ops: lists</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ops: lists</span></span><br><span class="line"><span class="comment">//// push</span></span><br><span class="line">client.LPush(<span class="string">"list"</span>,<span class="string">"one"</span>,<span class="string">"two"</span>,<span class="string">"three"</span>) <span class="comment">//rpush则在尾部插入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//// rm, pop</span></span><br><span class="line">client.LRem(<span class="string">"list"</span>,<span class="number">2</span>,<span class="string">"three"</span>) <span class="comment">//删除list中前2个value为 ‘three’的元素</span></span><br><span class="line">client.LPop(<span class="string">"list"</span>) <span class="comment">//删除头部的值，同理RPop删除尾部的值。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// range</span></span><br><span class="line">list, _ := client.LRange(<span class="string">"list"</span>, <span class="number">0</span>, <span class="number">2</span>).Result()</span><br><span class="line">fmt.Println(<span class="string">"List: "</span>, list)</span><br></pre></td></tr></table></figure>
-<h2 id="ops-hashes"><a href="#ops-hashes" class="headerlink" title="ops: hashes"></a>ops: hashes</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hashes</span></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">user := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">user[<span class="string">"name"</span>] = <span class="string">"jim"</span></span><br><span class="line">user[<span class="string">"gender"</span>] = <span class="string">"man"</span></span><br><span class="line">user[<span class="string">"age"</span>] = <span class="number">23</span></span><br><span class="line">client.HMSet(<span class="string">"user"</span>,user)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">client.HSet(<span class="string">"user"</span>, <span class="string">"name"</span>,<span class="string">"tom"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// get</span></span><br><span class="line">name := client.HGet(<span class="string">"user"</span>,<span class="string">"name"</span>)</span><br><span class="line">fmt.Print(name)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// getAll</span></span><br><span class="line">hash, _ := client.HGetAll(<span class="string">"user"</span>).Result()</span><br><span class="line"><span class="keyword">for</span> k, v:= <span class="keyword">range</span> hash&#123;</span><br><span class="line">	fmt.Printf(<span class="string">"key: %v, value: %v "</span>,k, v)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>参考: <a href="https://www.jianshu.com/p/4045a3721b3c" target="_blank" rel="noopener">https://www.jianshu.com/p/4045a3721b3c</a></p>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/go/"><i class="fa fa-tag fa-fw"></i>&nbsp;go</a>
-                
-                    <a href="/tags/redis/"><i class="fa fa-tag fa-fw"></i>&nbsp;redis</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
 </section>
 
 
@@ -1597,13 +1554,13 @@
     
         <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
     
-        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>7</div></a></li>
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>8</div></a></li>
     
         <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
     
-        <li><a class="flat-box" href="/categories/build-your-own-x/"><div class='name'>build-your-own-x</div><div class='badge'>0</div></a></li>
-    
         <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
+    
+        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>1</div></a></li>
     
     </ul>
     
@@ -1615,7 +1572,7 @@
 <section class="m_widget tagcloud">
     <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
     <div class='content'>
-        <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+        <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/css/" style="font-size: 14px; color: #999">css</a> <a href="/tags/css-grid/" style="font-size: 14px; color: #999">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
     </div>
 </section>
 
