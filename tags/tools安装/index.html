@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   
-  <title>Tag: docker | Jie-Think</title>
+  <title>Tag: tools安装 | Jie-Think</title>
   <meta name="description" content="jie blog" />
   <meta name="keywords" content="" />
   <meta name="HandheldFriendly" content="True" />
@@ -15,7 +15,7 @@
   <meta name="description" content="jie blog">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Jie-Think">
-<meta property="og:url" content="http://yoursite.com/tags/docker/index.html">
+<meta property="og:url" content="http://yoursite.com/tags/tools安装/index.html">
 <meta property="og:site_name" content="Jie-Think">
 <meta property="og:description" content="jie blog">
 <meta property="og:locale" content="default">
@@ -138,7 +138,7 @@
       <div class='l_main'>
         
     <script>
-        window.subData= { title:'tag : docker'}
+        window.subData= { title:'tag : tools安装'}
     </script>
 
 
@@ -149,54 +149,29 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
-            <a href="/2018/08/30/backend/docker/docker_构建最小_go_app/">
+            <a href="/2018/08/31/self_doc/个人软件安装记录/">
                 
-                    docker 构建最小 go app
+                    个人软件安装记录(mac osx)
                 
             </a>
         </h2>
         <time>
-            2018-08-30 Thursday
+            2018-08-31 Friday
         </time>
         
-    
-    <div class='cats'>
-        <a href="/categories/backend/">backend</a>
-    </div>
-
 
     </section>
 
     <section class="article typo">
-        <p>参考: <a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/" target="_blank" rel="noopener">https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/</a></p>
-<h2 id="写应用"><a href="#写应用" class="headerlink" title="写应用"></a>写应用</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io/ioutil"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    resp, err := http.Get(<span class="string">"http://www.baidu.com"</span>)</span><br><span class="line">    check(err)</span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    check(err)</span><br><span class="line">    fmt.Println(<span class="built_in">len</span>(body))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">check</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        os.Exit(<span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Dockerize"><a href="#Dockerize" class="headerlink" title="Dockerize"></a>Dockerize</h2><p>basic image</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="keyword">onbuild</span></span><br></pre></td></tr></table></figure>
-<p>compile Dockerfile</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:latest </span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir /app </span></span><br><span class="line"><span class="bash">ADD . /app/ </span></span><br><span class="line"><span class="bash">WORKDIR /app </span></span><br><span class="line"><span class="bash">RUN go build -o main . </span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/app/main"</span>]</span></span><br></pre></td></tr></table></figure>
-<p>这个构建出来需要500M</p>
-<p>因为 <code>golang:latest</code> 是从 <code>Debian Jessie</code> 构建出来的, 底层是操作系统, so 导致镜像特别大.</p>
-<h2 id="Compile"><a href="#Compile" class="headerlink" title="Compile!!"></a>Compile!!</h2><ol>
-<li>先编译工程</li>
-<li>构建镜像</li>
-</ol>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go build -o main .</span><br><span class="line">docker build -t example-scratch:v1 -f Dockerfile.scratch .</span><br></pre></td></tr></table></figure>
-<p>Dockerfile.scratch 内容:<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> main /</span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/main"</span>]</span></span><br></pre></td></tr></table></figure></p>
-<p>这样构建是无法工作的, 原因就在于生产的 main 是需要系统的动态链接库.</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it example-scratch:v1</span><br><span class="line">standard_init_linux.go:178: <span class="built_in">exec</span> user process caused <span class="string">"exec format error"</span></span><br></pre></td></tr></table></figure>
-<p>解决方法:</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .</span><br></pre></td></tr></table></figure>
-<p>禁用cgo，生产一个静态二进制文件, 我们还将操作系统设置为Linux, -a标志意味着重建我们正在使用的所有软件包，这意味着所有导入都将在cgo禁用的情况下重建。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t example-scratch:v2 -f Dockerfile.scratch .</span><br><span class="line">$ docker run -it example-scratch:v2</span><br><span class="line">  118146 <span class="comment"># it work</span></span><br></pre></td></tr></table></figure>
+        <h3 id="tree-install"><a href="#tree-install" class="headerlink" title="tree install"></a>tree install</h3><p>date: 2018-08-29 00:00:00<br>cmd: brew install tree</p>
+<h3 id="apidoc-install"><a href="#apidoc-install" class="headerlink" title="apidoc install"></a>apidoc install</h3><p>date: 2018-08-31 15:56:41<br>cmd: npm install apidoc -g</p>
 
         
 
         
             <div class="full-width auto-padding tags">
                 
-                    <a href="/tags/docker/"><i class="fa fa-tag fa-fw"></i>&nbsp;docker</a>
-                
-                    <a href="/tags/docker-app/"><i class="fa fa-tag fa-fw"></i>&nbsp;docker app</a>
+                    <a href="/tags/tools安装/"><i class="fa fa-tag fa-fw"></i>&nbsp;tools安装</a>
                 
             </div>
         
