@@ -2,15 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   
   <title>Dual pivot Quicksort | Jie-Think</title>
-  <meta name="description" content="jie blog" />
-  <meta name="keywords" content="" />
-  <meta name="HandheldFriendly" content="True" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="shortcut icon" href="/">
-  <link rel="alternate" href="/atom.xml" title="Jie-Think">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="time: 2018-04-27 14:55:52 参考：https://www.geeksforgeeks.org/dual-pivot-quicksort/    The idea of dual pivot quick sort is to take two pivots, one in the left end of the array and the second, in the rig">
 <meta name="keywords" content="sorting">
@@ -26,144 +19,91 @@
 <meta name="twitter:title" content="Dual pivot Quicksort">
 <meta name="twitter:description" content="time: 2018-04-27 14:55:52 参考：https://www.geeksforgeeks.org/dual-pivot-quicksort/    The idea of dual pivot quick sort is to take two pivots, one in the left end of the array and the second, in the rig">
 <meta name="twitter:image" content="http://contribute.geeksforgeeks.org/wp-content/uploads/dual.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
 
-  <link rel="shortcut icon" href="" />
-  <link rel="icon" href="" />
-  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Inconsolata|Titillium+Web" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
-  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href='//cdn.bootcss.com/node-waves/0.7.5/waves.min.css' rel='stylesheet'>
-  <link rel="stylesheet" href="/style.css">
-  <script>
-    function setLoadingBarProgress(num) {
-      document.getElementById('loading-bar').style.width=num+"%";
-    }
-  </script>
 </head>
 
 <body>
-  <div id="loading-bar-wrapper">
-  <div id="loading-bar"></div>
-</div>
-
-
-  <script>setLoadingBarProgress(20)</script>
-  <header class="l_header">
-	<div class='wrapper'>
-		<div class="nav-main container container--flex">
-			<a class="logo flat-box" href='/' >
-				<!-- <i class="fa fa-home"></i> -->
-				Jie-Think
-			</a>
-
-				<div class='menu'>
-					<ul class='h-list'>
-						
-							<li>
-								<a class='flat-box nav-about' href='/'>
-									<i class="fa fa-home fa-fw"></i>
-									主页
-								</a>
-							</li>
-						
-							<li>
-								<a class='flat-box nav-projects' href='https://github.com/jie-think'>
-									<i class="fa fa-cube fa-fw"></i>
-									项目
-								</a>
-							</li>
-						
-							<li>
-								<a class='flat-box nav-archives' href='/archives'>
-									<i class="fa fa-archive fa-fw"></i>
-									归档
-								</a>
-							</li>
-						
-					</ul>
-					<div class='underline'></div>
-				</div>
-
-			
-				<div class="m_search">
-					<form name="searchform" class="form u-search-form">
-						<input type="text" class="input u-search-input" placeholder="Search" />
-						<span class="icon"><i class="fa fa-search fa-fw"></i></span>
-					</form>
-				</div>
-			
-			<ul class='switcher h-list'>
-				
-					<li class='s-search'><a href='javascript:void(0)'><i class="fa fa-search fa-fw"></i></span></a></li>
-				
-				<li class='s-menu'><a href='javascript:void(0)'><i class="fa fa-navicon fa-fw"></i></a></li>
-			</ul>
-		</div>
-
-		<div class='nav-sub container container--flex'>
-			<a class="logo" class="flat-box" href='javascript:void(0)'>
-				xaoxuu
-			</a>
-
-			<ul class='switcher h-list'>
-				<li class='s-comment'><a href='javascript:void(0)'><i class="fa fa-comments fa-fw"></i></a></li>
-				<li class='s-top'><a href='javascript:void(0)'><i class="fa fa-arrow-up fa-fw"></i></a></li>
-				<li class='s-toc'><a href='javascript:void(0)'><i class="fa fa-list-ul fa-fw"></i></a></li>
-			</ul>
-		</div>
-	</div>
-</header>
-	<aside class="menu-phone">
-        <div class="header">Jie-Think</div>
-		<nav>
-			
-				<a href="/" class="nav-about nav">
-					<i class="fa fa-home"></i>
-					主页
-				</a>
-			
-				<a href="https://github.com/jie-think" class="nav-projects nav">
-					<i class="fa fa-cube"></i>
-					项目
-				</a>
-			
-				<a href="/archives" class="nav-archives nav">
-					<i class="fa fa-archive"></i>
-					归档
-				</a>
-			
-		</nav>
-	</aside>
-
-    <script>setLoadingBarProgress(40);</script>
-  <div class="l_body">
-    <div class='container clearfix'>
-      <div class='l_main'>
-        <article id="post-alg/sorting/Dual_pivot_Quicksort" class="post white-box article-type-post" itemscope itemprop="blogPost">
-    <section class='meta'>
-        <h1 class="title">
-            
-                Dual pivot Quicksort
-            
-        </h1>
-        <time>
-            2018-04-27 Friday&nbsp;&nbsp;
-            <i class="fa fa-eye fa-fw" aria-hidden="true"></i>&nbsp;<span id="busuanzi_value_page_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
-        </time>
-        
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
     
-    <div class='cats'>
-        <a href="/categories/alg/">alg</a>
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
     </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">blog</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-alg/sorting/Dual_pivot_Quicksort" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" class="article-date">
+  <time datetime="2018-04-27T06:55:52.000Z" itemprop="datePublished">2018-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Dual pivot Quicksort
+    </h1>
+  
 
-    </section>
-
-    <section class="article typo">
-
-        <div class="article-entry" itemprop="articleBody">
-            <p>time: 2018-04-27 14:55:52</p>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>time: 2018-04-27 14:55:52</p>
 <p>参考：<a href="https://www.geeksforgeeks.org/dual-pivot-quicksort/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/dual-pivot-quicksort/</a></p>
 <blockquote>
 <p>  The idea of dual pivot quick sort is to take two pivots, one in the left end of the array and the second, in the right end of the array. The left pivot must be less than or equal to the right pivot, so we swap them if necessary.</p>
@@ -185,271 +125,227 @@
 </li>
 </ol>
 
-        </div>
-
-        
-            <div class="article-tags tags">
-                
-                    <a href="/tags/sorting/"><i class="fa fa-tag fa-fw" aria-hidden="true"></i>&nbsp;sorting</a>
-                
-            </div>
-        
-
-        
-            <div class="prev-next">
-                
-                    <section class="prev" >
-                        <span class="art-item-left">
-                            <h6><i class="fa fa-chevron-left" aria-hidden="true"></i>&nbsp;上一篇</h6>
-                            <h4>
-                                <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" rel="prev" title="Build a Simple Database - 模块功能概述">
-                                    Build a Simple Database - 模块功能概述
-                                </a>
-                            </h4>
-                            
-                                <div class="tags">
-                                    
-                                        <i class="fa fa-tag fa-fw"></i>database
-                                    
-                                        <i class="fa fa-tag fa-fw"></i>db原理
-                                    
-                                </div>
-                            
-                        </span>
-                    </section>
-                
-                
-            </div>
-        
-
-    </section>
-
-</article>
-
-<br>
-
-<!-- 显示推荐文章和评论 -->
-
-    <article class="post white-box comments">
-        <section class="article typo">
-
-            
-                
-
-    <div class="recommended_posts">
-        <h4><i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>&nbsp;你可能感兴趣的文章</h4>
-        <ul>
-            
-                <li><a href="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a></li>
-            
-                <li><a href="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/">grpc start learn</a></li>
-            
-                <li><a href="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/">goose learn start</a></li>
-            
-                <li><a href="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/">Build a Simple Database - Introduction and Setting up the REPL</a></li>
-            
-                <li><a href="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/">Build a Simple Database - 模块功能概述</a></li>
-            
-        </ul>
+      
     </div>
-    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" data-id="cjlm2wbc4000n9ss674r69ps9" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sorting/">sorting</a></li></ul>
 
-
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
             
-
-            
-
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
                 
-
-                
-
-                
-            
-
-        </section>
-    </article>
-
-
-<script>
-    window.subData = {
-        title: 'Dual pivot Quicksort',
-        tools: true
-    }
-</script>
-
-
-      </div>
-      <aside class='l_side'>
-        
-  <section class='m_widget about'>
-    <div class='header'>
-        
-            <img class='avatar' src='https://github.com/jie-think/github_blog_prd/blob/master/img/heard.jpg' />
-        
-    </div>
-    <div class='content'>
-        
-        <div>
-            <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
-            
-                The only way to learn it is to do it.
-            
-        </div>
-    </div>
-    
-        <div class="social-wrapper">
-          
-            
-                <a href="qq646958863@163.com" class="social envelope"
-                    target="_blank" rel="external">
-                <i class="fa fa-envelope fa-fw"></i>
-                </a>
-            
-          
-            
-                <a href="https://github.com/jie-think" class="social github"
-                    target="_blank" rel="external">
-                <i class="fa fa-github fa-fw"></i>
-                </a>
-            
-          
-            
-          
-            
-          
-            
-          
-            
-          
-        </div>
-    
-
-</section>
-
-
-  <section class='m_widget categories'>
-<div class='header'><i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;分类</div>
-<div class='content'>
-    
-    <ul class="entry">
-    
-        <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
-    
-        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>10</div></a></li>
-    
-        <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
-    
-        <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
-    
-        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>2</div></a></li>
-    
-        <li><a class="flat-box" href="/categories/frontend/learn-notebook/"><div class='name'>learn notebook</div><div class='badge'>1</div></a></li>
-    
-    </ul>
-    
-</div>
-</section>
-
-
-  
-<section class="m_widget tagcloud">
-    <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
-    <div class='content'>
-        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px; color: #999">build tools</a> <a href="/tags/css/" style="font-size: 19px; color: #777">css</a> <a href="/tags/css-grid/" style="font-size: 19px; color: #777">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/markdown/" style="font-size: 14px; color: #999">markdown</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
-    </div>
-</section>
-
-
-
-  
-
-
-  
-
-
-  
-    <section class="m_widget toc-wrapper">
-        <div class="header"><i class="fa fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;目录</div>
-        <div class='content'>
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
-        </div>
-    </section>
-
-
-
-
-      </aside>
-      <script>setLoadingBarProgress(60);</script>
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
     </div>
   </div>
-  <footer id="footer" class="clearfix">
-    <div class="social-wrapper">
+
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Build a Simple Database - 模块功能概述
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
       
-        
-            <a href="qq646958863@163.com" class="social envelope flat-box"
-                target="_blank" rel="external">
-            <i class="fa fa-envelope fa-fw"></i>
-            </a>
-        
       
-        
-            <a href="https://github.com/jie-think" class="social github flat-box"
-                target="_blank" rel="external">
-            <i class="fa fa-github fa-fw"></i>
-            </a>
-        
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
       
-        
-      
-        
-      
-        
-      
-        
-      
-    </div>
-    <br>
-    <div>博客内容遵循 <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="licenses">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></div>
-    <div>本站使用 <a href="https://github.com/xaoxuu/hexo-theme-material-x" target="_blank" class="codename">Material-X</a> 作为主题，
-		总访问量为 <span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span> 次。
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">1.</span> <span class="toc-text">总结</span></a></li></ol>
+          </div>
+      </div>
     </div>
 
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
 </footer>
-<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
-
-
-  <script>setLoadingBarProgress(80);</script>
-  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src='//cdn.bootcss.com/node-waves/0.7.5/waves.min.js'></script>
-<script src="//cdn.bootcss.com/scrollReveal.js/3.3.2/scrollreveal.min.js"></script>
-<!-- 访问统计 -->
-<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-<script src="/js/jquery.fitvids.js"></script>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
 <script>
-var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
-var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
-var ALGOLIA_API_KEY = "";
-var ALGOLIA_APP_ID = "";
-var ALGOLIA_INDEX_NAME = "";
-var AZURE_SERVICE_NAME = "";
-var AZURE_INDEX_NAME = "";
-var AZURE_QUERY_KEY = "";
-var BAIDU_API_ID = "";
-var SEARCH_SERVICE = "hexo";
-var ROOT = "/"||"/";
-if(!ROOT.endsWith('/'))ROOT += '/';
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
 </script>
-<script src="/js/search.js"></script>
-<script src="/js/app.js"></script>
+      
 
-
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
     
-    
-    
+
+  
 
 
-  <script>setLoadingBarProgress(100);</script>
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
 </body>
 </html>
