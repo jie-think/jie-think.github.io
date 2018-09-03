@@ -149,6 +149,66 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
+            <a href="/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/">
+                
+                    Build a Simple Database - Introduction and Setting up the REPL
+                
+            </a>
+        </h2>
+        <time>
+            2018-05-17 Thursday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/build-own-x/">build-own-x</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <h1 id="Part-1-Introduction-and-Setting-up-the-REPL"><a href="#Part-1-Introduction-and-Setting-up-the-REPL" class="headerlink" title="Part 1 - Introduction and Setting up the REPL"></a>Part 1 - Introduction and Setting up the REPL</h1><h1 id="Sqlite"><a href="#Sqlite" class="headerlink" title="Sqlite"></a>Sqlite</h1><p>There’s lots of <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">documentation of sqlite internals</a> on their website, plus I’ve got a copy of <a href="https://play.google.com/store/books/details?id=9Z6IQQnX1JEC" target="_blank" rel="noopener">SQLite Database System: Design and Implementation</a>.</p>
+<p> <img src="https://cstack.github.io/db_tutorial/assets/images/arch1.gif" alt="https://cstack.github.io/db_tutorial/assets/images/arch1.gif"></p>
+<p>sqlite architecture (<a href="https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki" target="_blank" rel="noopener">https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki</a>)</p>
+<p>分成前后端:</p>
+<p>前端部分:</p>
+<ul>
+<li>tokenizer</li>
+<li>parser</li>
+<li>code generator</li>
+</ul>
+<p>后端部分:</p>
+<ul>
+<li>virtual machine</li>
+<li>B-tree</li>
+<li>pager</li>
+<li>os interface</li>
+</ul>
+<p><a href="https://en.wiktionary.org/wiki/a_journey_of_a_thousand_miles_begins_with_a_single_step" target="_blank" rel="noopener">A journey of a thousand miles begins with a single step(千里之行始于足下)</a>, so let’s start with something a little more straightforward: the REPL.</p>
+<p><strong>REPL:</strong> <em>read-execute-print</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~ sqlite3</span><br><span class="line">SQLite version <span class="number">3.16</span><span class="number">.0</span> <span class="number">2016</span><span class="number">-11</span><span class="number">-04</span> <span class="number">19</span>:<span class="number">09</span>:<span class="number">39</span></span><br><span class="line">Enter <span class="string">".help"</span> <span class="keyword">for</span> usage hints.</span><br><span class="line">Connected to a transient in-memory database.</span><br><span class="line">Use <span class="string">".open FILENAME"</span> to reopen on a persistent database.</span><br><span class="line">sqlite&gt; create table users (id int, username varchar(255), email varchar(255));</span><br><span class="line">sqlite&gt; .tables</span><br><span class="line">users</span><br><span class="line">sqlite&gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/database/"><i class="fa fa-tag fa-fw"></i>&nbsp;database</a>
+                
+                    <a href="/tags/db原理/"><i class="fa fa-tag fa-fw"></i>&nbsp;db原理</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
             <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/">
                 
                     Build a Simple Database - 模块功能概述
@@ -216,66 +276,6 @@
 
         </div>
     
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/">
-                
-                    Build a Simple Database - Introduction and Setting up the REPL
-                
-            </a>
-        </h2>
-        <time>
-            2018-05-17 Thursday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/build-own-x/">build-own-x</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <h1 id="Part-1-Introduction-and-Setting-up-the-REPL"><a href="#Part-1-Introduction-and-Setting-up-the-REPL" class="headerlink" title="Part 1 - Introduction and Setting up the REPL"></a>Part 1 - Introduction and Setting up the REPL</h1><h1 id="Sqlite"><a href="#Sqlite" class="headerlink" title="Sqlite"></a>Sqlite</h1><p>There’s lots of <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">documentation of sqlite internals</a> on their website, plus I’ve got a copy of <a href="https://play.google.com/store/books/details?id=9Z6IQQnX1JEC" target="_blank" rel="noopener">SQLite Database System: Design and Implementation</a>.</p>
-<p> <img src="https://cstack.github.io/db_tutorial/assets/images/arch1.gif" alt="https://cstack.github.io/db_tutorial/assets/images/arch1.gif"></p>
-<p>sqlite architecture (<a href="https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki" target="_blank" rel="noopener">https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki</a>)</p>
-<p>分成前后端:</p>
-<p>前端部分:</p>
-<ul>
-<li>tokenizer</li>
-<li>parser</li>
-<li>code generator</li>
-</ul>
-<p>后端部分:</p>
-<ul>
-<li>virtual machine</li>
-<li>B-tree</li>
-<li>pager</li>
-<li>os interface</li>
-</ul>
-<p><a href="https://en.wiktionary.org/wiki/a_journey_of_a_thousand_miles_begins_with_a_single_step" target="_blank" rel="noopener">A journey of a thousand miles begins with a single step(千里之行始于足下)</a>, so let’s start with something a little more straightforward: the REPL.</p>
-<p><strong>REPL:</strong> <em>read-execute-print</em></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~ sqlite3</span><br><span class="line">SQLite version <span class="number">3.16</span><span class="number">.0</span> <span class="number">2016</span><span class="number">-11</span><span class="number">-04</span> <span class="number">19</span>:<span class="number">09</span>:<span class="number">39</span></span><br><span class="line">Enter <span class="string">".help"</span> <span class="keyword">for</span> usage hints.</span><br><span class="line">Connected to a transient in-memory database.</span><br><span class="line">Use <span class="string">".open FILENAME"</span> to reopen on a persistent database.</span><br><span class="line">sqlite&gt; create table users (id int, username varchar(255), email varchar(255));</span><br><span class="line">sqlite&gt; .tables</span><br><span class="line">users</span><br><span class="line">sqlite&gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/database/"><i class="fa fa-tag fa-fw"></i>&nbsp;database</a>
-                
-                    <a href="/tags/db原理/"><i class="fa fa-tag fa-fw"></i>&nbsp;db原理</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
 </section>
 
 
@@ -294,7 +294,7 @@
         <div>
             <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
             
-                hello word!!
+                The only way to learn it is to do it.
             
         </div>
     </div>
@@ -337,15 +337,15 @@
     
         <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
     
-        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>8</div></a></li>
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>10</div></a></li>
     
         <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
     
         <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
     
-        <li><a class="flat-box" href="/categories/doc/"><div class='name'>doc</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>2</div></a></li>
     
-        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/learn-notebook/"><div class='name'>learn notebook</div><div class='badge'>1</div></a></li>
     
     </ul>
     
@@ -357,7 +357,7 @@
 <section class="m_widget tagcloud">
     <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
     <div class='content'>
-        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/css/" style="font-size: 14px; color: #999">css</a> <a href="/tags/css-grid/" style="font-size: 14px; color: #999">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px; color: #999">build tools</a> <a href="/tags/css/" style="font-size: 19px; color: #777">css</a> <a href="/tags/css-grid/" style="font-size: 19px; color: #777">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/markdown/" style="font-size: 14px; color: #999">markdown</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
     </div>
 </section>
 

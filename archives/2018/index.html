@@ -150,7 +150,153 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
-            <a href="/2018/08/31/backend/apidoc_start_learn/">
+            <a href="/2018/09/02/frontend/css/grid_learn/learn_css_grid/">
+                
+                    Learn CSS Grid
+                
+            </a>
+        </h2>
+        <time>
+            2018-09-02 Sunday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/frontend/">frontend</a>, <a href="/categories/frontend/learn-notebook/">learn notebook</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>视频教程推荐(建议先看一些基础概念): <a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a><br>简单教程: <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a><br>详细教程: <a href="https://learncssgrid.com/" target="_blank" rel="noopener">https://learncssgrid.com/</a></p>
+<p>该内容主要来自:<br><a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a> and <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a></p>
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*Oc88rInEcNuY-xCN3e1iPQ.png" alt="目标结构"></p>
+<h2 id="重要术语解释"><a href="#重要术语解释" class="headerlink" title="重要术语解释"></a>重要术语解释</h2><p>参考: <a href="https://www.jianshu.com/p/d183265a8dad" target="_blank" rel="noopener">https://www.jianshu.com/p/d183265a8dad</a></p>
+<ol>
+<li><p>网格容器（Grid Container）<br>元素应用display:grid，它是其所有网格项的父元素。下面例子container就是网格容器。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-3"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>网格项（Grid Item）</p>
+</li>
+</ol>
+<p>网格容器的子元素，下面的item元素是网格项，但sub-item不是。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span> </span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"sub-item"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<ol start="3">
+<li>网格线（Grid Line）</li>
+</ol>
+<p>组成网格线的分界线。它们可以是列网格线（column grid lines），也可以是行网格线（row grid lines）并且居于行或列的任意一侧，下面黄色线就是列网格线。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-294354d5cb39077a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="grid lines"></p>
+<ol start="4">
+<li><p>网格轨道（Grid Track）<br>两个相邻的网格线之间为网格轨道。你可以认为它们是网格的列或行，下面在第二个和第三个网格线之间的黄色部分为网格轨道。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-6fd45c7949a3f29b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Track"></p>
+</li>
+<li><p>网格单元（Grid Cell）<br>两个相邻的列网格线和两个相邻的行网格线组成的是网格单元，它是最小的网格单元。下面行网格线1（row grid lines 1）、行网格线2（row grid lines 2）和列网格线2（column grid lines 2）、列网格线3（column grid lines 3）组成的黄色区域为网格单元。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-5feacaa8175909c7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Cell"></p>
+</li>
+<li><p>网格区（Grid Area）<br>网格区是由任意数量网格单元组成，下面行网格线1（row grid lines 1）、行网格线3（row grid lines 3）和列网格线1（column grid lines 1）、列网格线3（column grid lines3）组成的黄色区域为网格区。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-2a62922e76f77c3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Area"></p>
+</li>
+</ol>
+<h2 id="第一个-grid-布局"><a href="#第一个-grid-布局" class="headerlink" title="第一个 grid 布局"></a>第一个 grid 布局</h2><blockquote>
+<p>The two core ingredients of a CSS Grid are the wrapper (parent) and the items (children). The wrapper is the actual grid and the items are the content inside the grid.<br>CSS Grid的两个核心组成部分是包装器（父）和项（子）。 包装器是实际网格，项目是网格内的内容。</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"wrapper"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>4<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>5<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>6<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>result:<br><img src="https://cdn-images-1.medium.com/max/1600/1*vTY7C5FMIp8OLkjrgp-vBg.png" alt="first grid layout result"></p>
+<h2 id="Columns-and-rows"><a href="#Columns-and-rows" class="headerlink" title="Columns and rows"></a>Columns and rows</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">100px</span> <span class="number">100px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">50px</span> <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*fJNIdDiScjhI9CZjdxv3Eg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">200px</span> <span class="number">50px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">100px</span> <span class="number">30px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*M9WbiVEFcseUCW6qeG4lSQ.png" alt=""></p>
+<h2 id="items"><a href="#items" class="headerlink" title="items"></a>items</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column-start</span>: <span class="number">1</span>;</span><br><span class="line">    <span class="attribute">grid-column-end</span>: <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*he7CoAzdQB3sei_WpHOtNg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column</span>: <span class="number">1</span> / <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*l-adYpQCGve7W6DWY949pw.png" alt=""></p>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/css/"><i class="fa fa-tag fa-fw"></i>&nbsp;css</a>
+                
+                    <a href="/tags/css-grid/"><i class="fa fa-tag fa-fw"></i>&nbsp;css grid</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
+            <a href="/2018/09/01/backend/tools/markfile_start_learn/">
+                
+                    markfile start learn
+                
+            </a>
+        </h2>
+        <time>
+            2018-09-01 Saturday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/backend/">backend</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>参考: <a href="https://www.cnblogs.com/wang_yb/p/3990952.html" target="_blank" rel="noopener">https://www.cnblogs.com/wang_yb/p/3990952.html</a></p>
+<h2 id="Makefile-简介"><a href="#Makefile-简介" class="headerlink" title="Makefile 简介"></a>Makefile 简介</h2><p>Makefile 是和 make 命令一起配合使用的.</p>
+<p>很多大型项目的编译都是通过 Makefile 来组织的, 如果没有 Makefile, 那很多项目中各种库和代码之间的依赖关系不知会多复杂.</p>
+<p>Makefile的组织流程的能力如此之强, 不仅可以用来编译项目, 还可以用来组织我们平时的一些日常操作. 这个需要大家发挥自己的想象力.</p>
+<h3 id="Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释"><a href="#Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释" class="headerlink" title="Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)"></a>Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)</h3><p>Makefile基本格式如下:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">target ... : prerequisites ...</span><br><span class="line">    command</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>其中,</p>
+<ul>
+<li>target        - 目标文件, 可以是 Object File, 也可以是可执行文件</li>
+<li>prerequisites - 生成 target 所需要的文件或者目标</li>
+<li>command       - make需要执行的命令 (任意的shell命令), Makefile中的命令必须以 <code>[tab] 开头</code></li>
+</ul>
+<ol>
+<li>显示规则 :: 说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)</li>
+<li>隐晦规则 :: make的自动推导功能所执行的规则</li>
+<li>变量定义 :: Makefile中定义的变量</li>
+<li>文件指示 :: Makefile中引用其他Makefile; 指定Makefile中有效部分; 定义一个多行命令</li>
+<li>注释     :: Makefile只有行注释 “#”, 如果要使用或者输出”#”字符, 需要进行转义, “#“</li>
+</ol>
+<h3 id="1-2-GNU-make-的工作方式"><a href="#1-2-GNU-make-的工作方式" class="headerlink" title="1.2 GNU make 的工作方式"></a>1.2 GNU make 的工作方式</h3><ol>
+<li>读入主Makefile (主Makefile中可以引用其他Makefile)</li>
+<li>读入被include的其他Makefile</li>
+<li>初始化文件中的变量</li>
+<li>推导隐晦规则, 并分析所有规则</li>
+<li>为所有的目标文件创建依赖关系链</li>
+<li>根据依赖关系, 决定哪些目标要重新生成</li>
+<li>执行生成命令</li>
+</ol>
+<h2 id="实例解析"><a href="#实例解析" class="headerlink" title="实例解析"></a>实例解析</h2>
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/markdown/"><i class="fa fa-tag fa-fw"></i>&nbsp;markdown</a>
+                
+                    <a href="/tags/build-tools/"><i class="fa fa-tag fa-fw"></i>&nbsp;build tools</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
+            <a href="/2018/08/31/backend/tools/apidoc_start_learn/">
                 
                     apidoc start learn
                 
@@ -162,7 +308,7 @@
         
     
     <div class='cats'>
-        <a href="/categories/doc/">doc</a>
+        <a href="/categories/backend/">backend</a>
     </div>
 
 
@@ -1364,152 +1510,6 @@
 
         </div>
     
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/08/29/backend/java/Lombok原理分析与功能实现/">
-                
-                    Lombok原理分析与功能实现
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/backend/">backend</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <p>参考：<a href="https://blog.mythsman.com/2017/12/19/1/" target="_blank" rel="noopener">https://blog.mythsman.com/2017/12/19/1/</a></p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
-<li>定义编译期的注解</li>
-<li>利用JSR269 api(Pluggable Annotation Processing API )创建编译期的注解处理器</li>
-<li>利用tools.jar的javac api处理AST(抽象语法树)</li>
-<li>将功能注册进jar包</li>
-</ol>
-<h2 id="基础点"><a href="#基础点" class="headerlink" title="基础点"></a>基础点</h2><ol>
-<li>注解</li>
-<li>JSR269 api</li>
-<li>javac api处理AST</li>
-</ol>
-<h2 id="手撸Getter"><a href="#手撸Getter" class="headerlink" title="手撸Getter"></a>手撸Getter</h2><p>实验的目的是自定义一个针对类的Getter注解，它能够读取该类的成员方法并自动生成getter方法。</p>
-<h3 id="创建Getter注解"><a href="#创建Getter注解" class="headerlink" title="创建Getter注解"></a>创建Getter注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.lombokLearn;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.ElementType;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.RetentionPolicy;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Getter &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="创建Getter注解的处理器"><a href="#创建Getter注解的处理器" class="headerlink" title="创建Getter注解的处理器"></a>创建Getter注解的处理器</h3><h4 id="基本框架"><a href="#基本框架" class="headerlink" title="基本框架"></a>基本框架</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.lombokLearn;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.processing.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.SourceVersion;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.element.TypeElement;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="meta">@SupportedAnnotationTypes</span>(<span class="string">"laboratory.lombokLearn.Getter"</span>)</span><br><span class="line"><span class="meta">@SupportedSourceVersion</span>(SourceVersion.RELEASE_8)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetterProcessor</span> <span class="keyword">extends</span> <span class="title">AbstractProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后需要着重实现两个方法，init跟process。init的主要用途是通过ProcessingEnvironment来获取编译阶段的一些环境信息;process主要是实现具体逻辑的地方，也就是对AST进行处理的地方。</p>
-<h4 id="init-方法"><a href="#init-方法" class="headerlink" title="init 方法"></a>init 方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Messager messager;</span><br><span class="line"><span class="keyword">private</span> JavacTrees trees;</span><br><span class="line"><span class="keyword">private</span> TreeMaker treeMaker;</span><br><span class="line"><span class="keyword">private</span> Names names;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">    <span class="keyword">this</span>.messager = processingEnv.getMessager();</span><br><span class="line">    <span class="keyword">this</span>.trees = JavacTrees.instance(processingEnv);</span><br><span class="line">    Context context = ((JavacProcessingEnvironment) processingEnv).getContext();</span><br><span class="line">    <span class="keyword">this</span>.treeMaker = TreeMaker.instance(context);</span><br><span class="line">    <span class="keyword">this</span>.names = Names.instance(context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>Messager主要是用来在编译期打log用的</li>
-<li>JavacTrees提供了待处理的抽象语法树</li>
-<li>TreeMaker封装了创建AST节点的一些方法</li>
-<li>Names提供了创建标识符的方法</li>
-</ol>
-<h4 id="PROCESS方法"><a href="#PROCESS方法" class="headerlink" title="PROCESS方法"></a>PROCESS方法</h4><p>步骤大概是下面这样：</p>
-<ol>
-<li>利用roundEnv的getElementsAnnotatedWith方法过滤出被Getter这个注解标记的类，并存入set</li>
-<li>遍历这个set里的每一个元素，并生成jCTree这个语法树</li>
-<li>创建一个TreeTranslator，并重写其中的visitClassDef方法，这个方法处理遍历语法树得到的类定义部分jcClassDecl<blockquote>
-<p>创建一个jcVariableDeclList保存类的成员变量<br>遍历jcTree的所有成员(包括成员变量和成员函数和构造函数)，过滤出其中的成员变量，并添加进jcVariableDeclList<br>将jcVariableDeclList的所有变量转换成需要添加的getter方法，并添加进jcClassDecl的成员中<br>调用默认的遍历方法遍历处理后的jcClassDecl</p>
-</blockquote>
-</li>
-<li>利用上面的TreeTranslator去处理jcTree</li>
-</ol>
-<h2 id="summary-answer-question"><a href="#summary-answer-question" class="headerlink" title="summary (answer question)"></a>summary (answer question)</h2><h3 id="1-注解的理解"><a href="#1-注解的理解" class="headerlink" title="1. 注解的理解"></a>1. 注解的理解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br></pre></td></tr></table></figure>
-<p>这个是编译时运行的注解，其实我更加想知道运行时的注解，如何运作的。</p>
-<h3 id="2-JSR269-api-是啥？"><a href="#2-JSR269-api-是啥？" class="headerlink" title="2. JSR269 api 是啥？"></a>2. JSR269 api 是啥？</h3><p>Pluggable Annotation Processing API（注解处理器）</p>
-<h3 id="3-AST-what？"><a href="#3-AST-what？" class="headerlink" title="3. AST what？"></a>3. AST what？</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> JavacTrees trees;</span><br></pre></td></tr></table></figure>
-<p>这个就是语法树</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcTree.accept(）</span><br></pre></td></tr></table></figure>
-<p>为类增加方法</p>
-<h3 id="运行时的注解"><a href="#运行时的注解" class="headerlink" title="运行时的注解"></a>运行时的注解</h3><p>我研究一下<code>@Cacheable</code>注解吧</p>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/java/"><i class="fa fa-tag fa-fw"></i>&nbsp;java</a>
-                
-                    <a href="/tags/lombok/"><i class="fa fa-tag fa-fw"></i>&nbsp;lombok</a>
-                
-                    <a href="/tags/原理/"><i class="fa fa-tag fa-fw"></i>&nbsp;原理</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
-        <div class='post-wrapper'>
-            <article class="post reveal">
-    <section class="meta">
-        <h2 class="title">
-            <a href="/2018/08/29/backend/java/spring_aop/">
-                
-                    spring aop 切向编程
-                
-            </a>
-        </h2>
-        <time>
-            2018-08-29 Wednesday
-        </time>
-        
-    
-    <div class='cats'>
-        <a href="/categories/backend/">backend</a>
-    </div>
-
-
-    </section>
-
-    <section class="article typo">
-        <h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><ol>
-<li>什么是切向编程？</li>
-<li>切向编程的好处</li>
-<li>spring aop的使用</li>
-<li>spring中类似于<code>@Cacheable</code>的实现</li>
-</ol>
-<p>重点讲3和4</p>
-<h2 id="什么是切向编程？"><a href="#什么是切向编程？" class="headerlink" title="什么是切向编程？"></a>什么是切向编程？</h2><p>自己的理解：<code>在一个方法前后执行某段特定功能的代码</code></p>
-<h2 id="切向编程的好处"><a href="#切向编程的好处" class="headerlink" title="切向编程的好处"></a>切向编程的好处</h2><p>举两个例子：</p>
-<ol>
-<li>web应用中，需要打印接口传入的params and return result，就需要在接口前后加上log。</li>
-<li>将数据库查询出的数据缓存到redis中（类似于<code>@Cacheable</code>）。</li>
-</ol>
-<h2 id="spring-aop的使用"><a href="#spring-aop的使用" class="headerlink" title="spring aop的使用"></a>spring aop的使用</h2><p>关键点：</p>
-<ol>
-<li>声明切面类，使用<code>@Aspect</code>并将类注册到IOC容器中<code>@Component</code></li>
-<li>定义切点：<code>@Pointcut(&quot;execution(public * laboratory.controller..*.*(..))&quot;)</code></li>
-<li>定义执行方法：<code>@Before(&quot;webLog()&quot;)</code></li>
-</ol>
-<h3 id="切点类型"><a href="#切点类型" class="headerlink" title="切点类型"></a>切点类型</h3><p><code>@Pointcut(value = &quot;&quot;)</code><br>value的类型：<br>TOTO: 总结value类型</p>
-<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><p><strong>WebLogAspect：</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.aop;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.JoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.AfterReturning;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Before;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.ServletRequestAttributes;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Aspect</span>    <span class="comment">// 1. 声明切面类</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebLogAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"execution(public * laboratory.controller..*.*(..))"</span>) <span class="comment">// 2. 定义切点</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">webLog</span><span class="params">()</span></span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span>(<span class="string">"webLog()"</span>)  <span class="comment">// 3. 定义执行方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doBefore</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 接收到请求，记录请求内容</span></span><br><span class="line">        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();</span><br><span class="line">        HttpServletRequest request =  attributes.getRequest();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 记录下请求内容</span></span><br><span class="line"><span class="comment">//        logger.info("URL : " + request.getRequestURL().toString());</span></span><br><span class="line"><span class="comment">//        logger.info("HTTP_METHOD : " + request.getMethod());</span></span><br><span class="line"><span class="comment">//        logger.info("IP : " + request.getRemoteAddr());</span></span><br><span class="line"><span class="comment">//        logger.info("CLASS_METHOD : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());</span></span><br><span class="line"><span class="comment">//        logger.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@AfterReturning</span>(returning = <span class="string">"ret"</span>, pointcut = <span class="string">"webLog()"</span>)  <span class="comment">//3. 定义执行方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAfterReturning</span><span class="params">(Object ret)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"resp: "</span> + JSON.toJSONString(ret));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>FirstCache:</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.aop;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> laboratory.annotation.FirstCacheAno;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Around;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.reflect.MethodSignature;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FirstCache</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"@annotation(laboratory.annotation.FirstCacheAno)"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">firstCache</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around</span>(<span class="string">"firstCache()"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">aroundFirstCache</span><span class="params">(ProceedingJoinPoint proceedingJoinPoint)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"aroundFirstCache after...."</span>);</span><br><span class="line">        MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();</span><br><span class="line">        FirstCacheAno firstCache = signature.getMethod().getAnnotation(FirstCacheAno.class);</span><br><span class="line">        System.out.println(<span class="string">"firstCache cacheName: "</span> + firstCache.cacheName());</span><br><span class="line">        System.out.println(<span class="string">"firstCache unless: "</span> + firstCache.unless());</span><br><span class="line">        Object ret = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ret = proceedingJoinPoint.proceed();</span><br><span class="line">            System.out.println(ret);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable throwable) &#123;</span><br><span class="line">            throwable.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"aroundFirstCache end...."</span>);</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-        
-
-        
-            <div class="full-width auto-padding tags">
-                
-                    <a href="/tags/java/"><i class="fa fa-tag fa-fw"></i>&nbsp;java</a>
-                
-                    <a href="/tags/spring-aop/"><i class="fa fa-tag fa-fw"></i>&nbsp;spring aop</a>
-                
-            </div>
-        
-    </section>
-</article>
-
-        </div>
-    
 </section>
 
 
@@ -1518,7 +1518,7 @@
         <div class="prev-next">
             
             <p class="current">
-                1 / 2
+                1 / 3
             </p>
             
                 <a class="next" rel="next" href="/archives/2018/page/2/">
@@ -1549,7 +1549,7 @@
         <div>
             <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
             
-                hello word!!
+                The only way to learn it is to do it.
             
         </div>
     </div>
@@ -1592,15 +1592,15 @@
     
         <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
     
-        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>8</div></a></li>
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>10</div></a></li>
     
         <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
     
         <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
     
-        <li><a class="flat-box" href="/categories/doc/"><div class='name'>doc</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>2</div></a></li>
     
-        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/learn-notebook/"><div class='name'>learn notebook</div><div class='badge'>1</div></a></li>
     
     </ul>
     
@@ -1612,7 +1612,7 @@
 <section class="m_widget tagcloud">
     <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
     <div class='content'>
-        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/css/" style="font-size: 14px; color: #999">css</a> <a href="/tags/css-grid/" style="font-size: 14px; color: #999">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px; color: #999">build tools</a> <a href="/tags/css/" style="font-size: 19px; color: #777">css</a> <a href="/tags/css-grid/" style="font-size: 19px; color: #777">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/markdown/" style="font-size: 14px; color: #999">markdown</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
     </div>
 </section>
 

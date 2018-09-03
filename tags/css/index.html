@@ -149,6 +149,84 @@
             <article class="post reveal">
     <section class="meta">
         <h2 class="title">
+            <a href="/2018/09/02/frontend/css/grid_learn/learn_css_grid/">
+                
+                    Learn CSS Grid
+                
+            </a>
+        </h2>
+        <time>
+            2018-09-02 Sunday
+        </time>
+        
+    
+    <div class='cats'>
+        <a href="/categories/frontend/">frontend</a>, <a href="/categories/frontend/learn-notebook/">learn notebook</a>
+    </div>
+
+
+    </section>
+
+    <section class="article typo">
+        <p>视频教程推荐(建议先看一些基础概念): <a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a><br>简单教程: <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a><br>详细教程: <a href="https://learncssgrid.com/" target="_blank" rel="noopener">https://learncssgrid.com/</a></p>
+<p>该内容主要来自:<br><a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a> and <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a></p>
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*Oc88rInEcNuY-xCN3e1iPQ.png" alt="目标结构"></p>
+<h2 id="重要术语解释"><a href="#重要术语解释" class="headerlink" title="重要术语解释"></a>重要术语解释</h2><p>参考: <a href="https://www.jianshu.com/p/d183265a8dad" target="_blank" rel="noopener">https://www.jianshu.com/p/d183265a8dad</a></p>
+<ol>
+<li><p>网格容器（Grid Container）<br>元素应用display:grid，它是其所有网格项的父元素。下面例子container就是网格容器。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-3"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>网格项（Grid Item）</p>
+</li>
+</ol>
+<p>网格容器的子元素，下面的item元素是网格项，但sub-item不是。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span> </span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"sub-item"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<ol start="3">
+<li>网格线（Grid Line）</li>
+</ol>
+<p>组成网格线的分界线。它们可以是列网格线（column grid lines），也可以是行网格线（row grid lines）并且居于行或列的任意一侧，下面黄色线就是列网格线。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-294354d5cb39077a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="grid lines"></p>
+<ol start="4">
+<li><p>网格轨道（Grid Track）<br>两个相邻的网格线之间为网格轨道。你可以认为它们是网格的列或行，下面在第二个和第三个网格线之间的黄色部分为网格轨道。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-6fd45c7949a3f29b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Track"></p>
+</li>
+<li><p>网格单元（Grid Cell）<br>两个相邻的列网格线和两个相邻的行网格线组成的是网格单元，它是最小的网格单元。下面行网格线1（row grid lines 1）、行网格线2（row grid lines 2）和列网格线2（column grid lines 2）、列网格线3（column grid lines 3）组成的黄色区域为网格单元。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-5feacaa8175909c7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Cell"></p>
+</li>
+<li><p>网格区（Grid Area）<br>网格区是由任意数量网格单元组成，下面行网格线1（row grid lines 1）、行网格线3（row grid lines 3）和列网格线1（column grid lines 1）、列网格线3（column grid lines3）组成的黄色区域为网格区。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-2a62922e76f77c3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Area"></p>
+</li>
+</ol>
+<h2 id="第一个-grid-布局"><a href="#第一个-grid-布局" class="headerlink" title="第一个 grid 布局"></a>第一个 grid 布局</h2><blockquote>
+<p>The two core ingredients of a CSS Grid are the wrapper (parent) and the items (children). The wrapper is the actual grid and the items are the content inside the grid.<br>CSS Grid的两个核心组成部分是包装器（父）和项（子）。 包装器是实际网格，项目是网格内的内容。</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"wrapper"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>4<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>5<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>6<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>result:<br><img src="https://cdn-images-1.medium.com/max/1600/1*vTY7C5FMIp8OLkjrgp-vBg.png" alt="first grid layout result"></p>
+<h2 id="Columns-and-rows"><a href="#Columns-and-rows" class="headerlink" title="Columns and rows"></a>Columns and rows</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">100px</span> <span class="number">100px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">50px</span> <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*fJNIdDiScjhI9CZjdxv3Eg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">200px</span> <span class="number">50px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">100px</span> <span class="number">30px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*M9WbiVEFcseUCW6qeG4lSQ.png" alt=""></p>
+<h2 id="items"><a href="#items" class="headerlink" title="items"></a>items</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column-start</span>: <span class="number">1</span>;</span><br><span class="line">    <span class="attribute">grid-column-end</span>: <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*he7CoAzdQB3sei_WpHOtNg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column</span>: <span class="number">1</span> / <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*l-adYpQCGve7W6DWY949pw.png" alt=""></p>
+
+        
+
+        
+            <div class="full-width auto-padding tags">
+                
+                    <a href="/tags/css/"><i class="fa fa-tag fa-fw"></i>&nbsp;css</a>
+                
+                    <a href="/tags/css-grid/"><i class="fa fa-tag fa-fw"></i>&nbsp;css grid</a>
+                
+            </div>
+        
+    </section>
+</article>
+
+        </div>
+    
+        <div class='post-wrapper'>
+            <article class="post reveal">
+    <section class="meta">
+        <h2 class="title">
             <a href="/2018/08/29/frontend/css/basic_1_0_css_position/">
                 
                     basic css learn - 1. css display grid
@@ -204,7 +282,7 @@
         <div>
             <i class="fa fa-quote-left fa-3x fa-pull-left" aria-hidden="true"></i>
             
-                hello word!!
+                The only way to learn it is to do it.
             
         </div>
     </div>
@@ -247,15 +325,15 @@
     
         <li><a class="flat-box" href="/categories/alg/"><div class='name'>alg</div><div class='badge'>4</div></a></li>
     
-        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>8</div></a></li>
+        <li><a class="flat-box" href="/categories/backend/"><div class='name'>backend</div><div class='badge'>10</div></a></li>
     
         <li><a class="flat-box" href="/categories/build-own-x/"><div class='name'>build-own-x</div><div class='badge'>2</div></a></li>
     
         <li><a class="flat-box" href="/categories/devops/"><div class='name'>devops</div><div class='badge'>1</div></a></li>
     
-        <li><a class="flat-box" href="/categories/doc/"><div class='name'>doc</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>2</div></a></li>
     
-        <li><a class="flat-box" href="/categories/frontend/"><div class='name'>frontend</div><div class='badge'>1</div></a></li>
+        <li><a class="flat-box" href="/categories/frontend/learn-notebook/"><div class='name'>learn notebook</div><div class='badge'>1</div></a></li>
     
     </ul>
     
@@ -267,7 +345,7 @@
 <section class="m_widget tagcloud">
     <div class="header"><i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;标签</div>
     <div class='content'>
-        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/css/" style="font-size: 14px; color: #999">css</a> <a href="/tags/css-grid/" style="font-size: 14px; color: #999">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
+        <a href="/tags/apidoc/" style="font-size: 14px; color: #999">apidoc</a> <a href="/tags/blockchain/" style="font-size: 19px; color: #777">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px; color: #999">build tools</a> <a href="/tags/css/" style="font-size: 19px; color: #777">css</a> <a href="/tags/css-grid/" style="font-size: 19px; color: #777">css grid</a> <a href="/tags/database/" style="font-size: 19px; color: #777">database</a> <a href="/tags/db原理/" style="font-size: 19px; color: #777">db原理</a> <a href="/tags/docker/" style="font-size: 14px; color: #999">docker</a> <a href="/tags/docker-app/" style="font-size: 14px; color: #999">docker app</a> <a href="/tags/go/" style="font-size: 24px; color: #555">go</a> <a href="/tags/goose/" style="font-size: 14px; color: #999">goose</a> <a href="/tags/grpc/" style="font-size: 14px; color: #999">grpc</a> <a href="/tags/java/" style="font-size: 19px; color: #777">java</a> <a href="/tags/learn/" style="font-size: 14px; color: #999">learn</a> <a href="/tags/lombok/" style="font-size: 14px; color: #999">lombok</a> <a href="/tags/markdown/" style="font-size: 14px; color: #999">markdown</a> <a href="/tags/redis/" style="font-size: 14px; color: #999">redis</a> <a href="/tags/sorting/" style="font-size: 14px; color: #999">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px; color: #999">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px; color: #999">supervisor</a> <a href="/tags/tools安装/" style="font-size: 14px; color: #999">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px; color: #999">以太坊</a> <a href="/tags/动态规划/" style="font-size: 24px; color: #555">动态规划</a> <a href="/tags/原理/" style="font-size: 14px; color: #999">原理</a> <a href="/tags/智能合约/" style="font-size: 14px; color: #999">智能合约</a> <a href="/tags/题集/" style="font-size: 14px; color: #999">题集</a>
     </div>
 </section>
 
