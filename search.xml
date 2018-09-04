@@ -6,7 +6,7 @@
       <title>个人软件安装记录(linux-ubuntu)</title>
       <link href="/2018/09/04/self_doc/%E4%B8%AA%E4%BA%BA%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95-linux/"/>
       <url>/2018/09/04/self_doc/%E4%B8%AA%E4%BA%BA%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95-linux/</url>
-      <content type="html"><![CDATA[<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y git</span><br><span class="line"></span><br><span class="line">apt-get install -y tree</span><br><span class="line"></span><br><span class="line">apt-get install -y wget</span><br></pre></td></tr></table></figure>]]></content>
+      <content type="html"><![CDATA[<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y git</span><br><span class="line"></span><br><span class="line">apt-get install -y tree</span><br><span class="line"></span><br><span class="line">apt-get install -y wget</span><br><span class="line"></span><br><span class="line"><span class="comment"># install go</span></span><br></pre></td></tr></table></figure>]]></content>
       
       
         <tags>
