@@ -69,6 +69,71 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-devops/supervisor_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/devops/supervisor_learn/" class="article-date">
+  <time datetime="2018-08-29T13:15:52.434Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/devops/">devops</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/devops/supervisor_learn/">supervisor 使用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="install"><a href="#install" class="headerlink" title="install"></a>install</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y supervisor</span><br></pre></td></tr></table></figure>
+<h3 id="启动命令"><a href="#启动命令" class="headerlink" title="启动命令"></a>启动命令</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/python /usr/bin/supervisord -c /etc/supervisor/supervisord.conf</span><br></pre></td></tr></table></figure>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>安装完后的默认配置 <code>/etc/supervisor/supervisord.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">; supervisor config file</span><br><span class="line"></span><br><span class="line">[unix_http_server]</span><br><span class="line">file=/var/run/supervisor.sock   ; (the path to the socket file)</span><br><span class="line">chmod=0700                       ; sockef file mode (default 0700)</span><br><span class="line"></span><br><span class="line">[supervisord]</span><br><span class="line">logfile=/var/log/supervisor/supervisord.log ; (main log file;default $CWD/supervisord.log)</span><br><span class="line">pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)</span><br><span class="line">childlogdir=/var/log/supervisor            ; (&apos;AUTO&apos; child log dir, default $TEMP)</span><br><span class="line">environment=IPADDRESS=&quot;172.16.6.6&quot;, HOST_NAME=&quot;i-nom0vro7&quot;</span><br><span class="line"></span><br><span class="line">; the below section must remain in the config file for RPC</span><br><span class="line">; (supervisorctl/web interface) to work, additional interfaces may be</span><br><span class="line">; added by defining them in separate rpcinterface: sections</span><br><span class="line">[rpcinterface:supervisor]</span><br><span class="line">supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface</span><br><span class="line"></span><br><span class="line">[supervisorctl]</span><br><span class="line">serverurl=unix:///var/run/supervisor.sock ; use a unix:// URL  for a unix socket</span><br><span class="line"></span><br><span class="line">; The [include] section can just contain the &quot;files&quot; setting.  This</span><br><span class="line">; setting can list multiple files (separated by whitespace or</span><br><span class="line">; newlines).  It can also contain wildcards.  The filenames are</span><br><span class="line">; interpreted as relative to this file.  Included files *cannot*</span><br><span class="line">; include files themselves.</span><br><span class="line"></span><br><span class="line">[include]</span><br><span class="line">files = /etc/supervisor/conf.d/*.conf</span><br></pre></td></tr></table></figure>
+<p>需要监控的进程</p>
+<ul>
+<li>consul 微服务守护进程</li>
+<li>coupon_web 守护进程</li>
+<li>coupon_gateway 守护进程</li>
+<li>coupon_trig 守护进程</li>
+<li>coupon_bot 守护进程</li>
+</ul>
+<p>配置如下: (在 conf.d 目录下)</p>
+<h5 id="consul-守护进程"><a href="#consul-守护进程" class="headerlink" title="consul 守护进程:"></a>consul 守护进程:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[program:consul] ; 程序名称，在 supervisorctl 中通过这个值来对程序进行一系列的操作</span><br><span class="line">autorestart=True      ; 程序异常退出后自动重启</span><br><span class="line">autostart=True        ; 在 supervisord 启动的时候也自动启动</span><br><span class="line">redirect_stderr=True  ; 把 stderr 重定向到 stdout，默认 false</span><br><span class="line">command=consul agent -data-dir /data/consul -node=common-conpous.0.13 -bind=172.16.0.13 -join=172.16.0.210 1&gt;/data/logs/out.log 2&gt;&amp;1  ; 启动命令，与手动在命令行启动的命令是一样的</span><br><span class="line">user=root           ; 用哪个用户启动</span><br><span class="line">directory=/data/caiqiu  ; 程序的启动目录</span><br><span class="line">stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB</span><br><span class="line">stdout_logfile_backups = 20     ; stdout 日志文件备份数</span><br><span class="line">; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）</span><br><span class="line">stdout_logfile = /data/logs/supervisord_consul.log</span><br></pre></td></tr></table></figure>
+<h5 id="coupon-web-守护进程"><a href="#coupon-web-守护进程" class="headerlink" title="coupon_web 守护进程:"></a>coupon_web 守护进程:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[program:coupon_web] ; 程序名称，在 supervisorctl 中通过这个值来对程序进行一系列的操作</span><br><span class="line">autorestart=True      ; 程序异常退出后自动重启</span><br><span class="line">autostart=True        ; 在 supervisord 启动的时候也自动启动</span><br><span class="line">redirect_stderr=True  ; 把 stderr 重定向到 stdout，默认 false</span><br><span class="line">command=java -jar -Xms512m -Xmx1024m /data/common-coupon/aries-coupon-web-1.0.0-SNAPSHOT.jar --server.port=8080 --server.address=172.16.0.13 --spring.profiles.active=dev --server.tomcat.max-thread=500</span><br><span class="line">user=root           ; 用哪个用户启动</span><br><span class="line">directory=/data/caiqiu  ; 程序的启动目录</span><br><span class="line">stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB</span><br><span class="line">stdout_logfile_backups = 20     ; stdout 日志文件备份数</span><br><span class="line">; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）</span><br><span class="line">stdout_logfile=/data/logs/supervisord_coupon_web.log</span><br></pre></td></tr></table></figure>
+<h5 id="coupon-gateway-守护进程"><a href="#coupon-gateway-守护进程" class="headerlink" title="coupon_gateway 守护进程:"></a>coupon_gateway 守护进程:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[program:coupon_gateway] ; 程序名称，在 supervisorctl 中通过这个值来对程序进行一系列的操作</span><br><span class="line">autorestart=True      ; 程序异常退出后自动重启</span><br><span class="line">autostart=True        ; 在 supervisord 启动的时候也自动启动</span><br><span class="line">redirect_stderr=True  ; 把 stderr 重定向到 stdout，默认 false</span><br><span class="line">command=java -jar -Xms512m -Xmx1024m /data/common-coupon/aries-coupon-gateway-1.0.0-SNAPSHOT.jar --server.port=9090 --server.address=172.16.0.13 --spring.profiles.active=dev --server.tomcat.max-thread=500</span><br><span class="line">user=root           ; 用哪个用户启动</span><br><span class="line">directory=/data/caiqiu  ; 程序的启动目录</span><br><span class="line">stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB</span><br><span class="line">stdout_logfile_backups = 20     ; stdout 日志文件备份数</span><br><span class="line">; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）</span><br><span class="line">stdout_logfile=/data/logs/supervisord_coupon_gateway.log</span><br></pre></td></tr></table></figure>
+<h5 id="coupon-trig-守护进程"><a href="#coupon-trig-守护进程" class="headerlink" title="coupon_trig 守护进程:"></a>coupon_trig 守护进程:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[program:coupon_trig] ; 程序名称，在 supervisorctl 中通过这个值来对程序进行一系列的操作</span><br><span class="line">autorestart=True      ; 程序异常退出后自动重启</span><br><span class="line">autostart=True        ; 在 supervisord 启动的时候也自动启动</span><br><span class="line">redirect_stderr=True  ; 把 stderr 重定向到 stdout，默认 false</span><br><span class="line">command=java -jar -Xms512m -Xmx1024m /data/common-coupon/aries-coupon-trig-1.0.0-SNAPSHOT.jar --server.port=8090 --server.address=172.16.0.13 --spring.profiles.active=dev --server.tomcat.max-thread=500</span><br><span class="line">user=root           ; 用哪个用户启动</span><br><span class="line">directory=/data/caiqiu  ; 程序的启动目录</span><br><span class="line">stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB</span><br><span class="line">stdout_logfile_backups = 20     ; stdout 日志文件备份数</span><br><span class="line">; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）</span><br><span class="line">stdout_logfile=/data/logs/supervisord_coupon_trig.log</span><br></pre></td></tr></table></figure>
+<h5 id="coupon-bot-守护进程"><a href="#coupon-bot-守护进程" class="headerlink" title="coupon_bot 守护进程:"></a>coupon_bot 守护进程:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[program:coupon_bot] ; 程序名称，在 supervisorctl 中通过这个值来对程序进行一系列的操作</span><br><span class="line">autorestart=True      ; 程序异常退出后自动重启</span><br><span class="line">autostart=True        ; 在 supervisord 启动的时候也自动启动</span><br><span class="line">redirect_stderr=True  ; 把 stderr 重定向到 stdout，默认 false</span><br><span class="line">command=java -jar -Xms512m -Xmx1024m /data/common-coupon/aries-coupon-bot-1.0.0-SNAPSHOT.jar --spring.profiles.active=dev --server.tomcat.max-thread=500</span><br><span class="line">user=root           ; 用哪个用户启动</span><br><span class="line">directory=/data/caiqiu  ; 程序的启动目录</span><br><span class="line">stdout_logfile_maxbytes = 20MB  ; stdout 日志文件大小，默认 50MB</span><br><span class="line">stdout_logfile_backups = 20     ; stdout 日志文件备份数</span><br><span class="line">; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）</span><br><span class="line">stdout_logfile=/data/logs/supervisord_coupon_bot.log</span><br></pre></td></tr></table></figure>
+<h4 id="supervisorctl-命令"><a href="#supervisorctl-命令" class="headerlink" title="supervisorctl 命令"></a>supervisorctl 命令</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">supervisorctl status  <span class="comment"># 查看 supervisorctl 的状态</span></span><br><span class="line"><span class="comment"># account_gateway                  RUNNING    pid 22892, uptime 1 day, 19:17:42</span></span><br><span class="line"><span class="comment"># account_web                      RUNNING    pid 22912, uptime 1 day, 19:17:41</span></span><br><span class="line"><span class="comment"># consul                           RUNNING    pid 22849, uptime 1 day, 19:17:51</span></span><br><span class="line"></span><br><span class="line">supervisorctl reload  <span class="comment"># 重新载入 supervisorctl 配置, 并且使其生效</span></span><br><span class="line"></span><br><span class="line">supervisorctl <span class="built_in">help</span>    <span class="comment"># 帮助文档</span></span><br><span class="line"><span class="comment"># default commands (type help &lt;topic&gt;):</span></span><br><span class="line"><span class="comment"># =====================================</span></span><br><span class="line"><span class="comment"># add    clear  fg        open  quit    remove  restart   start   stop  update</span></span><br><span class="line"><span class="comment"># avail  exit   maintail  pid   reload  reread  shutdown  status  tail  version</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/devops/supervisor_learn/" data-id="cjln27ekd00044is6liykky02" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/supervisor/">supervisor</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-backend/java/spring_aop" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/29/backend/java/spring_aop/" class="article-date">
@@ -124,7 +189,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/java/spring_aop/" data-id="cjlm4qpo2000tqns66dzq8ji1" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/java/spring_aop/" data-id="cjln27elx00164is6v2vgpjuv" class="article-share-link">分享</a>
       
       
       
@@ -211,7 +276,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/java/Lombok原理分析与功能实现/" data-id="cjlm4qpo1000sqns6ujqaycsj" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/java/Lombok原理分析与功能实现/" data-id="cjln27elr000w4is6se245pux" class="article-share-link">分享</a>
       
       
       
@@ -306,7 +371,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/block_chain/搭建自己的私有网络/" data-id="cjlm4qpmv0003qns6783kbqms" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/block_chain/搭建自己的私有网络/" data-id="cjln27eka00034is679dvvg4j" class="article-share-link">分享</a>
       
       
       
@@ -411,7 +476,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/" data-id="cjlm4qpo70013qns6lkbqmnr1" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/" data-id="cjln27elu00134is6nybfy3l2" class="article-share-link">分享</a>
       
       
       
@@ -443,7 +508,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/block_chain/在私有网络上搭建3个以上节点/" data-id="cjlm4qpmr0002qns6qtgtky8g" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/block_chain/在私有网络上搭建3个以上节点/" data-id="cjln27ek600024is6qmktmm2e" class="article-share-link">分享</a>
       
       
       
@@ -492,7 +557,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/" data-id="cjlm4qpoq002eqns68edsmetu" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/" data-id="cjln27emg002h4is6frfd9qq1" class="article-share-link">分享</a>
       
       
       
@@ -569,7 +634,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/" data-id="cjlm4qpop002cqns65slpxwof" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/" data-id="cjln27emf002f4is68q1pf0mm" class="article-share-link">分享</a>
       
       
       
@@ -637,7 +702,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/" data-id="cjlm4qpoo002bqns6z4wrjdol" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/" data-id="cjln27eme002e4is69v16zpt3" class="article-share-link">分享</a>
       
       
       
@@ -703,84 +768,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/" data-id="cjlm4qpor002fqns60exd38xe" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-build_own_x/data_base/build_simple_database/模块功能概述" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" class="article-date">
-  <time datetime="2018-05-17T11:59:57.000Z" itemprop="datePublished">2018-05-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/">Build a Simple Database - 模块功能概述</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="https://cstack.github.io/db_tutorial/assets/images/arch2.gif"></p>
-<p>sqlite architecture (<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
-<p>小结:</p>
-<p>core: 主要的构成模块: interface, sqlCommand Processor, Virtual Machine</p>
-<p>SQL Compiler: Tokenizer, Parser, Code Generator</p>
-<p>Backend: B-Tree, Pager, OS Interface</p>
-<p>翻译:(<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
-<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>SQLite的工作原理是将SQL文本编译为<a href="https://www.sqlite.org/opcode.html" target="_blank" rel="noopener">字节码</a>，然后使用虚拟机运行该字节码。</p>
-<p>sqlite3_prepare_v2（）和相关接口充当用于将SQL文本转换为字节码的编译器。 sqlite3_stmt对象是用于实现单个SQL语句的单个字节码程序的容器。 sqlite3_step（）接口将一个字节码程序传递给虚拟机，并运行该程序直到它完成，或者形成一行结果返回，或者发生致命错误或中断。</p>
-<h3 id="Interface"><a href="#Interface" class="headerlink" title="Interface"></a>Interface</h3><p>许多C语言接口可以在源文件main.c，legacy.c和vdbeapi.c中找到，尽管一些例程分散在其他文件中，在这些文件中它们可以访问具有文件范围的数据结构。sqlite3_get_table（）例程在table.c中实现。 sqlite3_mprintf（）例程在printf.c中找到。 sqlite3_complete（）接口位于tokenize.c中。 TCL接口由tclsqlite.c实现。</p>
-<p>为避免名称冲突，SQLite库中的所有外部符号都以前缀sqlite3开头。那些用于外部使用的符号（换句话说，那些构成SQLite API的符号）会添加一个下划线，因此以sqlite3_开头。扩展API有时会在下划线之前添加扩展名;例如：sqlite3rbu_或sqlite3session_。</p>
-<h3 id="Tokenizer"><a href="#Tokenizer" class="headerlink" title="Tokenizer"></a>Tokenizer</h3><p>当包含SQL语句的字符串要被评估时，它首先被发送到标记器。标记器将SQL文本分解为标记并将这些标记逐个传递给解析器。标记器是在文件tokenize.c中手动编码的</p>
-<p>请注意，在此设计中，标记器调用解析器。熟悉YACC和BISON的人可能习惯于以相反的方式做事 - 让解析器调用标记器。不过，令牌分析器调用分析器会更好，因为它可以做成线程安全的并且运行速度更快。</p>
-<h3 id="Parser"><a href="#Parser" class="headerlink" title="Parser"></a>Parser</h3><p>解析器根据其上下文为令牌分配含义。 SQLite的解析器是使用Lemon解析器生成器生成的。Lemon和YACC / BISON一样工作，但它使用了不太容易出错的不同输入语法。Lemon还生成一个可重入且线程安全的解析器。Lemon定义了非终端析构函数的概念，以便在遇到语法错误时不会泄漏内存。驱动Lemon并定义SQLite可理解的SQL语言的语法文件可在parse.y中找到。</p>
-<p>因为Lemon是一个通常在开发机器上找不到的程序，Lemon的完整源代码（只有一个C文件）包含在SQLite分发的“tool”子目录中。</p>
-<h3 id="Code-Generator"><a href="#Code-Generator" class="headerlink" title="Code Generator"></a>Code Generator</h3><p>解析器将令牌组装成解析树之后，代码生成器运行以分析解析器树并生成执行SQL语句工作的字节码。准备好的语句对象是这个字节码的容器。代码生成器中有许多文件，其中包括：attach.c，auth.c，build.c，delete.c，expr.c，insert.c，pragma.c，select.c，trigger.c，update.c ，vacuum.c，where.c，wherecode.c和whereexpr.c。在这些文件中，大部分严重的魔法都是在这里发生的。 expr.c处理表达式的代码生成。其中* .c处理SELECT，UPDATE和DELETE语句中WHERE子句的代码生成。文件attach.c，delete.c，insert.c，select.c，trigger.c update.c和vacuum.c处理具有相同名称的SQL语句的代码生成。 （这些文件中的每一个都根据需要调用expr.c和where.c中的例程。）所有其他SQL语句都由build.c编码。 auth.c文件实现sqlite3_set_authorizer（）的功能</p>
-<p>代码生成器，特别是* .c和select.c中的逻辑有时称为查询规划器。对于任何特定的SQL语句，可能有数百，数千或数百万种不同的算法来计算答案。查询计划员是一个AI，致力于从数百万个选择中选择最佳算法。</p>
-<h3 id="Bytecode-Engine"><a href="#Bytecode-Engine" class="headerlink" title="Bytecode Engine"></a>Bytecode Engine</h3><p>由代码生成器创建的字节码程序由虚拟机运行。</p>
-<p>虚拟机本身完全包含在单个源文件vdbe.c中。 vdbe.h头文件定义了虚拟机和SQLite库的其余部分之间的接口，vdbeInt.h定义了虚拟机本身专用的结构和接口。其他各种vdbe * .c文件都是虚拟机的助手。 vdbeaux.c文件包含虚拟机使用的实用程序以及库的其余部分用于构建VM程序的接口模块。 vdbeapi.c文件包含虚拟机的外部接口，如sqlite3_bind_int（）和sqlite3_step（）。各个值（字符串，整数，浮点数和BLOB）存储在由vdbemem.c实现的名为“Mem”的内部对象中。</p>
-<p>SQLite使用C语言例程的回调来实现SQL函数。即使内置的SQL函数也是这样实现的。大多数内置的SQL函数（例如：abs（），count（），substr（）等）都可以在func.c源文件中找到。日期和时间转换函数可在date.c中找到。一些函数如coalesce（）和typeof（）直接由代码生成器实现为字节码。</p>
-<h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B-Tree"></a>B-Tree</h3><p>SQLite数据库使用btree.c源文件中的B-tree实现在磁盘上进行维护。数据库中的每个表和索引都使用单独的B树。所有B树都存储在同一个磁盘文件中。文件格式细节稳定且定义明确，并保证向前兼容。</p>
-<p>B树子系统和SQLite库的其余部分的接口由头文件btree.h定义。</p>
-<h3 id="Page-Cache"><a href="#Page-Cache" class="headerlink" title="Page Cache"></a>Page Cache</h3><p>B树模块以固定大小的页面从磁盘请求信息。默认的page_size是4096字节，但可以是512到65536字节之间的任意两个幂。页面缓存负责读取，写入和缓存这些页面。页面缓存还提供了回滚和原子提交抽象，并负责锁定数据库文件。 B树驱动程序请求页面缓存中的特定页面，并在需要修改页面或提交或回滚更改时通知页面缓存。页面缓存处理了确保请求被快速，安全和有效地处理的所有细节.</p>
-<p>主页面缓存实现在pager.c文件中。 WAL模式逻辑位于单独的wal.c中。内存中缓存由pcache.c和pcache1.c文件实现。页面缓存子系统和SQLite其余部分之间的接口由头文件pager.h定义。</p>
-<p>###OS Interface</p>
-<p>为了提供跨操作系统的可移植性，SQLite使用称为VFS的抽象对象。每个VFS都提供了打开，读取，写入和关闭磁盘上的文件以及执行其他特定于操作系统的任务（如查找当前时间或获取随机性以初始化内置伪随机数生成器的方法）。 SQLite当前为unix（在os_unix.c文件中）和Windows（在os_win.c文件中）提供了VFSes。</p>
-<h3 id="Utilities"><a href="#Utilities" class="headerlink" title="Utilities"></a>Utilities</h3><p>内存分配，无格式字符串比较例程，便携式文本到数字转换例程以及其他实用程序位于util.c中。解析器使用的符号表由散列表中的哈希表维护。 utf.c源文件包含Unicode转换子例程。 SQLite在printf.c中有它自己的printf（）（有一些扩展）的私有实现，在random.c中有它自己的伪随机数生成器（PRNG）。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结:"></a>总结:</h3><p>sqlite(数据库)将数据持久化,并将其做到了极致吧.(引人深思)</p>
-<p>整体结构, 主要分成三部分: 1. core, 2. SQL Compiler, 3. Backend</p>
-<p>其主要流程也相当清晰:</p>
-<p>   interface -&gt; sqlCommand Processor -&gt; Virtual Machine</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" data-id="cjlm4qpos002hqns69ydkflue" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/p1_introduction_and_setting_up_the_REPL/" data-id="cjln27emh002i4is6koc79bih" class="article-share-link">分享</a>
       
       
       
@@ -820,6 +808,10 @@
       <ul>
         
           <li>
+            <a href="/2018/09/04/self_doc/个人软件安装记录-linux/">个人软件安装记录(linux-ubuntu)</a>
+          </li>
+        
+          <li>
             <a href="/2018/09/02/frontend/css/grid_learn/learn_css_grid/">Learn CSS Grid</a>
           </li>
         
@@ -833,10 +825,6 @@
         
           <li>
             <a href="/2018/08/31/self_doc/个人软件安装记录/">个人软件安装记录(mac osx)</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/30/backend/docker/docker_构建最小_go_app/">docker 构建最小 go app</a>
           </li>
         
       </ul>
