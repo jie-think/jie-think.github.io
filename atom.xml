@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-09-04T01:54:42.439Z</updated>
+  <updated>2018-09-04T02:55:17.217Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://yoursite.com/2018/09/04/self_doc/%E4%B8%AA%E4%BA%BA%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95-linux/"/>
     <id>http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/</id>
     <published>2018-09-04T01:51:07.000Z</published>
-    <updated>2018-09-04T01:54:42.439Z</updated>
+    <updated>2018-09-04T02:55:17.217Z</updated>
     
     <content type="html"><![CDATA[<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y git</span><br><span class="line"></span><br><span class="line">apt-get install -y tree</span><br><span class="line"></span><br><span class="line">apt-get install -y wget</span><br><span class="line"></span><br><span class="line"><span class="comment"># install go</span></span><br></pre></td></tr></table></figure>]]></content>
     
