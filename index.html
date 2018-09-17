@@ -69,6 +69,111 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-backend/go/grpc/服务的注册_发现" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/14/backend/go/grpc/服务的注册_发现/" class="article-date">
+  <time datetime="2018-09-14T12:42:22.000Z" itemprop="datePublished">2018-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/14/backend/go/grpc/服务的注册_发现/">服务的注册,发现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://juejin.im/post/5ad9b9596fb9a07acf55b550" target="_blank" rel="noopener">https://juejin.im/post/5ad9b9596fb9a07acf55b550</a></p>
+<h2 id="微服务之服务的注册和发现"><a href="#微服务之服务的注册和发现" class="headerlink" title="微服务之服务的注册和发现"></a>微服务之服务的注册和发现</h2><p>服务的注册发现功能, 能够很好的解耦服务器之间的调用功能.</p>
+<h2 id="服务注册"><a href="#服务注册" class="headerlink" title="服务注册"></a>服务注册</h2><p>策略: </p>
+<ol>
+<li>将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ).</li>
+<li>心跳续期 </li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Register</span><span class="params">(ctx context.Context, target <span class="keyword">string</span>, update naming.Update, opts ...wrapper.RegistryOptions)</span> <span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> upBytes []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">if</span> upBytes, err = json.Marshal(update); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	er.cancal = cancel</span><br><span class="line">	rgOpt := wrapper.RegistryOption&#123;TTL: wrapper.DefaultRegInfTTL&#125;</span><br><span class="line">	<span class="keyword">for</span> _, opt := <span class="keyword">range</span> opts &#123;</span><br><span class="line">		opt(&amp;rgOpt)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">switch</span> update.Op &#123;</span><br><span class="line">	<span class="keyword">case</span> naming.Add:</span><br><span class="line">		lsRsp, err := er.lsCli.Grant(ctx, <span class="keyword">int64</span>(rgOpt.TTL/time.Second))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//Put服务信息到etcd,并设置key的值TTL,通过后面的KeepAlive接口</span></span><br><span class="line">        <span class="comment">//对TTL进行续期,超过TTL的时间未收到续期请求,则说明服务可能挂了,从而清除服务信息</span></span><br><span class="line">		etcdOpts := []etcd.OpOption&#123;etcd.WithLease(lsRsp.ID)&#125;</span><br><span class="line">		key := target + <span class="string">"/"</span> + update.Addr</span><br><span class="line">		_, err = er.cli.KV.Put(ctx, key, <span class="keyword">string</span>(upBytes), etcdOpts...)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保持心跳</span></span><br><span class="line">		lsRspChan, err := er.lsCli.KeepAlive(context.TODO(), lsRsp.ID)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				_, ok := &lt;-lsRspChan</span><br><span class="line">				<span class="keyword">if</span> !ok &#123;</span><br><span class="line">					grpclog.Fatalf(<span class="string">"%v keepalive channel is closing"</span>, key)</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	<span class="keyword">case</span> naming.Delete:</span><br><span class="line">		_, err = er.cli.Delete(ctx, target+<span class="string">"/"</span>+update.Addr)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, <span class="string">"unsupported op"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p><strong>Resolve()接口</strong><br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用于生成Watcher,监听注册中心中的服务信息变化</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Resolve</span><span class="params">(target <span class="keyword">string</span>)</span> <span class="params">(naming.Watcher, error)</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	w := &amp;etcdWatcher&#123;</span><br><span class="line">		cli:    er.cli,</span><br><span class="line">		target: target + <span class="string">"/"</span>,</span><br><span class="line">		ctx:    ctx,</span><br><span class="line">		cancel: cancel,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> w, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Next() 接口</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Next接口主要用于获取注册的服务信息,通过channel以及watch,当服务信息发生</span></span><br><span class="line"><span class="comment">//变化时,Next接口会将变化返回给grpc框架从而实现服务信息变更.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(ew *etcdWatcher)</span> <span class="title">Next</span><span class="params">()</span> <span class="params">([]*naming.Update, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> updates []*naming.Update</span><br><span class="line">    <span class="comment">//初次获取时,创建监听channel,并返回获取到的服务信息</span></span><br><span class="line">	<span class="keyword">if</span> ew.watchChan == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">//create new chan</span></span><br><span class="line">		resp, err := ew.cli.Get(ew.ctx, ew.target, etcd.WithPrefix(), etcd.WithSerializable())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> _, kv := <span class="keyword">range</span> resp.Kvs &#123;</span><br><span class="line">			<span class="keyword">var</span> upt naming.Update</span><br><span class="line">			<span class="keyword">if</span> err := json.Unmarshal(kv.Value, &amp;upt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//创建etcd的watcher监听target(服务名)的信息.</span></span><br><span class="line">		opts := []etcd.OpOption&#123;etcd.WithRev(resp.Header.Revision + <span class="number">1</span>), etcd.WithPrefix(), etcd.WithPrevKV()&#125;</span><br><span class="line">		ew.watchChan = ew.cli.Watch(context.TODO(), ew.target, opts...)</span><br><span class="line">		<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//阻塞监听,服务发生变化时才返回给上层</span></span><br><span class="line">	wrsp, ok := &lt;-ew.watchChan</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		err := status.Error(codes.Unavailable, <span class="string">"etcd watch closed"</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> wrsp.Err() != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, wrsp.Err()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> _, e := <span class="keyword">range</span> wrsp.Events &#123;</span><br><span class="line">		<span class="keyword">var</span> upt naming.Update</span><br><span class="line">		<span class="keyword">var</span> err error</span><br><span class="line">		<span class="keyword">switch</span> e.Type &#123;</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypePut:</span><br><span class="line">			err = json.Unmarshal(e.Kv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Add</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypeDelete:</span><br><span class="line">			err = json.Unmarshal(e.PrevKv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Delete</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用默认的grpc"><a href="#使用默认的grpc" class="headerlink" title="使用默认的grpc"></a>使用默认的grpc</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cli, _ := clientv3.NewFromURL(<span class="string">"http://127.0.0.1:2379"</span>)</span><br><span class="line">rs := &amp;etcdnaming.GRPCResolver&#123;Client: cli&#125;</span><br><span class="line"></span><br><span class="line">b := grpc.RoundRobin(rs)</span><br><span class="line">dialOpts := []grpc.DialOption&#123;grpc.WithBalancer(b), grpc.WithInsecure()&#125;</span><br><span class="line">conn, err := grpc.Dial(<span class="string">"jie-test"</span>, dialOpts...)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">client := pb.NewGreeterClient(conn)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjm60adsr002oxls625hwjngg" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/etcd/">etcd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/grpc/">grpc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-frontend/learn_admin_manage/admin_manage_jie_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" class="article-date">
+  <time datetime="2018-09-08T14:27:30.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/frontend/">frontend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/">admin_manage_jie</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="admin-manage-jie"><a href="#admin-manage-jie" class="headerlink" title="admin_manage_jie"></a>admin_manage_jie</h2><p>copy from Material Dashboard React</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" data-id="cjm60adsb0018xls6lge147sk" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/admin-manage/">admin manage</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-self_doc/个人软件安装记录-linux" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/04/self_doc/个人软件安装记录-linux/" class="article-date">
@@ -98,7 +203,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/" data-id="cjlnumm3d000brcs60wx7fi74" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/" data-id="cjm60adrc0007xls6p0d67x5p" class="article-share-link">分享</a>
       
       
       
@@ -182,7 +287,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/02/frontend/css/grid_learn/learn_css_grid/" data-id="cjlnumm4w003frcs62ks7q0jj" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/02/frontend/css/grid_learn/learn_css_grid/" data-id="cjm60adsy002txls6qtkt6i41" class="article-share-link">分享</a>
       
       
       
@@ -256,7 +361,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/01/backend/tools/markfile_start_learn/" data-id="cjlnumm3w000vrcs6pyoz1bnz" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/01/backend/tools/markfile_start_learn/" data-id="cjm60ads6000wxls6c2l7d8d4" class="article-share-link">分享</a>
       
       
       
@@ -381,7 +486,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/31/backend/tools/apidoc_start_learn/" data-id="cjlnumm3u000rrcs6jsutqxtb" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/31/backend/tools/apidoc_start_learn/" data-id="cjm60ads3000rxls6hxpmzsi0" class="article-share-link">分享</a>
       
       
       
@@ -425,7 +530,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/31/self_doc/个人软件安装记录/" data-id="cjlnumm3e000ercs6ynfny5x5" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/31/self_doc/个人软件安装记录/" data-id="cjm60adre0008xls6d6t8txx2" class="article-share-link">分享</a>
       
       
       
@@ -491,7 +596,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/30/backend/docker/docker_构建最小_go_app/" data-id="cjlnumm3t000prcs63xge1bgz" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/30/backend/docker/docker_构建最小_go_app/" data-id="cjm60ads2000pxls6g9ujzhqa" class="article-share-link">分享</a>
       
       
       
@@ -538,891 +643,11 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/frontend/css/basic_1_0_css_position/" data-id="cjlnumm4e0027rcs6rwwcpzga" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/frontend/css/basic_1_0_css_position/" data-id="cjm60adsc001bxls6yp3sb9z7" class="article-share-link">分享</a>
       
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css grid</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/DynamicProgramming/1_1_Fibonacci numbers" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" class="article-date">
-  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/alg/">alg</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/">Program for Fibonacci numbers</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>来源：<a href="https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/</a></p>
-<p>The Fibonacci numbers are the numbers in the following integer sequence.</p>
-<p>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ……..</p>
-<p>In mathematical terms, the sequence Fn of Fibonacci numbers is defined by the recurrence relation</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fn = Fn-1 + Fn-2</span><br></pre></td></tr></table></figure>
-<p>with seed values</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">F0 = 0 and F1 = 1.</span><br></pre></td></tr></table></figure>
-<p><img src="https://www.geeksforgeeks.org/wp-content/uploads/fibonacci-sequence.png" alt="fibonacci-sequence"></p>
-<p>Given a number n, print n-th Fibonacci Number.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input  : n = 2</span><br><span class="line">Output : 1</span><br><span class="line"></span><br><span class="line">Input  : n = 9</span><br><span class="line">Output : 34</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" data-id="cjlnumm3x000yrcs6n35v8gf9" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/DynamicProgramming/题集" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/alg/DynamicProgramming/题集/" class="article-date">
-  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/alg/">alg</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/题集/">动态规划题集</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>摘录：<a href="https://www.geeksforgeeks.org/dynamic-programming/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/dynamic-programming/</a></p>
-<p><a href="https://www.geeksforgeeks.org/category/algorithm/dynamic-programming/" target="_blank" rel="noopener">‘Recent Articles’ on Dynamic Programming</a></p>
-<p><strong>Topics:</strong></p>
-<ul>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming/#concepts" target="_blank" rel="noopener">Basic Concepts</a></li>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming/#advanced" target="_blank" rel="noopener">Advanced Concepts</a></li>
-<li><p><a href="https://www.geeksforgeeks.org/dynamic-programming/#basicProblems" target="_blank" rel="noopener">Basic Problems</a></p>
-</li>
-<li><p><a href="https://www.geeksforgeeks.org/dynamic-programming/#mediumProblems" target="_blank" rel="noopener">Intermediate Problems</a></p>
-</li>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming/#hardProblems" target="_blank" rel="noopener">Hard Problems</a></li>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming/#quick" target="_blank" rel="noopener">Quick Links</a></li>
-</ul>
-<p><strong>Basic Concepts:</strong></p>
-<ol>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming-set-1/" target="_blank" rel="noopener">Overlapping Subproblems Property</a></li>
-<li><a href="https://www.geeksforgeeks.org/dynamic-programming-set-2-optimal-substructure-property/" target="_blank" rel="noopener">Optimal Substructure Property</a></li>
-<li><a href="https://www.geeksforgeeks.org/solve-dynamic-programming-problem/" target="_blank" rel="noopener">How to solve a Dynamic Programming Problem ?</a></li>
-<li><a href="https://www.geeksforgeeks.org/tabulation-vs-memoizatation/" target="_blank" rel="noopener">Tabulation vs Memoizatation</a></li>
-</ol>
-<p><strong>Advanced Concepts :</strong></p>
-<ol>
-<li><a href="https://www.geeksforgeeks.org/bitmasking-and-dynamic-programming-set-1-count-ways-to-assign-unique-cap-to-every-person/" target="_blank" rel="noopener">Bitmasking and Dynamic Programming | Set 1</a></li>
-<li><a href="https://www.geeksforgeeks.org/digit-dp-introduction/" target="_blank" rel="noopener">Digit DP | Introduction</a></li>
-</ol>
-<p><strong>Basic Problems :</strong></p>
-<ol>
-<li><ul>
-<li style="list-style: none"><input type="checkbox" checked> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">Fibonacci numbers</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-9-binomial-coefficient/" target="_blank" rel="noopener">Binomial Coefficient</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-4-longest-common-subsequence/" target="_blank" rel="noopener">Longest Common Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-repeated-subsequence/" target="_blank" rel="noopener">Longest Repeated Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/" target="_blank" rel="noopener">Largest Sum Contiguous Subarray</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/ugly-numbers/" target="_blank" rel="noopener">Ugly numbers</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-size-sub-matrix-with-all-1s-in-a-binary-matrix/" target="_blank" rel="noopener">Maximum size square sub-matrix with all 1s</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-3-longest-increasing-subsequence/" target="_blank" rel="noopener">Longest Increasing Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-6-min-cost-path/" target="_blank" rel="noopener">Min Cost Path</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-7-coin-change/" target="_blank" rel="noopener">Coin change problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-5-edit-distance/" target="_blank" rel="noopener">Minimum number of edits ( operations ) require to convert string 1 to string 2</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-13-cutting-a-rod/" target="_blank" rel="noopener">Cutting a Rod</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-subset-sum-problem/" target="_blank" rel="noopener">Subset Sum Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-number-of-jumps-to-reach-end-of-a-given-array/" target="_blank" rel="noopener">Minimum number of jumps to reach end</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-34-assembly-line-scheduling/" target="_blank" rel="noopener">Assembly line scheduling</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-14-maximum-sum-increasing-subsequence/" target="_blank" rel="noopener">Maximum Sum Increasing Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-20-maximum-length-chain-of-pairs/" target="_blank" rel="noopener">Maximum Length Chain of Pairs</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-common-substring/" target="_blank" rel="noopener">Longest Common Substring</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-possible-paths-top-left-bottom-right-nxm-matrix/" target="_blank" rel="noopener">Count all possible paths from top left to bottom right of a mXn matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/program-nth-catalan-number/" target="_blank" rel="noopener">nth Catalan Number</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-ways-reach-given-score-game/" target="_blank" rel="noopener">Count number of ways to reach a given score in a game</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/tiling-problem/" target="_blank" rel="noopener">Tiling Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-even-length-binary-sequences-with-same-sum-of-first-and-second-half-bits/" target="_blank" rel="noopener">Count even length binary sequences with same sum of first and second half bits</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-number-of-solutions-of-a-linear-equation-of-n-variables/" target="_blank" rel="noopener">Find number of solutions of a linear equation of n variables</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/bell-numbers-number-of-ways-to-partition-a-set/" target="_blank" rel="noopener">Bell Numbers (Number of ways to Partition a Set)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/compute-ncr-p-set-1-introduction-and-dynamic-programming-solution/" target="_blank" rel="noopener">Compute nCr % p</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/permutation-coefficient/" target="_blank" rel="noopener">Permutation Coefficient</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-of-ways-to-fill-a-n-x-4-grid-using-1-x-4-tiles/" target="_blank" rel="noopener">Count number of ways to fill a “n x 4” grid using “1 x 4” tiles</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/space-optimized-solution-lcs/" target="_blank" rel="noopener">A Space Optimized Solution of LCS</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-maximum-length-snake-sequence/" target="_blank" rel="noopener">Find maximum length Snake sequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-cost-to-fill-given-weight-in-a-bag/" target="_blank" rel="noopener">Minimum cost to fill given weight in a bag</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/game-theory-choice-area/" target="_blank" rel="noopener">Choice of area</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-weight-path-ending-element-last-row-matrix/" target="_blank" rel="noopener">Maximum weight path ending at any element of last row in a matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/recursively-break-number-3-parts-get-maximum-sum/" target="_blank" rel="noopener">Recursively break a number in 3 parts to get maximum sum</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/path-maximum-average-value/" target="_blank" rel="noopener">Path with maximum average value</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-sum-pairs-specific-difference/" target="_blank" rel="noopener">Maximum sum of pairs with specific difference</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-subsequence-sum-such-that-no-three-are-consecutive/" target="_blank" rel="noopener">Maximum subsequence sum such that no three are consecutive</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-subsequence-such-that-difference-between-adjacents-is-one/" target="_blank" rel="noopener">Longest subsequence such that difference between adjacents is one</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-path-sum-position-jumps-divisibility-condition/" target="_blank" rel="noopener">Maximum path sum for each position with jumps under divisibility condition</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-sum-bi-tonic-sub-sequence/" target="_blank" rel="noopener">Maximum sum Bi-tonic Sub-sequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/lcs-longest-common-subsequence-three-strings/" target="_blank" rel="noopener">LCS (Longest Common Subsequence) of three strings</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-path-sum-triangle/" target="_blank" rel="noopener">Maximum path sum in a triangle</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/friends-pairing-problem/" target="_blank" rel="noopener">Friends Pairing Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/size-array-repeated-deletion-lis/" target="_blank" rel="noopener">Size of array after repeated deletion of LIS</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-steps-minimize-n-per-given-condition/" target="_blank" rel="noopener">Minimum steps to minimize n as per given condition</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-path-sum-starting-cell-0-th-row-ending-cell-n-1-th-row/" target="_blank" rel="noopener">Maximum path sum that starting with any cell of 0-th row and ending with any cell of (N-1)-th row</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/gold-mine-problem/" target="_blank" rel="noopener">Gold Mine Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-number-endless-points/" target="_blank" rel="noopener">Find number of endless points</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/perfect-sum-problem-print-subsets-given-sum/" target="_blank" rel="noopener">Perfect Sum Problem (Print all subsets with given sum)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-sum-path-right-number-triangle/" target="_blank" rel="noopener">Maximum sum of a path in a Right Number Triangle</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/subset-sum-divisible-m/" target="_blank" rel="noopener">Subset with sum divisible by m</a></li>
-</ul>
-</li>
-</ol>
-<p><strong>Intermediate Problems :</strong></p>
-<ol>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-10-0-1-knapsack-problem/" target="_blank" rel="noopener">0-1 Knapsack Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/length-of-the-longest-substring-without-repeating-characters/" target="_blank" rel="noopener">Length of the longest substring without repeating characters</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-ways-reach-destination-maze/" target="_blank" rel="noopener">Count number of ways to reach destination in a Maze</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/super-ugly-number-number-whose-prime-factors-given-set/" target="_blank" rel="noopener">Super Ugly Number (Number whose prime factors are in given set)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-of-ways-to-partition-a-set-into-k-subsets/" target="_blank" rel="noopener">Count number of ways to partition a set into k subsets</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-12-longest-palindromic-subsequence/" target="_blank" rel="noopener">Longest Palindromic Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-11-egg-dropping-puzzle/" target="_blank" rel="noopener">Egg Dropping Puzzle</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/weighted-job-scheduling/" target="_blank" rel="noopener">Weighted job scheduling</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-15-longest-bitonic-subsequence/" target="_blank" rel="noopener">Longest Bitonic Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/" target="_blank" rel="noopener">Floyd Warshall Algorithm</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-18-partition-problem/" target="_blank" rel="noopener">Partition Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-14-variations-of-lis/" target="_blank" rel="noopener">Variations of LIS</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-21-box-stacking-problem/" target="_blank" rel="noopener">Box-Stacking Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-23-bellman-ford-algorithm/" target="_blank" rel="noopener">Bellman–Ford Algorithm</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-24-optimal-binary-search-tree/" target="_blank" rel="noopener">Optimal Binary Search Tree</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/largest-independent-set-problem/" target="_blank" rel="noopener">Largest Independent Set Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-28-minimum-insertions-to-form-a-palindrome/" target="_blank" rel="noopener">Minimum insertions to form a palindrome</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-number-deletions-make-string-palindrome/" target="_blank" rel="noopener">Minimum number of deletions to make a string palindrome</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-36-cut-a-rope-to-maximize-product/" target="_blank" rel="noopener">Maximum Product Cutting</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/clusteringpartitioning-an-array-such-that-sum-of-square-differences-is-minimum/" target="_blank" rel="noopener">Clustering/Partitioning an array such that sum of square differences is minimum</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-decimal-value-path-in-a-binary-matrix/" target="_blank" rel="noopener">Maximum decimal value path in a binary matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-derangements-permutation-such-that-no-element-appears-in-its-original-position/" target="_blank" rel="noopener">Count Derangements (Permutation such that no element appears in its original position)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dice-throw-problem/" target="_blank" rel="noopener">Dice Throw Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-31-optimal-strategy-for-a-game/" target="_blank" rel="noopener">Optimal Strategy for a game</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-32-word-break-problem/" target="_blank" rel="noopener">Word Break Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/remove-minimum-elements-either-side-2min-max/" target="_blank" rel="noopener">Remove minimum elements from either side such that 2*min becomes more than max</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-binary-strings-without-consecutive-1s/" target="_blank" rel="noopener">Count number of binary strings without consecutive 1’s</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-possible-decodings-given-digit-sequence/" target="_blank" rel="noopener">Count Possible Decodings of a given Digit Sequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-possible-paths-source-destination-exactly-k-edges/" target="_blank" rel="noopener">Count all possible walks from a source to a destination with exactly k edges</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/shortest-path-exactly-k-edges-directed-weighted-graph/" target="_blank" rel="noopener">Shortest path with exactly k edges in a directed and weighted graph</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-even-length-substring-sum-first-second-half/" target="_blank" rel="noopener">Longest Even Length Substring such that Sum of First and Second Half is same</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/vertex-cover-problem-set-2-dynamic-programming-solution-tree/" target="_blank" rel="noopener">Vertex Cover Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-the-minimum-cost-to-reach-a-destination-where-every-station-is-connected-in-one-direction/" target="_blank" rel="noopener">Find the minimum cost to reach destination using a train</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-twice/" target="_blank" rel="noopener">Maximum profit by buying and selling a share at most twice</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-possible-ways-to-construct-buildings/" target="_blank" rel="noopener">Count possible ways to construct buildings</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-sum-of-digits-in-numbers-from-1-to-n/" target="_blank" rel="noopener">Compute sum of digits in all numbers from 1 to n</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/shortest-common-supersequence/" target="_blank" rel="noopener">Shortest Common Supersequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-minimum-number-of-coins-that-make-a-change/" target="_blank" rel="noopener">Minimum number of coins that make a given value</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-number-of-squares-whose-sum-equals-to-given-number-n/" target="_blank" rel="noopener">Minimum number of squares whose sum equals to given number n</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-length-of-the-longest-consecutive-path-in-a-character-matrix/" target="_blank" rel="noopener">length of the longest consecutive path from a given starting character</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/total-number-of-non-decreasing-numbers-with-n-digits/" target="_blank" rel="noopener">Total number of non-decreasing numbers with n digits</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-positive-points-to-reach-destination/" target="_blank" rel="noopener">Minimum Initial Points to Reach Destination</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-of-n-digit-numbers-whose-sum-of-digits-equals-to-given-sum/" target="_blank" rel="noopener">Count of n digit numbers whose sum of digits equals to given sum</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-total-number-of-n-digit-numbers-such-that-the-difference-between-the-sum-of-even-digits-and-odd-digits-is-1/" target="_blank" rel="noopener">Count total number of N digit numbers such that the difference between sum of even and odd digits is 1</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/bitmasking-and-dynamic-programming-set-1-count-ways-to-assign-unique-cap-to-every-person/" target="_blank" rel="noopener">Count ways to assign unique cap to every person</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-repeating-subsequence/" target="_blank" rel="noopener">Longest Repeating Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-the-longest-path-in-a-matrix-with-given-constraints/" target="_blank" rel="noopener">Find the longest path in a matrix with given constraints</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/number-of-paths-with-exactly-k-coins/" target="_blank" rel="noopener">Number of paths with exactly k coins</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/collect-maximum-coins-before-hitting-a-dead-end/" target="_blank" rel="noopener">Collect maximum coins before hitting a dead end</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-of-paths-with-k-turns/" target="_blank" rel="noopener">Count number of paths with at-most k turns</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/" target="_blank" rel="noopener">Partition a set into two subsets such that the difference of subset sums is minimum</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-zig-zag-subsequence/" target="_blank" rel="noopener">Longest Zig-Zag Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/largest-sum-zig-zag-sequence-in-a-matrix/" target="_blank" rel="noopener">Largest sum Zigzag sequence in a matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-of-subsets-having-a-particular-xor-value/" target="_blank" rel="noopener">Count number of subsets having a particular XOR value</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/weighted-job-scheduling-log-n-time/" target="_blank" rel="noopener">Weighted Job Scheduling in O(n Log n) time</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/ways-to-arrange-balls-such-that-adjacent-balls-are-of-different-types/" target="_blank" rel="noopener">Ways to arrange Balls such that adjacent balls are of different types</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-time-to-finish-tasks-without-skipping-two-consecutive/" target="_blank" rel="noopener">Minimum time to finish tasks without skipping two consecutive</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-if-string-is-k-palindrome-or-not/" target="_blank" rel="noopener">Find if string is K-Palindrome or not | Set 1</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-if-string-is-k-palindrome-or-not-set-2/" target="_blank" rel="noopener">Find if string is K-Palindrome or not | Set 2</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/wildcard-pattern-matching/" target="_blank" rel="noopener">Wildcard Pattern Matching</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-common-increasing-subsequence-lcs-lis/" target="_blank" rel="noopener">Longest Common Increasing Subsequence (LCS + LIS)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/printing-longest-common-subsequence-set-2-printing/" target="_blank" rel="noopener">Printing Longest Common Subsequence | Set 2 (Printing All)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-high-effort-vs-low-effort-tasks-problem/" target="_blank" rel="noopener">High-effort vs. Low-effort Tasks Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-minimum-adjustment-cost-of-an-array/" target="_blank" rel="noopener">Find minimum adjustment cost of an array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-jobs-involved-in-weighted-job-scheduling/" target="_blank" rel="noopener">Find Jobs involved in Weighted Job Scheduling</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-cost-make-two-strings-identical/" target="_blank" rel="noopener">Minimum Cost To Make Two Strings Identical</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-number-times-string-occurs-given-string/" target="_blank" rel="noopener">Find number of times a string occurs as a subsequence in given string</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-groupings-number-sum-digits-every-sub-group-less-equals-immediate-right-sub-group/" target="_blank" rel="noopener">Count digit groupings of a number with given constraints</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/non-crossing-lines-connect-points-circle/" target="_blank" rel="noopener">Non-crossing lines to connect points in a circle</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-distinct-subsequences/" target="_blank" rel="noopener">Count Distinct Subsequences</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-minimum-sum-one-every-three-consecutive-elements-taken/" target="_blank" rel="noopener">Find minimum sum such that one of every three consecutive elements is taken</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-distinct-occurrences-as-a-subsequence/" target="_blank" rel="noopener">Count distinct occurrences as a subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/number-of-permutation-with-k-inversions/" target="_blank" rel="noopener">Number of permutation with K inversions</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/print-longest-common-sub-sequences-lexicographical-order/" target="_blank" rel="noopener">Print all longest common sub-sequences in lexicographical order</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-distinct-subset-subsequence-sums-array/" target="_blank" rel="noopener">Find all distinct subset (or subsequence) sums of an array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-palindromic-subsequence-given-string/" target="_blank" rel="noopener">Count All Palindromic Subsequence in a given String</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-sum-alternating-subsequence-sum/" target="_blank" rel="noopener">Maximum sum alternating subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/sum-average-subsets/" target="_blank" rel="noopener">Sum of average of all subsets</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-maximum-values-expression/" target="_blank" rel="noopener">Minimum and Maximum values of an expression with * and +</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-sum-subsequence-least-one-every-four-consecutive-elements-picked/" target="_blank" rel="noopener">Minimum sum subsequence such that at least one of every four consecutive elements is picked</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/ways-to-write-n-as-sum-of-two-or-more-positive-integers/" target="_blank" rel="noopener">Ways to write n as sum of two or more positive integers</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/unbounded-knapsack-repetition-items-allowed/" target="_blank" rel="noopener">Unbounded Knapsack (Repetition of items allowed)</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/finding-the-maximum-square-sub-matrix-with-all-equal-elements/" target="_blank" rel="noopener">Finding the maximum square sub-matrix with all equal elements</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-maximum-dot-product-two-arrays-insertion-0s/" target="_blank" rel="noopener">Find Maximum dot product of two arrays with insertion of 0’s</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-points-collected-by-two-persons-allowed-to-meet-once/" target="_blank" rel="noopener">Maximum points collected by two persons allowed to meet once</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-sum-path-3-d-array/" target="_blank" rel="noopener">Minimum Sum Path In 3-D Array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-binary-strings-k-times-appearing-adjacent-two-set-bits/" target="_blank" rel="noopener">Count binary strings with k times appearing adjacent two set bits</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/highway-billboard-problem/" target="_blank" rel="noopener">Highway Billboard Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/probability-getting-least-k-heads-n-tosses-coins/" target="_blank" rel="noopener">Probability of getting at least K heads in N tosses of Coins</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-strings-can-formed-using-b-c-given-constraints/" target="_blank" rel="noopener">Count of strings that can be formed using a, b and c under given constraints</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/modify-array-to-maximize-sum-of-adjacent-differences/" target="_blank" rel="noopener">Modify array to maximize sum of adjacent differences</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/temple-offerings/" target="_blank" rel="noopener">Temple Offerings</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-alternating-subsequence/" target="_blank" rel="noopener">Longest alternating subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-steps-to-delete-a-string-after-repeated-deletion-of-palindrome-substrings/" target="_blank" rel="noopener">Minimum steps to delete a string after repeated deletion of palindrome substrings</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-number-deletions-make-sorted-sequence/" target="_blank" rel="noopener">Minimum number of deletions to make a sorted sequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-number-ways-jump-reach-end/" target="_blank" rel="noopener">Count number of ways to jump to reach end</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/shortest-uncommon-subsequence/" target="_blank" rel="noopener">Shortest Uncommon Subsequence</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-insertions-sort-array/" target="_blank" rel="noopener">Minimum insertions to sort an array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-building-bridges/" target="_blank" rel="noopener">Dynamic Programming | Building Bridges</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/check-valid-sequence-divisible-m/" target="_blank" rel="noopener">Check if any valid sequence is divisible by M</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/rencontres-number-counting-partial-derangements/" target="_blank" rel="noopener">Rencontres Number</a></li>
-</ul>
-</li>
-</ol>
-<p><strong>Hard Problems :</strong></p>
-<ol>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-17-palindrome-partitioning/" target="_blank" rel="noopener">Palindrome Partitioning</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-18-word-wrap/" target="_blank" rel="noopener">Word Wrap Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-27-max-sum-rectangle-in-a-2d-matrix/" target="_blank" rel="noopener">Maximum sum rectangle in a 2D matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-8-matrix-chain-multiplication/" target="_blank" rel="noopener">Matrix Chain Multiplication</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-geometric-progression/" target="_blank" rel="noopener">Longest Geometric Progression</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-combinations-k-bit-numbers-n-bits-set-1-n-k-sorted-order/" target="_blank" rel="noopener">Find all combinations of k-bit numbers with n bits set where 1 &lt;= n &lt;= k in sorted order</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/check-whether-a-given-string-is-an-interleaving-of-two-other-given-strings-set-2/" target="_blank" rel="noopener">Find if a string is interleaved of two other strings</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/length-of-the-longest-arithmatic-progression-in-a-sorted-array/" target="_blank" rel="noopener">Longest Arithmetic Progression</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-set-37-boolean-parenthesization-problem/" target="_blank" rel="noopener">Boolean Parenthesization Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/mobile-numeric-keypad-problem/" target="_blank" rel="noopener">Mobile Numeric Keypad Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-cost-polygon-triangulation/" target="_blank" rel="noopener">Minimum Cost Polygon Triangulation</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/how-to-print-maximum-number-of-a-using-given-four-keys/" target="_blank" rel="noopener">How to print maximum number of A’s using given four keys</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/smallest-length-string-with-repeated-replacement-of-two-distinct-adjacent/" target="_blank" rel="noopener">Smallest length string with repeated replacement of two distinct adjacent</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/collect-maximum-points-in-a-grid-using-two-traversals/" target="_blank" rel="noopener">Collect maximum points in a grid using two traversals</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-weight-transformation-of-a-given-string/" target="_blank" rel="noopener">Maximum weight transformation of a given string</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/find-minimum-possible-size-of-array-with-given-rules-for-removal/" target="_blank" rel="noopener">Find minimum possible size of array with given rules for removing elements</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-k-times/" target="_blank" rel="noopener">Maximum profit by buying and selling a share at most k times</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/number-subsequences-string-divisible-n/" target="_blank" rel="noopener">Number of subsequences in a string divisible by n</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/maximize-arrj-arri-arrl-arrk-such-that-i-j-k-l/" target="_blank" rel="noopener">Maximize arr[j] – arr[i] + arr[l] – arr[k], such that i &lt; j &lt; k &lt; l</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/space-optimized-dp-solution-0-1-knapsack-problem/" target="_blank" rel="noopener">A Space Optimized DP solution for 0-1 Knapsack Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/longest-repeating-and-non-overlapping-substring/" target="_blank" rel="noopener">Longest repeating and non-overlapping substring</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/all-ways-to-add-parenthesis-for-evaluation/" target="_blank" rel="noopener">All ways to add parenthesis for evaluation</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/number-of-palindromic-paths-in-a-matrix/" target="_blank" rel="noopener">Number of palindromic paths in a matrix</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-cost-sort-strings-using-reversal-operations-different-costs/" target="_blank" rel="noopener">Minimum cost to sort strings using reversal operations of different costs</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/minimum-number-of-elements-which-are-not-part-of-increasing-or-decreasing-subsequence-in-array/" target="_blank" rel="noopener">Minimum number of elements which are not part of Increasing or decreasing subsequence in array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/printing-brackets-matrix-chain-multiplication-problem/" target="_blank" rel="noopener">Printing brackets in Matrix Chain Multiplication Problem</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/check-people-can-vote-two-machines/" target="_blank" rel="noopener">Check if all people can vote on two machines</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/probability-knight-remain-chessboard/" target="_blank" rel="noopener">Probability of Knight to remain in the chessboard</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-arithmetic-progression-subsequences-array/" target="_blank" rel="noopener">Count of AP (Arithmetic Progression) Subsequences in an array</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/number-subsequences-form-ai-bj-ck/" target="_blank" rel="noopener">Number of subsequences of the form a^i b^j c^k</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-ways-increase-lcs-length-two-strings-one/" target="_blank" rel="noopener">Count ways to increase LCS length of two strings by one</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/count-arrays-adjacent-elements-one-divide-another/" target="_blank" rel="noopener">Count of arrays in which all adjacent elements are such that one of them divide the another</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/dynamic-programming-trees-set-2/" target="_blank" rel="noopener">Dynamic Programming on Trees</a></li>
-</ul>
-</li>
-<li><ul>
-<li style="list-style: none"><input type="checkbox"> &nbsp;&nbsp; <a href="https://www.geeksforgeeks.org/check-whether-row-column-swap-produces-maximum-size-binary-sub-matrix-1s/" target="_blank" rel="noopener">Check whether row or column swaps produce maximum size binary sub-matrix with all 1s</a></li>
-</ul>
-</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/题集/" data-id="cjlnumm3z0014rcs6l794yb6x" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/题集/">题集</a></li></ul>
 
     </footer>
   </div>
@@ -1466,7 +691,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/动态规划总结/" data-id="cjlnumm3y0011rcs6qe8cshuf" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/动态规划总结/" data-id="cjm60ads70010xls62m6kkjvk" class="article-share-link">分享</a>
       
       
       
@@ -1514,7 +739,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title categories">分类</h3>
     <div class="widget" id="categories">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/alg/">alg</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/backend/">backend</a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/build-own-x/">build-own-x</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/devops/">devops</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/frontend/">frontend</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/frontend/learn-notebook/">learn notebook</a><span class="category-list-count">1</span></li></ul></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/alg/">alg</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/backend/">backend</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/build-own-x/">build-own-x</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/devops/">devops</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/frontend/">frontend</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/frontend/learn-notebook/">learn notebook</a><span class="category-list-count">1</span></li></ul></li></ul>
     </div>
   </div>
 
@@ -1524,7 +749,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title tagcloud">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/apidoc/" style="font-size: 14px;">apidoc</a> <a href="/tags/blockchain/" style="font-size: 17.67px;">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px;">build tools</a> <a href="/tags/css/" style="font-size: 17.67px;">css</a> <a href="/tags/css-grid/" style="font-size: 17.67px;">css grid</a> <a href="/tags/database/" style="font-size: 17.67px;">database</a> <a href="/tags/db原理/" style="font-size: 17.67px;">db原理</a> <a href="/tags/docker/" style="font-size: 14px;">docker</a> <a href="/tags/docker-app/" style="font-size: 14px;">docker app</a> <a href="/tags/gin/" style="font-size: 14px;">gin</a> <a href="/tags/go/" style="font-size: 25px;">go</a> <a href="/tags/goose/" style="font-size: 14px;">goose</a> <a href="/tags/grpc/" style="font-size: 14px;">grpc</a> <a href="/tags/java/" style="font-size: 17.67px;">java</a> <a href="/tags/learn/" style="font-size: 14px;">learn</a> <a href="/tags/lombok/" style="font-size: 14px;">lombok</a> <a href="/tags/markdown/" style="font-size: 14px;">markdown</a> <a href="/tags/redis/" style="font-size: 14px;">redis</a> <a href="/tags/sorting/" style="font-size: 14px;">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px;">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px;">supervisor</a> <a href="/tags/tools安装/" style="font-size: 17.67px;">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px;">以太坊</a> <a href="/tags/动态规划/" style="font-size: 21.33px;">动态规划</a> <a href="/tags/原理/" style="font-size: 14px;">原理</a> <a href="/tags/智能合约/" style="font-size: 14px;">智能合约</a> <a href="/tags/题集/" style="font-size: 14px;">题集</a>
+      <a href="/tags/admin-manage/" style="font-size: 14px;">admin manage</a> <a href="/tags/apidoc/" style="font-size: 14px;">apidoc</a> <a href="/tags/blockchain/" style="font-size: 17.67px;">blockchain</a> <a href="/tags/build-tools/" style="font-size: 14px;">build tools</a> <a href="/tags/css/" style="font-size: 17.67px;">css</a> <a href="/tags/css-grid/" style="font-size: 17.67px;">css grid</a> <a href="/tags/database/" style="font-size: 17.67px;">database</a> <a href="/tags/db原理/" style="font-size: 17.67px;">db原理</a> <a href="/tags/docker/" style="font-size: 14px;">docker</a> <a href="/tags/docker-app/" style="font-size: 14px;">docker app</a> <a href="/tags/etcd/" style="font-size: 14px;">etcd</a> <a href="/tags/gin/" style="font-size: 14px;">gin</a> <a href="/tags/go/" style="font-size: 25px;">go</a> <a href="/tags/goose/" style="font-size: 14px;">goose</a> <a href="/tags/grpc/" style="font-size: 17.67px;">grpc</a> <a href="/tags/java/" style="font-size: 17.67px;">java</a> <a href="/tags/learn/" style="font-size: 14px;">learn</a> <a href="/tags/lombok/" style="font-size: 14px;">lombok</a> <a href="/tags/markdown/" style="font-size: 14px;">markdown</a> <a href="/tags/react/" style="font-size: 14px;">react</a> <a href="/tags/redis/" style="font-size: 14px;">redis</a> <a href="/tags/sorting/" style="font-size: 14px;">sorting</a> <a href="/tags/spring-aop/" style="font-size: 14px;">spring aop</a> <a href="/tags/supervisor/" style="font-size: 14px;">supervisor</a> <a href="/tags/tools安装/" style="font-size: 17.67px;">tools安装</a> <a href="/tags/以太坊/" style="font-size: 14px;">以太坊</a> <a href="/tags/动态规划/" style="font-size: 21.33px;">动态规划</a> <a href="/tags/原理/" style="font-size: 14px;">原理</a> <a href="/tags/智能合约/" style="font-size: 14px;">智能合约</a> <a href="/tags/题集/" style="font-size: 14px;">题集</a>
     </div>
   </div>
 
@@ -1534,6 +759,14 @@
     <h3 class="widget-title recent-posts">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/09/14/backend/go/grpc/服务的注册_发现/">服务的注册,发现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/">admin_manage_jie</a>
+          </li>
         
           <li>
             <a href="/2018/09/04/self_doc/个人软件安装记录-linux/">个人软件安装记录(linux-ubuntu)</a>
@@ -1547,14 +780,6 @@
             <a href="/2018/09/01/backend/tools/markfile_start_learn/">markfile start learn</a>
           </li>
         
-          <li>
-            <a href="/2018/08/31/backend/tools/apidoc_start_learn/">apidoc start learn</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/31/self_doc/个人软件安装记录/">个人软件安装记录(mac osx)</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1564,7 +789,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 

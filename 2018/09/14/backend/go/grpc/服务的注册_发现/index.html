@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>服务的注册,发现 | Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="参考: https://juejin.im/post/5ad9b9596fb9a07acf55b550 微服务之服务的注册和发现服务的注册发现功能, 能够很好的解耦服务器之间的调用功能. 服务注册策略:   将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ). 心跳续期   1234567891011121314151617181920212223242526272829303132">
+<meta name="keywords" content="go,grpc,etcd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="服务的注册,发现">
+<meta property="og:url" content="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="参考: https://juejin.im/post/5ad9b9596fb9a07acf55b550 微服务之服务的注册和发现服务的注册发现功能, 能够很好的解耦服务器之间的调用功能. 服务注册策略:   将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ). 心跳续期   1234567891011121314151617181920212223242526272829303132">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-15T02:22:59.561Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="服务的注册,发现">
+<meta name="twitter:description" content="参考: https://juejin.im/post/5ad9b9596fb9a07acf55b550 微服务之服务的注册和发现服务的注册发现功能, 能够很好的解耦服务器之间的调用功能. 服务注册策略:   将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ). 心跳续期   1234567891011121314151617181920212223242526272829303132">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-backend/go/grpc/服务的注册_发现" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/14/backend/go/grpc/服务的注册_发现/" class="article-date">
+  <time datetime="2018-09-14T12:42:22.000Z" itemprop="datePublished">2018-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      服务的注册,发现
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://juejin.im/post/5ad9b9596fb9a07acf55b550" target="_blank" rel="noopener">https://juejin.im/post/5ad9b9596fb9a07acf55b550</a></p>
+<h2 id="微服务之服务的注册和发现"><a href="#微服务之服务的注册和发现" class="headerlink" title="微服务之服务的注册和发现"></a>微服务之服务的注册和发现</h2><p>服务的注册发现功能, 能够很好的解耦服务器之间的调用功能.</p>
+<h2 id="服务注册"><a href="#服务注册" class="headerlink" title="服务注册"></a>服务注册</h2><p>策略: </p>
+<ol>
+<li>将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ).</li>
+<li>心跳续期 </li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Register</span><span class="params">(ctx context.Context, target <span class="keyword">string</span>, update naming.Update, opts ...wrapper.RegistryOptions)</span> <span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> upBytes []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">if</span> upBytes, err = json.Marshal(update); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	er.cancal = cancel</span><br><span class="line">	rgOpt := wrapper.RegistryOption&#123;TTL: wrapper.DefaultRegInfTTL&#125;</span><br><span class="line">	<span class="keyword">for</span> _, opt := <span class="keyword">range</span> opts &#123;</span><br><span class="line">		opt(&amp;rgOpt)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">switch</span> update.Op &#123;</span><br><span class="line">	<span class="keyword">case</span> naming.Add:</span><br><span class="line">		lsRsp, err := er.lsCli.Grant(ctx, <span class="keyword">int64</span>(rgOpt.TTL/time.Second))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//Put服务信息到etcd,并设置key的值TTL,通过后面的KeepAlive接口</span></span><br><span class="line">        <span class="comment">//对TTL进行续期,超过TTL的时间未收到续期请求,则说明服务可能挂了,从而清除服务信息</span></span><br><span class="line">		etcdOpts := []etcd.OpOption&#123;etcd.WithLease(lsRsp.ID)&#125;</span><br><span class="line">		key := target + <span class="string">"/"</span> + update.Addr</span><br><span class="line">		_, err = er.cli.KV.Put(ctx, key, <span class="keyword">string</span>(upBytes), etcdOpts...)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保持心跳</span></span><br><span class="line">		lsRspChan, err := er.lsCli.KeepAlive(context.TODO(), lsRsp.ID)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				_, ok := &lt;-lsRspChan</span><br><span class="line">				<span class="keyword">if</span> !ok &#123;</span><br><span class="line">					grpclog.Fatalf(<span class="string">"%v keepalive channel is closing"</span>, key)</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	<span class="keyword">case</span> naming.Delete:</span><br><span class="line">		_, err = er.cli.Delete(ctx, target+<span class="string">"/"</span>+update.Addr)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, <span class="string">"unsupported op"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p><strong>Resolve()接口</strong><br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用于生成Watcher,监听注册中心中的服务信息变化</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Resolve</span><span class="params">(target <span class="keyword">string</span>)</span> <span class="params">(naming.Watcher, error)</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	w := &amp;etcdWatcher&#123;</span><br><span class="line">		cli:    er.cli,</span><br><span class="line">		target: target + <span class="string">"/"</span>,</span><br><span class="line">		ctx:    ctx,</span><br><span class="line">		cancel: cancel,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> w, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Next() 接口</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Next接口主要用于获取注册的服务信息,通过channel以及watch,当服务信息发生</span></span><br><span class="line"><span class="comment">//变化时,Next接口会将变化返回给grpc框架从而实现服务信息变更.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(ew *etcdWatcher)</span> <span class="title">Next</span><span class="params">()</span> <span class="params">([]*naming.Update, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> updates []*naming.Update</span><br><span class="line">    <span class="comment">//初次获取时,创建监听channel,并返回获取到的服务信息</span></span><br><span class="line">	<span class="keyword">if</span> ew.watchChan == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">//create new chan</span></span><br><span class="line">		resp, err := ew.cli.Get(ew.ctx, ew.target, etcd.WithPrefix(), etcd.WithSerializable())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> _, kv := <span class="keyword">range</span> resp.Kvs &#123;</span><br><span class="line">			<span class="keyword">var</span> upt naming.Update</span><br><span class="line">			<span class="keyword">if</span> err := json.Unmarshal(kv.Value, &amp;upt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//创建etcd的watcher监听target(服务名)的信息.</span></span><br><span class="line">		opts := []etcd.OpOption&#123;etcd.WithRev(resp.Header.Revision + <span class="number">1</span>), etcd.WithPrefix(), etcd.WithPrevKV()&#125;</span><br><span class="line">		ew.watchChan = ew.cli.Watch(context.TODO(), ew.target, opts...)</span><br><span class="line">		<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//阻塞监听,服务发生变化时才返回给上层</span></span><br><span class="line">	wrsp, ok := &lt;-ew.watchChan</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		err := status.Error(codes.Unavailable, <span class="string">"etcd watch closed"</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> wrsp.Err() != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, wrsp.Err()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> _, e := <span class="keyword">range</span> wrsp.Events &#123;</span><br><span class="line">		<span class="keyword">var</span> upt naming.Update</span><br><span class="line">		<span class="keyword">var</span> err error</span><br><span class="line">		<span class="keyword">switch</span> e.Type &#123;</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypePut:</span><br><span class="line">			err = json.Unmarshal(e.Kv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Add</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypeDelete:</span><br><span class="line">			err = json.Unmarshal(e.PrevKv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Delete</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用默认的grpc"><a href="#使用默认的grpc" class="headerlink" title="使用默认的grpc"></a>使用默认的grpc</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cli, _ := clientv3.NewFromURL(<span class="string">"http://127.0.0.1:2379"</span>)</span><br><span class="line">rs := &amp;etcdnaming.GRPCResolver&#123;Client: cli&#125;</span><br><span class="line"></span><br><span class="line">b := grpc.RoundRobin(rs)</span><br><span class="line">dialOpts := []grpc.DialOption&#123;grpc.WithBalancer(b), grpc.WithInsecure()&#125;</span><br><span class="line">conn, err := grpc.Dial(<span class="string">"jie-test"</span>, dialOpts...)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">client := pb.NewGreeterClient(conn)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjm60adsr002oxls625hwjngg" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/etcd/">etcd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/grpc/">grpc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">admin_manage_jie</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#微服务之服务的注册和发现"><span class="toc-number">1.</span> <span class="toc-text">微服务之服务的注册和发现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#服务注册"><span class="toc-number">2.</span> <span class="toc-text">服务注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#服务发现"><span class="toc-number">3.</span> <span class="toc-text">服务发现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用默认的grpc"><span class="toc-number">3.1.</span> <span class="toc-text">使用默认的grpc</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
