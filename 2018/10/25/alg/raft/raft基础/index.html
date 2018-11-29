@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="raft 基础理论参考: https://www.jianshu.com/p/096ae57d1fe0 问题分解为：领导选取、日志复制、安全和成员变化 基础概念复制状态机  复制状态机通过复制日志来实现： 日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令 状态机：状态机会按顺序执行这些命令 一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2018/10/25/alg/raft/raft基础/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="raft 基础理论参考: https://www.jianshu.com/p/096ae57d1fe0 问题分解为：领导选取、日志复制、安全和成员变化 基础概念复制状态机  复制状态机通过复制日志来实现： 日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令 状态机：状态机会按顺序执行这些命令 一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3412164-922866cdd2dd47c6.png">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3412164-07ae960bce59aab5.png">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3412164-d67cbaab1479a864.png">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3412164-7bfb13d382599f65.png">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3412164-45a235af7798e8f2.png">
+<meta property="og:updated_time" content="2018-11-09T12:16:03.107Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="raft 基础理论参考: https://www.jianshu.com/p/096ae57d1fe0 问题分解为：领导选取、日志复制、安全和成员变化 基础概念复制状态机  复制状态机通过复制日志来实现： 日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令 状态机：状态机会按顺序执行这些命令 一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3412164-922866cdd2dd47c6.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-alg/raft/raft基础" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/25/alg/raft/raft基础/" class="article-date">
+  <time datetime="2018-10-25T10:33:24.559Z" itemprop="datePublished">2018-10-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="raft-基础理论"><a href="#raft-基础理论" class="headerlink" title="raft 基础理论"></a>raft 基础理论</h1><p>参考: <a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
+<p>问题分解为：领导选取、日志复制、安全和成员变化</p>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="复制状态机"><a href="#复制状态机" class="headerlink" title="复制状态机"></a>复制状态机</h3><p><img src="https://upload-images.jianshu.io/upload_images/3412164-922866cdd2dd47c6.png" alt="复制状态机"></p>
+<ul>
+<li>复制状态机通过复制日志来实现：<ul>
+<li>日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令</li>
+<li>状态机：状态机会按顺序执行这些命令</li>
+<li>一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的</li>
+</ul>
+</li>
+</ul>
+<h3 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h3><p>每台服务器均有可能存在下面三种情况:</p>
+<ol>
+<li>领导者</li>
+<li>候选人</li>
+<li>追随者</li>
+</ol>
+<p><img src="https://upload-images.jianshu.io/upload_images/3412164-07ae960bce59aab5.png" alt="服务器转态转换图"></p>
+<p>追随者只响应其他服务器的请求。如果追随者没有收到任何消息，它会成为一个候选人并且开始一次选举。收到大多数服务器投票的候选人会成为新的领导人。领导人在它们宕机之前会一直保持领导人的状态。</p>
+<h3 id="任期"><a href="#任期" class="headerlink" title="任期"></a>任期</h3><p>Raft 算法将时间划分成为任意不同长度的任期（term）。任期用连续的数字进行表示。每一个任期的开始都是一次选举（election），一个或多个候选人会试图成为领导人。如果一个候选人赢得了选举，它就会在该任期的剩余时间担任领导人。在某些情况下，选票会被瓜分，有可能没有选出领导人，那么，将会开始另一个任期，并且立刻开始下一次选举。Raft 算法保证在给定的一个任期最多只有一个领导人。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3412164-d67cbaab1479a864.png" alt="任期示意图"></p>
+<h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><p>Raft 算法中服务器节点之间通信使用远程过程调用（RPCs），并且基本的一致性算法只需要两种类型的 RPCs。请求投票（<code>RequestVote</code>） RPCs 由候选人在选举期间发起，然后附加条目（<code>AppendEntries</code>）RPCs 由领导人发起，用来复制日志和提供一种心跳机制。为了在服务器之间传输快照增加了第三种 RPC。当服务器没有及时的收到 RPC 的响应时，会进行重试， 并且他们能够并行的发起 RPCs 来获得最佳的性能。</p>
+<p>RPC有三种：</p>
+<ol>
+<li>RequestVote RPC：候选人在选举期间发起</li>
+<li>AppendEntries RPC：领导人发起的一种心跳机制，复制日志也在该命令中完成</li>
+<li>InstallSnapshot RPC: 领导者使用该RPC来发送快照给太落后的追随者。</li>
+</ol>
+<p>超时设置：</p>
+<ol>
+<li>BroadcastTime :  领导者的心跳超时时间</li>
+<li>Election Timeout: 追随者设置的候选超时时间</li>
+<li>MTBT :指的是单个服务器发生故障的间隔时间的平均数</li>
+</ol>
+<p>BroadcastTime &lt;&lt; ElectionTimeout &lt;&lt; MTBF<br> 两个原则：</p>
+<ol>
+<li>BroadcastTime应该比ElectionTimeout小一个数量级，为的是使领导人能够持续发送心跳信息（heartbeat）来阻止追随者们开始选举；</li>
+<li>ElectionTimeout也要比MTBF小几个数量级，为的是使得系统稳定运行。</li>
+</ol>
+<p>一般BroadcastTime大约为0.5毫秒到20毫秒，ElectionTimeout一般在10ms到500ms之间。大多数服务器的MTBF都在几个月甚至更长。</p>
+<h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
+<ol>
+<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
+<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
+</ol>
+<p><strong>候选操作过程：</strong></p>
+<blockquote>
+<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
+</blockquote>
+<ol>
+<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
+<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
+<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
+</ol>
+<ul>
+<li>注意事项：</li>
+</ul>
+<ol>
+<li>服务器在一个任期内，最多能给一个候选人投票，采用先到先服务原则；</li>
+<li>候选者等待投票时，可能会接收到来自其它声明为领导人的的AppendEntries RPC。如果该领导人的任期（RPC中有）比当前候选人的当前任期要大，则候选人认为该领导人合法，并转换成追随者；如果RPC中的任期小于候选人的当前任期，则候选人拒绝此次RPC，继续保持候选人状态；</li>
+<li>候选人既没有赢得选举也没有输掉选举：如果许多追随者在同一时刻都成为了候选人，选票会被分散，可能没有候选人能获得大多数的选票。当这种情形发生时，每一个候选人都会超时，并且通过自增任期号和发起另一轮 RequestVote RPC 来开始新的选举。然而，如果没有其它手段来分配选票的话，这种情形可能会无限的重复下去。所以Raft使用的随机的选举超时时间（150~300ms之间），来避免这种情况发生。</li>
+</ol>
+<ul>
+<li>问题探讨：为什么这里没有谈收到其他候选者的RequestVote RPC请求？<br> 可能的解释：</li>
+</ul>
+<ol>
+<li>候选者已经给自己投票了，一个候选者在一个任期只会给一个人投票，不会给其他人再投票了；</li>
+<li>也有可能算法本身设定候选者就拒绝所有的其他服务器的请求。</li>
+</ol>
+<h2 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h2><p><img src="https://upload-images.jianshu.io/upload_images/3412164-7bfb13d382599f65.png" alt="日志复制问题"></p>
+<p>接受命令的过程：</p>
+<ol>
+<li>领导者接受客户端请求；</li>
+<li>领导者把指令追加到日志；</li>
+<li>发送AppendEntries RPC到追随者；</li>
+<li>领导者收到大多数追随者的确认后，领导者Commit该日志，把日志在状态机中回放，并返回结果给客户端；</li>
+</ol>
+<p>提交过程：</p>
+<ol>
+<li>在下一个心跳阶段，领导者再次发送AppendEntries RPC给追随者，日志已经commited；</li>
+<li>追随者收到Commited日志后，将日志在状态机中回放。</li>
+</ol>
+<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>到目前为止描述的机制并不能充分的保证每一个状态机会按照相同的顺序执行相同的指令，例如：一个跟随者可能会进入不可用状态同时领导人已经提交了若干的日志条目，然后这个跟随者可能会被选举为领导人并且覆盖这些日志条目；因此，不同的状态机可能会执行不同的指令序列。</p>
+<h3 id="1-领导者追加日志（Append-Only"><a href="#1-领导者追加日志（Append-Only" class="headerlink" title="1. 领导者追加日志（Append-Only)"></a>1. 领导者追加日志（Append-Only)</h3><p>领导者永远不会覆盖已经存在的日志条目；<br>日志永远只有一个流向：从领导者到追随者；</p>
+<h3 id="2-选举限制：投票阻止没有全部日志条目的服务器赢得选举"><a href="#2-选举限制：投票阻止没有全部日志条目的服务器赢得选举" class="headerlink" title="2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举"></a>2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举</h3><p>如果投票者的日志比候选人的新，拒绝投票请求；<br>这意味着要赢得选举，候选者的日志至少和大多数服务器的日志一样新，那么它一定包含全部的已经提交的日志条目。</p>
+<h3 id="3-永远不提交任期之前的日志条目（只提交任期内的日志条目）"><a href="#3-永远不提交任期之前的日志条目（只提交任期内的日志条目）" class="headerlink" title="3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）"></a>3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）</h3><p>在Raft算法中，当一个日志被安全的复制到绝大多数的机器上面，即AppendEntries RPC在绝大多数服务器正确返回了，那么这个日志就是被提交了，然后领导者会更新commit index。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3412164-45a235af7798e8f2.png" alt=""></p>
+<p>如果允许提交任期之前的日志条目，那么在步骤c中，我们就会把之前任期为2的日志提交到其他服务器中去，并造成了大多数机器存在了日志为2的情况。所以造成了d中S5中任期为3的日志条目会覆盖掉已经提交的日志的情况。</p>
+<p>Raft 从来不会通过计算复制的数目来提交之前人气的日志条目。只有领导人当前任期的日志条目才能通过计算数目来进行提交。一旦当前任期的日志条目以这种方式被提交，那么由于日志匹配原则（Log Matching Property），之前的日志条目也都会被间接的提交。</p>
+<p>论文中的这段话比较难理解，更加直观的说：由于Raft不会提交任期之前的日志条目，那么就不会从b过渡到c的情况，只能从b发生S5down机的情况下直接过渡到e，这样就产生的更新的任期，这样S5就没有机会被选为领导者了。</p>
+<h3 id="4-候选者和追随者崩溃"><a href="#4-候选者和追随者崩溃" class="headerlink" title="4. 候选者和追随者崩溃"></a>4. 候选者和追随者崩溃</h3><p>候选者和追随者崩溃的情况处理要简单的多。如果这类角色崩溃了，那么后续发送给他们的 RequestVote和AppendEntries的所有RCP都会失败，Raft算法中处理这类失败就是简单的无限重试的方式。<br> 　　如果这些服务器重新可用，那么这些RPC就会成功返回。如果一个服务器完成了一个RPC，但是在响应Leader前崩溃了，那么当他再次可用的时候还会收到相同的RPC请求，此时接收服务器负责检查，比如如果收到了已经包含该条日志的RPC请求，可以直接忽略这个请求，确保对系统是无害的。</p>
+<h2 id="成员变化问题"><a href="#成员变化问题" class="headerlink" title="成员变化问题"></a>成员变化问题</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/25/alg/raft/raft基础/" data-id="cjp2c2okq000q5os6v23ow9ci" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2018/10/25/alg/raft/raft领导选取/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/10/24/alg/raft/goraft_read/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#raft-基础理论"><span class="toc-number">1.</span> <span class="toc-text">raft 基础理论</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基础概念"><span class="toc-number">1.1.</span> <span class="toc-text">基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#复制状态机"><span class="toc-number">1.1.1.</span> <span class="toc-text">复制状态机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#服务器状态"><span class="toc-number">1.1.2.</span> <span class="toc-text">服务器状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#任期"><span class="toc-number">1.1.3.</span> <span class="toc-text">任期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RPC"><span class="toc-number">1.1.4.</span> <span class="toc-text">RPC</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#leader选取问题"><span class="toc-number">1.2.</span> <span class="toc-text">leader选取问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#日志复制"><span class="toc-number">1.3.</span> <span class="toc-text">日志复制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安全性"><span class="toc-number">1.4.</span> <span class="toc-text">安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-领导者追加日志（Append-Only"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 领导者追加日志（Append-Only)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-选举限制：投票阻止没有全部日志条目的服务器赢得选举"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-永远不提交任期之前的日志条目（只提交任期内的日志条目）"><span class="toc-number">1.4.3.</span> <span class="toc-text">3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-候选者和追随者崩溃"><span class="toc-number">1.4.4.</span> <span class="toc-text">4. 候选者和追随者崩溃</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#成员变化问题"><span class="toc-number">1.5.</span> <span class="toc-text">成员变化问题</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

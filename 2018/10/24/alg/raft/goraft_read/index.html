@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="GoRaft Read建议粗略的看一下原理：https://www.jianshu.com/p/096ae57d1fe0 整体文件目录结构raft    ├── LICENSE    ├── Makefile    ├── README.md    ├── append_entries.go    ├── append_entries_test.go    ├── command.go    ├─">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2018/10/24/alg/raft/goraft_read/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="GoRaft Read建议粗略的看一下原理：https://www.jianshu.com/p/096ae57d1fe0 整体文件目录结构raft    ├── LICENSE    ├── Makefile    ├── README.md    ├── append_entries.go    ├── append_entries_test.go    ├── command.go    ├─">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-24T15:14:43.906Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="GoRaft Read建议粗略的看一下原理：https://www.jianshu.com/p/096ae57d1fe0 整体文件目录结构raft    ├── LICENSE    ├── Makefile    ├── README.md    ├── append_entries.go    ├── append_entries_test.go    ├── command.go    ├─">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-alg/raft/goraft_read" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/24/alg/raft/goraft_read/" class="article-date">
+  <time datetime="2018-10-24T13:25:59.811Z" itemprop="datePublished">2018-10-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="GoRaft-Read"><a href="#GoRaft-Read" class="headerlink" title="GoRaft Read"></a>GoRaft Read</h1><p>建议粗略的看一下原理：<a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
+<h3 id="整体文件目录结构"><a href="#整体文件目录结构" class="headerlink" title="整体文件目录结构"></a>整体文件目录结构</h3><p>raft<br>    ├── LICENSE<br>    ├── Makefile<br>    ├── README.md<br>    ├── append_entries.go<br>    ├── append_entries_test.go<br>    ├── command.go<br>    ├── commands.go<br>    ├── config.go<br>    ├── context.go<br>    ├── debug.go<br>    ├── event.go<br>    ├── event_dispatcher.go<br>    ├── event_dispatcher_test.go<br>    ├── http_transporter.go<br>    ├── http_transporter_test.go<br>    ├── log.go<br>    ├── log_entry.go<br>    ├── log_test.go<br>    ├── peer.go<br>    ├── protobuf<br>    │   ├── append_entries_request.pb.go<br>    │   ….<br>    ├── request_vote.go<br>    ├── server.go<br>    ├── server_test.go<br>    ├── snapshot.go<br>    ├── snapshot_test.go<br>    ├── statemachine.go<br>    ├── statemachine_test.go<br>    ├── test.go<br>    ├── transporter.go<br>    ├── util.go<br>    └── z_test.go</p>
+<h3 id="文件作用详解"><a href="#文件作用详解" class="headerlink" title="文件作用详解"></a>文件作用详解</h3><p><strong>append_entries.go </strong></p>
+<p>entries：项，日志中的一条指令？</p>
+<p>存在两个结构体：</p>
+<p>AppendEntriesRequest</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to append entries to the log.</span></span><br><span class="line"><span class="comment">// 这个请求是发送给服务端的增加一项到日志中</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term         <span class="keyword">uint64</span></span><br><span class="line">	PrevLogIndex <span class="keyword">uint64</span></span><br><span class="line">	PrevLogTerm  <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex  <span class="keyword">uint64</span></span><br><span class="line">	LeaderName   <span class="keyword">string</span></span><br><span class="line">	Entries      []*protobuf.LogEntry</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AppendEntriesResponse</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="comment">// 从服务端返回的应答</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb     *protobuf.AppendEntriesResponse</span><br><span class="line">	peer   <span class="keyword">string</span></span><br><span class="line">	<span class="built_in">append</span> <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>command.go</strong></p>
+<p>一些和命令相关的接口定义:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> commandTypes <span class="keyword">map</span>[<span class="keyword">string</span>]Command</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	commandTypes = <span class="keyword">map</span>[<span class="keyword">string</span>]Command&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Command represents an action to be taken on the replicated state machine.</span></span><br><span class="line"><span class="keyword">type</span> Command <span class="keyword">interface</span> &#123;</span><br><span class="line">	CommandName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CommandApply represents the interface to apply a command to the server.</span></span><br><span class="line"><span class="keyword">type</span> CommandApply <span class="keyword">interface</span> &#123;</span><br><span class="line">	Apply(Context) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>commands.go</strong></p>
+<p>定义了一些指令的接口和结构体</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Join command interface</span></span><br><span class="line"><span class="keyword">type</span> JoinCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Join command</span></span><br><span class="line"><span class="keyword">type</span> DefaultJoinCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name             <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command interface</span></span><br><span class="line"><span class="keyword">type</span> LeaveCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command</span></span><br><span class="line"><span class="keyword">type</span> DefaultLeaveCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// NOP command</span></span><br><span class="line"><span class="keyword">type</span> NOPCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>context.go</strong></p>
+<p>context</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Context represents the current state of the server. It is passed into</span></span><br><span class="line"><span class="comment">// a command when the command is being applied since the server methods</span></span><br><span class="line"><span class="comment">// are locked.</span></span><br><span class="line"><span class="comment">// Context表示服务器的当前状态。 由于服务器方法被锁定，因此在应用命令时将其传递给命令</span></span><br><span class="line"><span class="keyword">type</span> Context <span class="keyword">interface</span> &#123;</span><br><span class="line">	Server() Server</span><br><span class="line">	CurrentTerm() <span class="keyword">uint64</span></span><br><span class="line">	CurrentIndex() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// context is the concrete implementation of Context.</span></span><br><span class="line"><span class="comment">// context是Context的具体实现</span></span><br><span class="line"><span class="keyword">type</span> context <span class="keyword">struct</span> &#123;</span><br><span class="line">	server       Server</span><br><span class="line">	currentIndex <span class="keyword">uint64</span></span><br><span class="line">	currentTerm  <span class="keyword">uint64</span></span><br><span class="line">	commitIndex  <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>event_dispatcher.go</strong></p>
+<p>事件调度者</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// eventDispatcher is responsible for managing listeners for named events</span></span><br><span class="line"><span class="comment">// and dispatching event notifications to those listeners.</span></span><br><span class="line"><span class="comment">// eventDispatcher负责管理命名事件的侦听器并将事件通知分派给这些侦听器</span></span><br><span class="line"><span class="keyword">type</span> eventDispatcher <span class="keyword">struct</span> &#123;</span><br><span class="line">	sync.RWMutex</span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	listeners <span class="keyword">map</span>[<span class="keyword">string</span>]eventListeners</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// EventListener is a function that can receive event notifications.</span></span><br><span class="line"><span class="comment">// EventListener 是一个函数,能够接受事件通知</span></span><br><span class="line"><span class="keyword">type</span> EventListener <span class="function"><span class="keyword">func</span><span class="params">(Event)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> <span class="title">represents</span> <span class="title">a</span> <span class="title">collection</span> <span class="title">of</span> <span class="title">individual</span> <span class="title">listeners</span>.</span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> 一个监听器的收集器</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">eventListeners</span> []<span class="title">EventListener</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>event.go</strong></p>
+<p>定义了事件</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Event represents an action that occurred within the Raft library.</span></span><br><span class="line"><span class="comment">// Listeners can subscribe to event types by using the Server.AddEventListener() function.</span></span><br><span class="line"><span class="comment">// Event 表示在Raft库中发生的操作。 监听器可以使用Server.AddEventListener（）函数订阅事件类型。</span></span><br><span class="line"><span class="keyword">type</span> Event <span class="keyword">interface</span> &#123;</span><br><span class="line">	Type() <span class="keyword">string</span></span><br><span class="line">	Source() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	Value() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	PrevValue() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// event is the concrete implementation of the Event interface.</span></span><br><span class="line"><span class="comment">// event 是 Event 接口的一个实现</span></span><br><span class="line"><span class="keyword">type</span> event <span class="keyword">struct</span> &#123;</span><br><span class="line">	typ       <span class="keyword">string</span></span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	value     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	prevValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>http_transporter.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An HTTPTransporter is a default transport layer used to communicate between</span></span><br><span class="line"><span class="comment">// multiple servers.</span></span><br><span class="line"><span class="comment">// HTTPTransporter 是用于在多个服务器之间进行通信的默认传输层</span></span><br><span class="line"><span class="keyword">type</span> HTTPTransporter <span class="keyword">struct</span> &#123;</span><br><span class="line">	DisableKeepAlives    <span class="keyword">bool</span></span><br><span class="line">	prefix               <span class="keyword">string</span></span><br><span class="line">	appendEntriesPath    <span class="keyword">string</span></span><br><span class="line">	requestVotePath      <span class="keyword">string</span></span><br><span class="line">	snapshotPath         <span class="keyword">string</span></span><br><span class="line">	snapshotRecoveryPath <span class="keyword">string</span></span><br><span class="line">	httpClient           http.Client</span><br><span class="line">	Transport            *http.Transport</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HTTPMuxer <span class="keyword">interface</span> &#123;</span><br><span class="line">	HandleFunc(<span class="keyword">string</span>, <span class="function"><span class="keyword">func</span><span class="params">(http.ResponseWriter, *http.Request)</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>log_entry.go</strong></p>
+<p>日志中的一项</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log entry stores a single item in the log.</span></span><br><span class="line"><span class="comment">// 日志中的单独一项</span></span><br><span class="line"><span class="keyword">type</span> LogEntry <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb       *protobuf.LogEntry</span><br><span class="line">	Position <span class="keyword">int64</span> <span class="comment">// position in the log file</span></span><br><span class="line">	log      *Log</span><br><span class="line">	event    *ev</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>log.go</strong></p>
+<p>日志</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log is a collection of log entries that are persisted to durable storage.</span></span><br><span class="line"><span class="comment">// Log 是 log entries 的一个收集器, 可以持久存储到持久存储器</span></span><br><span class="line"><span class="keyword">type</span> Log <span class="keyword">struct</span> &#123;</span><br><span class="line">	ApplyFunc   <span class="function"><span class="keyword">func</span><span class="params">(*LogEntry, Command)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span></span><br><span class="line"><span class="function">	<span class="title">file</span>        *<span class="title">os</span>.<span class="title">File</span></span></span><br><span class="line"><span class="function">	<span class="title">path</span>        <span class="title">string</span></span></span><br><span class="line"><span class="function">	<span class="title">entries</span>     []*<span class="title">LogEntry</span></span></span><br><span class="line"><span class="function">	<span class="title">commitIndex</span> <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">mutex</span>       <span class="title">sync</span>.<span class="title">RWMutex</span></span></span><br><span class="line"><span class="function">	<span class="title">startIndex</span>  <span class="title">uint64</span> // <span class="title">the</span> <span class="title">index</span> <span class="title">before</span> <span class="title">the</span> <span class="title">first</span> <span class="title">entry</span> <span class="title">in</span> <span class="title">the</span> <span class="title">Log</span> <span class="title">entries</span></span></span><br><span class="line"><span class="function">	<span class="title">startTerm</span>   <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">initialized</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">The</span> <span class="title">results</span> <span class="title">of</span> <span class="title">the</span> <span class="title">applying</span> <span class="title">a</span> <span class="title">log</span> <span class="title">entry</span>.</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">logResult</span> <span class="title">struct</span></span> &#123;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	err         error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>peer.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A peer is a reference to another server involved in the consensus protocol.</span></span><br><span class="line"><span class="comment">// Peer 是对共识协议中涉及的另一个服务器的引用</span></span><br><span class="line"><span class="keyword">type</span> Peer <span class="keyword">struct</span> &#123;</span><br><span class="line">	server            *server</span><br><span class="line">	Name              <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString  <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">	prevLogIndex      <span class="keyword">uint64</span></span><br><span class="line">	stopChan          <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line">	lastActivity      time.Time</span><br><span class="line">	sync.RWMutex</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>request_vote.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer          *Peer</span><br><span class="line">	Term          <span class="keyword">uint64</span></span><br><span class="line">	LastLogIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastLogTerm   <span class="keyword">uint64</span></span><br><span class="line">	CandidateName <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server after a vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer        *Peer</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	VoteGranted <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>server.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A server is involved in the consensus protocol and can act as a follower,</span></span><br><span class="line"><span class="comment">// candidate or a leader.</span></span><br><span class="line"><span class="keyword">type</span> Server <span class="keyword">interface</span> &#123;</span><br><span class="line">	Name() <span class="keyword">string</span></span><br><span class="line">	Context() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	StateMachine() StateMachine</span><br><span class="line">	Leader() <span class="keyword">string</span></span><br><span class="line">	State() <span class="keyword">string</span></span><br><span class="line">	Path() <span class="keyword">string</span></span><br><span class="line">	LogPath() <span class="keyword">string</span></span><br><span class="line">	SnapshotPath(lastIndex <span class="keyword">uint64</span>, lastTerm <span class="keyword">uint64</span>) <span class="keyword">string</span></span><br><span class="line">	Term() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">	VotedFor() <span class="keyword">string</span></span><br><span class="line">	MemberCount() <span class="keyword">int</span></span><br><span class="line">	QuorumSize() <span class="keyword">int</span></span><br><span class="line">	IsLogEmpty() <span class="keyword">bool</span></span><br><span class="line">	LogEntries() []*LogEntry</span><br><span class="line">	LastCommandName() <span class="keyword">string</span></span><br><span class="line">	GetState() <span class="keyword">string</span></span><br><span class="line">	ElectionTimeout() time.Duration</span><br><span class="line">	SetElectionTimeout(duration time.Duration)</span><br><span class="line">	HeartbeatInterval() time.Duration</span><br><span class="line">	SetHeartbeatInterval(duration time.Duration)</span><br><span class="line">	Transporter() Transporter</span><br><span class="line">	SetTransporter(t Transporter)</span><br><span class="line">	AppendEntries(req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	RequestVote(req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	RequestSnapshot(req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SnapshotRecoveryRequest(req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">	AddPeer(name <span class="keyword">string</span>, connectiongString <span class="keyword">string</span>) error</span><br><span class="line">	RemovePeer(name <span class="keyword">string</span>) error</span><br><span class="line">	Peers() <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	Init() error</span><br><span class="line">	Start() error</span><br><span class="line">	Stop()</span><br><span class="line">	Running() <span class="keyword">bool</span></span><br><span class="line">	Do(command Command) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">	TakeSnapshot() error</span><br><span class="line">	LoadSnapshot() error</span><br><span class="line">	AddEventListener(<span class="keyword">string</span>, EventListener)</span><br><span class="line">	FlushCommitIndex()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span> &#123;</span><br><span class="line">	*eventDispatcher</span><br><span class="line"></span><br><span class="line">	name        <span class="keyword">string</span></span><br><span class="line">	path        <span class="keyword">string</span></span><br><span class="line">	state       <span class="keyword">string</span></span><br><span class="line">	transporter Transporter</span><br><span class="line">	context     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	currentTerm <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	votedFor   <span class="keyword">string</span></span><br><span class="line">	log        *Log</span><br><span class="line">	leader     <span class="keyword">string</span></span><br><span class="line">	peers      <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	mutex      sync.RWMutex</span><br><span class="line">	syncedPeer <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">	stopped           <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	c                 <span class="keyword">chan</span> *ev</span><br><span class="line">	electionTimeout   time.Duration</span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line"></span><br><span class="line">	snapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	<span class="comment">// PendingSnapshot is an unfinished snapshot.</span></span><br><span class="line">	<span class="comment">// After the pendingSnapshot is saved to disk,</span></span><br><span class="line">	<span class="comment">// it will be set to snapshot and also will be</span></span><br><span class="line">	<span class="comment">// set to nil.</span></span><br><span class="line">	pendingSnapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	stateMachine            StateMachine</span><br><span class="line">	maxLogEntriesPerRequest <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	connectionString <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">	routineGroup sync.WaitGroup</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// An internal event to be processed by the server's event loop.</span></span><br><span class="line"><span class="keyword">type</span> ev <span class="keyword">struct</span> &#123;</span><br><span class="line">	target      <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	c           <span class="keyword">chan</span> error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>snapshot.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Snapshot represents an in-memory representation of the current state of the system.</span></span><br><span class="line"><span class="keyword">type</span> Snapshot <span class="keyword">struct</span> &#123;</span><br><span class="line">	LastIndex <span class="keyword">uint64</span> <span class="string">`json:"lastIndex"`</span></span><br><span class="line">	LastTerm  <span class="keyword">uint64</span> <span class="string">`json:"lastTerm"`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Cluster configuration.</span></span><br><span class="line">	Peers []*Peer <span class="string">`json:"peers"`</span></span><br><span class="line">	State []<span class="keyword">byte</span>  <span class="string">`json:"state"`</span></span><br><span class="line">	Path  <span class="keyword">string</span>  <span class="string">`json:"path"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">	Peers      []*Peer</span><br><span class="line">	State      []<span class="keyword">byte</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	Success     <span class="keyword">bool</span></span><br><span class="line">	CommitIndex <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned if the follower entered snapshot state</span></span><br><span class="line"><span class="keyword">type</span> SnapshotResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Success <span class="keyword">bool</span> <span class="string">`json:"success"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>statemachine.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// StateMachine is the interface for allowing the host application to save and</span></span><br><span class="line"><span class="comment">// recovery the state machine. This makes it possible to make snapshots</span></span><br><span class="line"><span class="comment">// and compact the log.</span></span><br><span class="line"><span class="keyword">type</span> StateMachine <span class="keyword">interface</span> &#123;</span><br><span class="line">	Save() ([]<span class="keyword">byte</span>, error)</span><br><span class="line">	Recovery([]<span class="keyword">byte</span>) error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>transporter.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Transporter is the interface for allowing the host application to transport</span></span><br><span class="line"><span class="comment">// requests to other nodes.</span></span><br><span class="line"><span class="keyword">type</span> Transporter <span class="keyword">interface</span> &#123;</span><br><span class="line">	SendVoteRequest(server Server, peer *Peer, req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	SendAppendEntriesRequest(server Server, peer *Peer, req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	SendSnapshotRequest(server Server, peer *Peer, req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SendSnapshotRecoveryRequest(server Server, peer *Peer, req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/24/alg/raft/goraft_read/" data-id="cjp2c2okn000m5os601kquvki" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2018/10/25/alg/raft/raft基础/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/09/23/build_own_x/os/How to create an OS from scratch/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GoRaft-Read"><span class="toc-number">1.</span> <span class="toc-text">GoRaft Read</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#整体文件目录结构"><span class="toc-number">1.0.1.</span> <span class="toc-text">整体文件目录结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件作用详解"><span class="toc-number">1.0.2.</span> <span class="toc-text">文件作用详解</span></a></li></ol></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
