@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="CCI 算法CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。 计算公式系统默认n为14 $TP = \frac{最高价 + 最低价 + 收盘价}{3}$ $MA = \frac{\sum\limits_{k=1}^{n}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2019/06/26/alg/finance/cci/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="CCI 算法CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。 计算公式系统默认n为14 $TP = \frac{最高价 + 最低价 + 收盘价}{3}$ $MA = \frac{\sum\limits_{k=1}^{n}">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-27T01:24:45.557Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="CCI 算法CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。 计算公式系统默认n为14 $TP = \frac{最高价 + 最低价 + 收盘价}{3}$ $MA = \frac{\sum\limits_{k=1}^{n}">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-alg/finance/cci" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/26/alg/finance/cci/" class="article-date">
+  <time datetime="2019-06-26T15:03:32.836Z" itemprop="datePublished">2019-06-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="CCI-算法"><a href="#CCI-算法" class="headerlink" title="CCI 算法"></a>CCI 算法</h1><p>CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。</p>
+<h2 id="计算公式"><a href="#计算公式" class="headerlink" title="计算公式"></a>计算公式</h2><p>系统默认n为14</p>
+<p>$TP = \frac{最高价 + 最低价 + 收盘价}{3}$</p>
+<p>$MA = \frac{\sum\limits_{k=1}^{n} TP(i)}{n}$</p>
+<p>MD = 最近n日 (MA - TP)的绝对值的累计和 ÷ n</p>
+<p>可能不太准确…</p>
+<p>$MD = \frac{MA - TP}{n}​$</p>
+<p>$CCI(n) = \frac{TP - MA}{MD} * 0.015$</p>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p><strong>1,观察CCI范围</strong></p>
+<p>当CCI从0~+100的正常范围内，由下往上突破+100时，<a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87" target="_blank" rel="noopener">股指</a>或<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>有可能出现强势上涨，是买入的时机；当CCI从+100之上，由上往下跌破+100，股指或股价<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a>有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E8%B0%83/9837525" target="_blank" rel="noopener">回调</a>，是卖出的时机。当CCI从0~-100的正常范围内，由上往下跌破-100时，股指或股价有可能出现弱势下跌，是抛出的时机。当CCI从-100的下方，由下往上突破-100时，有可能出现反弹，可逢低买入。</p>
+<p><strong>2, CCI运用也可以用<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>来判断<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E5%A4%B4%E9%83%A8" target="_blank" rel="noopener">短线头部</a>的出现，用<a href="https://baike.baidu.com/item/%E5%BA%95%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">底背离</a>来判断短线底部的到来</strong></p>
+<p>当股指或股价创出新高，而CCI没有同步创出新高时，<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>出现，<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a><a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87/3342555" target="_blank" rel="noopener">股指</a>或股价有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E6%8C%A1" target="_blank" rel="noopener">回挡</a>，可逢高卖出；当股指或股价创出新低，而CCI没有同步创出新低时，底背离出现，短线股指或股价有可能出现反弹，可逢低买入。</p>
+<h2 id="应用技巧"><a href="#应用技巧" class="headerlink" title="应用技巧"></a>应用技巧</h2><p>1、如果CCI指标一直上行突破了100的话,表示此时的股市进入了异常波动的阶段,可能伴随着较大的<a href="https://baike.baidu.com/item/%E6%88%90%E4%BA%A4%E9%87%8F" target="_blank" rel="noopener">成交量</a>,可以进行中短线的投资者,此时的<a href="https://baike.baidu.com/item/%E4%B9%B0%E5%85%A5" target="_blank" rel="noopener">买入</a>信号比较明显.</p>
+<p>2、反之如果CCI指标向下突破了-100,则代表此时的股市进入了新一轮的下跌趋势,此时可以选择不要操作,保持观望的态度面对市场.</p>
+<p>3、如果CCI指标从上行突破100又回到100之内的正常范围,则代表股价这一阶段的上涨行情已经疲软,投资者可以在此时选择卖出.反之CCI突破-100又回到正常范围,则代表<a href="https://baike.baidu.com/item/%E4%B8%8B%E8%B7%8C%E8%B6%8B%E5%8A%BF" target="_blank" rel="noopener">下跌趋势</a>已经结束,观察一段时间可能有转折的信号出现,可以先少量买入.</p>
+<p>注意<a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>主要用来判断100到-100范围之外的行情趋势,在这之间的趋势分析应用 <a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>没有作用和意义,可以选择<a href="https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">KDJ指标</a>来分析.另外CCI指标是进行<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E6%93%8D%E4%BD%9C" target="_blank" rel="noopener">短线操作</a>的投资者比较实用的武器,可以很快帮助交易者找到准确的<a href="https://baike.baidu.com/item/%E4%BA%A4%E6%98%93%E4%BF%A1%E5%8F%B7" target="_blank" rel="noopener">交易信号</a>. [2] </p>
+<p><strong>参考：</strong></p>
+<p>[CCI百度百科(<a href="https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196" target="_blank" rel="noopener">https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196</a>)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/26/alg/finance/cci/" data-id="cjy2hahs300182seo252r2frp" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/06/27/alg/finance/kdj/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/06/26/alg/finance/alg_list/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CCI-算法"><span class="toc-number">1.</span> <span class="toc-text">CCI 算法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#计算公式"><span class="toc-number">1.1.</span> <span class="toc-text">计算公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用方法"><span class="toc-number">1.2.</span> <span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用技巧"><span class="toc-number">1.3.</span> <span class="toc-text">应用技巧</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

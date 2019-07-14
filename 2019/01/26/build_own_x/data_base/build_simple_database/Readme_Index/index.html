@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Let&#39;s Build a Simple Database | Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Let’s Build a Simple Database原文: https://cstack.github.io/db_tutorial/ 从 C 重新开始写 Sqlite 数据库是如何工作的? 在内存和磁盘上, 数据保存的格式是啥? 什么时候会从内存中移动到硬盘上? 为什么每个表仅有一个主键呢? 事务回滚是如何工作的呢? 索引是如何格式化? FIXME(Jx)  (How are indexe">
+<meta name="keywords" content="database,db原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Let&#39;s Build a Simple Database">
+<meta property="og:url" content="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Let’s Build a Simple Database原文: https://cstack.github.io/db_tutorial/ 从 C 重新开始写 Sqlite 数据库是如何工作的? 在内存和磁盘上, 数据保存的格式是啥? 什么时候会从内存中移动到硬盘上? 为什么每个表仅有一个主键呢? 事务回滚是如何工作的呢? 索引是如何格式化? FIXME(Jx)  (How are indexe">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/arch2.gif">
+<meta property="og:updated_time" content="2019-01-28T01:37:45.967Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Let&#39;s Build a Simple Database">
+<meta name="twitter:description" content="Let’s Build a Simple Database原文: https://cstack.github.io/db_tutorial/ 从 C 重新开始写 Sqlite 数据库是如何工作的? 在内存和磁盘上, 数据保存的格式是啥? 什么时候会从内存中移动到硬盘上? 为什么每个表仅有一个主键呢? 事务回滚是如何工作的呢? 索引是如何格式化? FIXME(Jx)  (How are indexe">
+<meta name="twitter:image" content="https://cstack.github.io/db_tutorial/assets/images/arch2.gif">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build_own_x/data_base/build_simple_database/Readme_Index" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" class="article-date">
+  <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Let&#39;s Build a Simple Database
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Let’s-Build-a-Simple-Database"><a href="#Let’s-Build-a-Simple-Database" class="headerlink" title="Let’s Build a Simple Database"></a>Let’s Build a Simple Database</h1><p>原文: <a href="https://cstack.github.io/db_tutorial/" target="_blank" rel="noopener">https://cstack.github.io/db_tutorial/</a></p>
+<p>从 C 重新开始写 Sqlite</p>
+<h2 id="数据库是如何工作的"><a href="#数据库是如何工作的" class="headerlink" title="数据库是如何工作的?"></a>数据库是如何工作的?</h2><ul>
+<li>在内存和磁盘上, 数据保存的格式是啥?</li>
+<li>什么时候会从内存中移动到硬盘上?</li>
+<li>为什么每个表仅有一个主键呢?</li>
+<li>事务回滚是如何工作的呢?</li>
+<li>索引是如何格式化? FIXME(Jx)  (How are indexes formatted?)</li>
+<li>啥时候全表扫描会发生呢?</li>
+<li>保存前的预准备格式是啥样的呢? FIXME(Jx) (What format is a prepared statement saved in?)</li>
+</ul>
+<p>总而言之, 数据库是如何工作的呢?</p>
+<p>为了理解这个, 我将会用 C 重新构建一个 Sqlite , 并且会记录其过程.</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li>Part 1 - 介绍和设置 REPL</li>
+<li>Part 2 - 世上最简单的 SQL 编译器和虚拟机</li>
+<li>Part 3 - 一个在内存, 仅追加的 单表数据库</li>
+<li>Part 4 - 第一个单元测试类(和一些Bugs)</li>
+<li>Part 5 - 持久化到硬盘</li>
+<li>Part 6 - 游标的抽象化</li>
+<li>Part 7 - 介绍 B 树</li>
+<li>Part 8 - B 树叶子接口格式化</li>
+<li>Part 9 - 二分查找和重复键</li>
+<li>Part 10 - 拆分叶子节点</li>
+<li>Part 11 - 递归搜索 B 树</li>
+<li>Part 12 - 扫描多层级的 B 树</li>
+<li>Part 13 - 拆分后更新父节点</li>
+</ul>
+<blockquote>
+<p>“What I cannot create, I do not understand.” – <a href="https://en.m.wikiquote.org/wiki/Richard_Feynman" target="_blank" rel="noopener">Richard Feynman</a></p>
+</blockquote>
+<h3 id="Sqlite-架构图"><a href="#Sqlite-架构图" class="headerlink" title="Sqlite 架构图"></a>Sqlite 架构图</h3><p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="Sqlite 架构图"></p>
+<p>Sqlite 架构图: <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" data-id="cjy2hahwp005e2seoa0smtiyo" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/28/build_own_x/data_base/build_simple_database/Part4_our_first_tests/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Part 4 - 第一个单元测试类(和一些 Bugs)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Part 2 - 世上最简单的 SQL 编译器和虚拟机</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Let’s-Build-a-Simple-Database"><span class="toc-number">1.</span> <span class="toc-text">Let’s Build a Simple Database</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#数据库是如何工作的"><span class="toc-number">1.1.</span> <span class="toc-text">数据库是如何工作的?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#目录"><span class="toc-number">1.2.</span> <span class="toc-text">目录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Sqlite-架构图"><span class="toc-number">1.2.1.</span> <span class="toc-text">Sqlite 架构图</span></a></li></ol></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

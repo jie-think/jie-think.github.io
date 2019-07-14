@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Taskone weak one Part 1. 翻译原文  Part 0 - Index readme  Part 1 - Introduction and Setting up the REPL  Part 2 - World’s Simplest SQL Compiler and Virtual Machine  Part 3 - An In-Memory, Append-Only, Sin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Taskone weak one Part 1. 翻译原文  Part 0 - Index readme  Part 1 - Introduction and Setting up the REPL  Part 2 - World’s Simplest SQL Compiler and Virtual Machine  Part 3 - An In-Memory, Append-Only, Sin">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-26T13:24:26.646Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="Taskone weak one Part 1. 翻译原文  Part 0 - Index readme  Part 1 - Introduction and Setting up the REPL  Part 2 - World’s Simplest SQL Compiler and Virtual Machine  Part 3 - An In-Memory, Append-Only, Sin">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build_own_x/data_base/build_simple_database_task" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database_task/" class="article-date">
+  <time datetime="2019-01-26T07:23:30.094Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h2><p>one weak one Part</p>
+<h3 id="1-翻译原文"><a href="#1-翻译原文" class="headerlink" title="1. 翻译原文"></a>1. 翻译原文</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 0 - Index readme</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="2-基础总结"><a href="#2-基础总结" class="headerlink" title="2. 基础总结"></a>2. 基础总结</h3><ul>
+<li style="list-style: none"><input type="checkbox"> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox"> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="3-follow-it-write-a-simple-DB"><a href="#3-follow-it-write-a-simple-DB" class="headerlink" title="3. follow it write a simple DB"></a>3. follow it write a simple DB</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/" data-id="cjy2hahtd002b2seoyjt4xx0o" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Part1_Introduction_and_setting_up_the_REPL/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Part 1 - 介绍和设置 REPL
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/10/alg/raft/raft_think/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">关于 Raft 的 think</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Task"><span class="toc-number">1.</span> <span class="toc-text">Task</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-翻译原文"><span class="toc-number">1.1.</span> <span class="toc-text">1. 翻译原文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-基础总结"><span class="toc-number">1.2.</span> <span class="toc-text">2. 基础总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-follow-it-write-a-simple-DB"><span class="toc-number">1.3.</span> <span class="toc-text">3. follow it write a simple DB</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

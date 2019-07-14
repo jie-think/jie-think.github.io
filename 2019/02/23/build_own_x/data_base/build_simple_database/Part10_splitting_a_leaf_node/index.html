@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Part 10 - Splitting a Leaf Node | Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Part 10 - 分割叶子节点我们的 B树现在仅有一个节点. 修复它, 我们需要一些代码去分割一个叶子节点. 在哪之后我们需要去创建一个中间节点作为两个叶子节点的中间节点.基本上我们这篇文章的目标就是从这样:one-node btree 到这样:two-level btree 第一步, 先让我们移除叶子节点填充完的错误.1234567891011void leaf_node_insert(Cur">
+<meta name="keywords" content="database,db原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Part 10 - Splitting a Leaf Node">
+<meta property="og:url" content="http://yoursite.com/2019/02/23/build_own_x/data_base/build_simple_database/Part10_splitting_a_leaf_node/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Part 10 - 分割叶子节点我们的 B树现在仅有一个节点. 修复它, 我们需要一些代码去分割一个叶子节点. 在哪之后我们需要去创建一个中间节点作为两个叶子节点的中间节点.基本上我们这篇文章的目标就是从这样:one-node btree 到这样:two-level btree 第一步, 先让我们移除叶子节点填充完的错误.1234567891011void leaf_node_insert(Cur">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree2.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree3.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/internal-node-format.png">
+<meta property="og:updated_time" content="2019-02-24T13:10:57.765Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Part 10 - Splitting a Leaf Node">
+<meta name="twitter:description" content="Part 10 - 分割叶子节点我们的 B树现在仅有一个节点. 修复它, 我们需要一些代码去分割一个叶子节点. 在哪之后我们需要去创建一个中间节点作为两个叶子节点的中间节点.基本上我们这篇文章的目标就是从这样:one-node btree 到这样:two-level btree 第一步, 先让我们移除叶子节点填充完的错误.1234567891011void leaf_node_insert(Cur">
+<meta name="twitter:image" content="https://cstack.github.io/db_tutorial/assets/images/btree2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build_own_x/data_base/build_simple_database/Part10_splitting_a_leaf_node" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/23/build_own_x/data_base/build_simple_database/Part10_splitting_a_leaf_node/" class="article-date">
+  <time datetime="2019-02-23T13:33:19.000Z" itemprop="datePublished">2019-02-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Part 10 - Splitting a Leaf Node
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Part-10-分割叶子节点"><a href="#Part-10-分割叶子节点" class="headerlink" title="Part 10 - 分割叶子节点"></a>Part 10 - 分割叶子节点</h1><p>我们的 B树现在仅有一个节点. 修复它, 我们需要一些代码去分割一个叶子节点. 在哪之后我们需要去创建一个中间节点作为两个叶子节点的中间节点.<br>基本上我们这篇文章的目标就是从这样:<br><img src="https://cstack.github.io/db_tutorial/assets/images/btree2.png" alt="one-node btree"><br>one-node btree</p>
+<p>到这样:<br><img src="https://cstack.github.io/db_tutorial/assets/images/btree3.png" alt="two-level btree"><br>two-level btree</p>
+<p>第一步, 先让我们移除叶子节点填充完的错误.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">leaf_node_insert</span><span class="params">(Cursor* cursor, <span class="keyword">uint32_t</span> key, Row* value)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">void</span>* node = get_page(cursor-&gt;table-&gt;pager, cursor-&gt;page_num);</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">uint32_t</span> num_cells = *leaf_node_num_cells(node);</span><br><span class="line">   <span class="keyword">if</span> (num_cells &gt;= LEAF_NODE_MAX_CELLS) &#123;</span><br><span class="line">     <span class="comment">// Node full</span></span><br><span class="line">-    <span class="built_in">printf</span>(<span class="string">"Need to implement splitting a leaf node.\n"</span>);</span><br><span class="line">-    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">+    leaf_node_split_and_insert(cursor, key, value);</span><br><span class="line">+    <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ExecuteResult <span class="title">execute_insert</span><span class="params">(Statement* statement, Table* table)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">void</span>* node = get_page(table-&gt;pager, table-&gt;root_page_num);</span><br><span class="line">   <span class="keyword">uint32_t</span> num_cells = (*leaf_node_num_cells(node));</span><br><span class="line">-  <span class="keyword">if</span> (num_cells &gt;= LEAF_NODE_MAX_CELLS) &#123;</span><br><span class="line">-    <span class="keyword">return</span> EXECUTE_TABLE_FULL;</span><br><span class="line">-  &#125;</span><br><span class="line"> </span><br><span class="line">   Row* row_to_insert = &amp;(statement-&gt;row_to_insert);</span><br><span class="line">   <span class="keyword">uint32_t</span> key_to_insert = row_to_insert-&gt;id;</span><br></pre></td></tr></table></figure>
+<h2 id="切分算法"><a href="#切分算法" class="headerlink" title="切分算法"></a>切分算法</h2><p>简单的部分结束了. 从 sqlite 官网获得的一些描述信息: <a href="https://play.google.com/store/books/details/Sibsankar_Haldar_SQLite_Database_System_Design_and?id=9Z6IQQnX1JEC&amp;hl=en" target="_blank" rel="noopener">https://play.google.com/store/books/details/Sibsankar_Haldar_SQLite_Database_System_Design_and?id=9Z6IQQnX1JEC&amp;hl=en</a></p>
+<blockquote>
+<p>If there is no space on the leaf node, we would split the existing entries residing there and the new one (being inserted) into two equal halves: lower and upper halves. (Keys on the upper half are strictly greater than those on the lower half.) We allocate a new leaf node, and move the upper half into the new node.</p>
+</blockquote>
+<blockquote>
+<p>如果叶子节点没有空间了, 我们会将驻留在那里的现有条目和新的条目（被插入）分成两半：下半部分和上半部分.  (上半部分的键严格大于下半部分的键.) 我们分配一个新的叶子节点，并将上半部分移动到新节点.</p>
+</blockquote>
+<p>让我来处理旧的节点并且创建一个新的节点:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">leaf_node_split_and_insert</span><span class="params">(Cursor* cursor, <span class="keyword">uint32_t</span> key, Row* value)</span> </span>&#123;</span><br><span class="line">+  <span class="comment">/*</span></span><br><span class="line"><span class="comment">+  Create a new node and move half the cells over.</span></span><br><span class="line"><span class="comment">+  Insert the new value in one of the two nodes.</span></span><br><span class="line"><span class="comment">+  Update parent or create a new parent.</span></span><br><span class="line"><span class="comment">+  */</span></span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">void</span>* old_node = get_page(cursor-&gt;table-&gt;pager, cursor-&gt;page_num);</span><br><span class="line">+  <span class="keyword">uint32_t</span> new_page_num = get_unused_page_num(cursor-&gt;table-&gt;pager);</span><br><span class="line">+  <span class="keyword">void</span>* new_node = get_page(cursor-&gt;table-&gt;pager, new_page_num);</span><br><span class="line">+  initialize_leaf_node(new_node);</span><br></pre></td></tr></table></figure></p>
+<p>下一步, 拷贝每一个 cell 到新的地方:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">+  <span class="comment">/*</span></span><br><span class="line"><span class="comment">+  All existing keys plus new key should be divided</span></span><br><span class="line"><span class="comment">+  evenly between old (left) and new (right) nodes.</span></span><br><span class="line"><span class="comment">+  Starting from the right, move each key to correct position.</span></span><br><span class="line"><span class="comment">+  */</span></span><br><span class="line">+  <span class="keyword">for</span> (<span class="keyword">int32_t</span> i = LEAF_NODE_MAX_CELLS; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">+    <span class="keyword">void</span>* destination_node;</span><br><span class="line">+    <span class="keyword">if</span> (i &gt;= LEAF_NODE_LEFT_SPLIT_COUNT) &#123;</span><br><span class="line">+      destination_node = new_node;</span><br><span class="line">+    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+      destination_node = old_node;</span><br><span class="line">+    &#125;</span><br><span class="line">+    <span class="keyword">uint32_t</span> index_within_node = i % LEAF_NODE_LEFT_SPLIT_COUNT;</span><br><span class="line">+    <span class="keyword">void</span>* destination = leaf_node_cell(destination_node, index_within_node);</span><br><span class="line">+</span><br><span class="line">+    <span class="keyword">if</span> (i == cursor-&gt;cell_num) &#123;</span><br><span class="line">+      serialize_row(value, destination);</span><br><span class="line">+    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (i &gt; cursor-&gt;cell_num) &#123;</span><br><span class="line">+      <span class="built_in">memcpy</span>(destination, leaf_node_cell(old_node, i - <span class="number">1</span>), LEAF_NODE_CELL_SIZE);</span><br><span class="line">+    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+      <span class="built_in">memcpy</span>(destination, leaf_node_cell(old_node, i), LEAF_NODE_CELL_SIZE);</span><br><span class="line">+    &#125;</span><br><span class="line">+  &#125;</span><br></pre></td></tr></table></figure>
+<p>更新 cell 的数量在每一个节点的头部:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+  <span class="comment">/* Update cell count on both leaf nodes */</span></span><br><span class="line">+  *(leaf_node_num_cells(old_node)) = LEAF_NODE_LEFT_SPLIT_COUNT;</span><br><span class="line">+  *(leaf_node_num_cells(new_node)) = LEAF_NODE_RIGHT_SPLIT_COUNT;</span><br></pre></td></tr></table></figure></p>
+<p>然后我们需要更新节点的父节点. 如果原节点是一个根节点就没有父节点了. 在这种情况下, 新建一个根节点去作为父节点. 我们先去除其它情况:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+  <span class="keyword">if</span> (is_node_root(old_node)) &#123;</span><br><span class="line">+    <span class="keyword">return</span> create_new_root(cursor-&gt;table, new_page_num);</span><br><span class="line">+  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Need to implement updating parent after split\n"</span>);</span><br><span class="line">+    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="分配新的页"><a href="#分配新的页" class="headerlink" title="分配新的页"></a>分配新的页</h2><p>定义一些新的函数和常量. 当我们创建一个新的叶子节点的时, 我们将其放在由<code>get_unused_page_num()</code> 决定的页面中.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">/*</span></span><br><span class="line"><span class="comment">+Until we start recycling free pages, new pages will always</span></span><br><span class="line"><span class="comment">+go onto the end of the database file</span></span><br><span class="line"><span class="comment">+*/</span></span><br><span class="line">+<span class="keyword">uint32_t</span> get_unused_page_num(Pager* pager) &#123; <span class="keyword">return</span> pager-&gt;num_pages; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在我们假设数据库现在有 N 页, 从 0 到 N -1 被分配完了. 我们总是能分配第 N 页. 最终我们实行删除后, 一些页面可能变成空并且他们的页码将不可用. 为了高效, 我们可以重新分配这些页面.</p>
+<h2 id="叶子节点的大小"><a href="#叶子节点的大小" class="headerlink" title="叶子节点的大小"></a>叶子节点的大小</h2><p>为了让树保持平衡, 我们在两个新节点之间均匀分配cells. 如果一个叶子节点能保存 N 个 cell, 然后在分割的时候需要在两个节点间分配 N+1 的 cells. (N 为原始单元加一个新的单元). 如果 N+1 是一个基数, 我随意选择左节点再获得一个单元格.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + <span class="number">1</span>) / <span class="number">2</span>;</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> LEAF_NODE_LEFT_SPLIT_COUNT =</span><br><span class="line">+    (LEAF_NODE_MAX_CELLS + <span class="number">1</span>) - LEAF_NODE_RIGHT_SPLIT_COUNT;</span><br></pre></td></tr></table></figure></p>
+<h2 id="创建一个新的根节点"><a href="#创建一个新的根节点" class="headerlink" title="创建一个新的根节点"></a>创建一个新的根节点</h2><p>以下是SQLite数据库系统如何解释创建新根节点的过程: <a href="https://play.google.com/store/books/details/Sibsankar_Haldar_SQLite_Database_System_Design_and?id=9Z6IQQnX1JEC&amp;hl=en" target="_blank" rel="noopener">https://play.google.com/store/books/details/Sibsankar_Haldar_SQLite_Database_System_Design_and?id=9Z6IQQnX1JEC&amp;hl=en</a></p>
+<blockquote>
+<p>Let N be the root node. First allocate two nodes, say L and R. Move lower half of N into L and the upper half into R. Now N is empty. Add 〈L, K,R〉 in N, where K is the max key in L. Page N remains the root. Note that the depth of the tree has increased by one, but the new tree remains height balanced without violating any B+-tree property.</p>
+<p>设N为根节点. 首先, 分配两个节点 L 和 R. 移动低一半的 N 到 L 和 高一半到 R 中. 现在 N 是空的了. 在 N 中, 增加 &lt;L, K, R&gt;. 这里的 K 是 L 中的最大 key . 第 N 页依旧是根. 请注意，树的深度增加了1，但新树保持高度平衡而不违反任何B + tree属性。</p>
+</blockquote>
+<p>在这一点上，我们已经分配了正确的孩子，并将上半部分移入其中. 我们的函数将正确的子项作为输入，并分配一个新页面来存储左子项.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">create_new_root</span><span class="params">(Table* table, <span class="keyword">uint32_t</span> right_child_page_num)</span> </span>&#123;</span><br><span class="line">+  <span class="comment">/*</span></span><br><span class="line"><span class="comment">+  Handle splitting the root.</span></span><br><span class="line"><span class="comment">+  Old root copied to new page, becomes left child.</span></span><br><span class="line"><span class="comment">+  Address of right child passed in.</span></span><br><span class="line"><span class="comment">+  Re-initialize root page to contain the new root node.</span></span><br><span class="line"><span class="comment">+  New root node points to two children.</span></span><br><span class="line"><span class="comment">+  */</span></span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">void</span>* root = get_page(table-&gt;pager, table-&gt;root_page_num);</span><br><span class="line">+  <span class="keyword">void</span>* right_child = get_page(table-&gt;pager, right_child_page_num);</span><br><span class="line">+  <span class="keyword">uint32_t</span> left_child_page_num = get_unused_page_num(table-&gt;pager);</span><br><span class="line">+  <span class="keyword">void</span>* left_child = get_page(table-&gt;pager, left_child_page_num);</span><br></pre></td></tr></table></figure>
+<p>旧的根数据被拷贝到左子项, 所以我能重用根页.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+  <span class="comment">/* Left child has data copied from old root */</span></span><br><span class="line">+  <span class="built_in">memcpy</span>(left_child, root, PAGE_SIZE);</span><br><span class="line">+  set_node_root(left_child, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
+<p>最后,我们初始化一个根页为有两个孩子的中间节点.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+  <span class="comment">/* Root node is a new internal node with one key and two children */</span></span><br><span class="line">+  initialize_internal_node(root);</span><br><span class="line">+  set_node_root(root, <span class="literal">true</span>);</span><br><span class="line">+  *internal_node_num_keys(root) = <span class="number">1</span>;</span><br><span class="line">+  *internal_node_child(root, <span class="number">0</span>) = left_child_page_num;</span><br><span class="line">+  <span class="keyword">uint32_t</span> left_child_max_key = get_node_max_key(left_child);</span><br><span class="line">+  *internal_node_key(root, <span class="number">0</span>) = left_child_max_key;</span><br><span class="line">+  *internal_node_right_child(root) = right_child_page_num;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="中间节点的格式"><a href="#中间节点的格式" class="headerlink" title="中间节点的格式"></a>中间节点的格式</h2><p>现在我们终于创建了一个内部节点, 我们现在去定义他的layout. 它一开始是一个普通的头, 然后是包含的键的数量, 然后是最右边孩子的页码. 内部节点总是有一个子指针而不是它们的键, 额外的指针存储在header 中.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">/*</span></span><br><span class="line"><span class="comment">+ * Internal Node Header Layout</span></span><br><span class="line"><span class="comment">+ */</span></span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_NUM_KEYS_SIZE = <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_RIGHT_CHILD_SIZE = <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_RIGHT_CHILD_OFFSET =</span><br><span class="line">+    INTERNAL_NODE_NUM_KEYS_OFFSET + INTERNAL_NODE_NUM_KEYS_SIZE;</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE +</span><br><span class="line">+                                           INTERNAL_NODE_NUM_KEYS_SIZE +</span><br><span class="line">+                                         INTERNAL_NODE_RIGHT_CHILD_SIZE;</span><br></pre></td></tr></table></figure></p>
+<p>内容时一个cells 的数组, 每一个 cell 包含一个子指针和一个键. 每个键应该是左侧子项中包含的最大键.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+<span class="comment">/*</span></span><br><span class="line"><span class="comment">+ * Internal Node Body Layout</span></span><br><span class="line"><span class="comment">+ */</span></span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_KEY_SIZE = <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_CHILD_SIZE = <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">+<span class="keyword">const</span> <span class="keyword">uint32_t</span> INTERNAL_NODE_CELL_SIZE =</span><br><span class="line">+    INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;</span><br></pre></td></tr></table></figure></p>
+<p>基于这些常量, 以下是内部节点的布局:</p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/internal-node-format.png" alt="Our internal node format"><br>Our internal node format</p>
+<p>注意我们巨大的变化. 因为每一个子指针和键值对都很小, 我们能够填充510 key 和511 个子指针,在每一个中间节点. 这意味着我们永远不必遍历树的许多层来找到给定的key.</p>
+<table>
+<thead>
+<tr>
+<th># internal node layers</th>
+<th>max # leaf nodes</th>
+<th>Size of all leaf nodes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>511^0 = 1</td>
+<td>4 KB</td>
+</tr>
+<tr>
+<td>1</td>
+<td>511^1 = 512</td>
+<td>~2 MB</td>
+</tr>
+<tr>
+<td>2</td>
+<td>511^2 = 261,121</td>
+<td>~1 GB</td>
+</tr>
+<tr>
+<td>3</td>
+<td>511^3 = 133,432,831</td>
+<td>~550 GB</td>
+</tr>
+</tbody>
+</table>
+<p>实际上，由于头部信息，key和浪费空间的开销，我们无法为每个叶节点存储完整的4 KB数据。但是我们可以通过从磁盘加载仅4页来搜索500 GB的数据。这就是B-Tree是数据库的有用数据结构的原因。<br>以下是读取和写入内部节点的方法:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">+<span class="keyword">uint32_t</span>* internal_node_num_keys(<span class="keyword">void</span>* node) &#123;</span><br><span class="line">+  <span class="keyword">return</span> node + INTERNAL_NODE_NUM_KEYS_OFFSET;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">uint32_t</span>* internal_node_right_child(<span class="keyword">void</span>* node) &#123;</span><br><span class="line">+  <span class="keyword">return</span> node + INTERNAL_NODE_RIGHT_CHILD_OFFSET;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">uint32_t</span>* internal_node_cell(<span class="keyword">void</span>* node, <span class="keyword">uint32_t</span> cell_num) &#123;</span><br><span class="line">+  <span class="keyword">return</span> node + INTERNAL_NODE_HEADER_SIZE + cell_num * INTERNAL_NODE_CELL_SIZE;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">uint32_t</span>* internal_node_child(<span class="keyword">void</span>* node, <span class="keyword">uint32_t</span> child_num) &#123;</span><br><span class="line">+  <span class="keyword">uint32_t</span> num_keys = *internal_node_num_keys(node);</span><br><span class="line">+  <span class="keyword">if</span> (child_num &gt; num_keys) &#123;</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Tried to access child_num %d &gt; num_keys %d\n"</span>, child_num, num_keys);</span><br><span class="line">+    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">+  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (child_num == num_keys) &#123;</span><br><span class="line">+    <span class="keyword">return</span> internal_node_right_child(node);</span><br><span class="line">+  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+    <span class="keyword">return</span> internal_node_cell(node, child_num);</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">uint32_t</span>* internal_node_key(<span class="keyword">void</span>* node, <span class="keyword">uint32_t</span> key_num) &#123;</span><br><span class="line">+  <span class="keyword">return</span> internal_node_cell(node, key_num) + INTERNAL_NODE_CHILD_SIZE;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<p>对于内部节点，最大密钥始终是其右键。对于叶节点，它是最大索引处的键:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+<span class="keyword">uint32_t</span> get_node_max_key(<span class="keyword">void</span>* node) &#123;</span><br><span class="line">+  <span class="keyword">switch</span> (get_node_type(node)) &#123;</span><br><span class="line">+    <span class="keyword">case</span> NODE_INTERNAL:</span><br><span class="line">+      <span class="keyword">return</span> *internal_node_key(node, *internal_node_num_keys(node) - <span class="number">1</span>);</span><br><span class="line">+    <span class="keyword">case</span> NODE_LEAF:</span><br><span class="line">+      <span class="keyword">return</span> *leaf_node_key(node, *leaf_node_num_cells(node) - <span class="number">1</span>);</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="跟踪-Root"><a href="#跟踪-Root" class="headerlink" title="跟踪 Root"></a>跟踪 Root</h2><p>我们最终在公共节点头中使用了is_root字段。回想一下，我们使用它来决定如何拆分叶节点:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function"><span class="keyword">bool</span> <span class="title">is_node_root</span><span class="params">(<span class="keyword">void</span>* node)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">uint8_t</span> value = *((<span class="keyword">uint8_t</span>*)(node + IS_ROOT_OFFSET));</span><br><span class="line">+  <span class="keyword">return</span> (<span class="keyword">bool</span>)value;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">set_node_root</span><span class="params">(<span class="keyword">void</span>* node, <span class="keyword">bool</span> is_root)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">uint8_t</span> value = is_root;</span><br><span class="line">+  *((<span class="keyword">uint8_t</span>*)(node + IS_ROOT_OFFSET)) = value;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure>
+<p>以下是getter 和 setter 方法:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function"><span class="keyword">bool</span> <span class="title">is_node_root</span><span class="params">(<span class="keyword">void</span>* node)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">uint8_t</span> value = *((<span class="keyword">uint8_t</span>*)(node + IS_ROOT_OFFSET));</span><br><span class="line">+  <span class="keyword">return</span> (<span class="keyword">bool</span>)value;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">set_node_root</span><span class="params">(<span class="keyword">void</span>* node, <span class="keyword">bool</span> is_root)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">uint8_t</span> value = is_root;</span><br><span class="line">+  *((<span class="keyword">uint8_t</span>*)(node + IS_ROOT_OFFSET)) = value;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<p>初始化两种类型的节点应该默认将is_root设置为false：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initialize_leaf_node</span><span class="params">(<span class="keyword">void</span>* node)</span> </span>&#123;</span><br><span class="line">   set_node_type(node, NODE_LEAF);</span><br><span class="line">+  set_node_root(node, <span class="literal">false</span>);</span><br><span class="line">   *leaf_node_num_cells(node) = <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">initialize_internal_node</span><span class="params">(<span class="keyword">void</span>* node)</span> </span>&#123;</span><br><span class="line">+  set_node_type(node, NODE_INTERNAL);</span><br><span class="line">+  set_node_root(node, <span class="literal">false</span>);</span><br><span class="line">+  *internal_node_num_keys(node) = <span class="number">0</span>;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们应该在创建表的第一个节点时将is_root设置为true:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">     <span class="comment">// New database file. Initialize page 0 as leaf node.</span></span><br><span class="line">     <span class="keyword">void</span>* root_node = get_page(pager, <span class="number">0</span>);</span><br><span class="line">     initialize_leaf_node(root_node);</span><br><span class="line">+    set_node_root(root_node, <span class="literal">true</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">   <span class="keyword">return</span> table;</span><br></pre></td></tr></table></figure>
+<h2 id="打印树"><a href="#打印树" class="headerlink" title="打印树"></a>打印树</h2><p>为了帮助我们可视化数据库的状态，我们应该更新.btree metacommand以打印多级树.<br>我要替换当前的print_leaf_node（）函数.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-<span class="function"><span class="keyword">void</span> <span class="title">print_leaf_node</span><span class="params">(<span class="keyword">void</span>* node)</span> </span>&#123;</span><br><span class="line">-  <span class="keyword">uint32_t</span> num_cells = *leaf_node_num_cells(node);</span><br><span class="line">-  <span class="built_in">printf</span>(<span class="string">"leaf (size %d)\n"</span>, num_cells);</span><br><span class="line">-  <span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; num_cells; i++) &#123;</span><br><span class="line">-    <span class="keyword">uint32_t</span> key = *leaf_node_key(node, i);</span><br><span class="line">-    <span class="built_in">printf</span>(<span class="string">"  - %d : %d\n"</span>, i, key);</span><br><span class="line">-  &#125;</span><br><span class="line">-&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用一个新的递归函数，它接受任何节点，然后打印它及其子节点。它将缩进级别作为参数，随着每次递归调用而增加。我还添加了一个小的辅助函数来缩进。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">indent</span><span class="params">(<span class="keyword">uint32_t</span> level)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; level; i++) &#123;</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"  "</span>);</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">print_tree</span><span class="params">(Pager* pager, <span class="keyword">uint32_t</span> page_num, <span class="keyword">uint32_t</span> indentation_level)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">void</span>* node = get_page(pager, page_num);</span><br><span class="line">+  <span class="keyword">uint32_t</span> num_keys, child;</span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">switch</span> (get_node_type(node)) &#123;</span><br><span class="line">+    <span class="keyword">case</span> (NODE_LEAF):</span><br><span class="line">+      num_keys = *leaf_node_num_cells(node);</span><br><span class="line">+      indent(indentation_level);</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"- leaf (size %d)\n"</span>, num_keys);</span><br><span class="line">+      <span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; num_keys; i++) &#123;</span><br><span class="line">+        indent(indentation_level + <span class="number">1</span>);</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"- %d\n"</span>, *leaf_node_key(node, i));</span><br><span class="line">+      &#125;</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+    <span class="keyword">case</span> (NODE_INTERNAL):</span><br><span class="line">+      num_keys = *internal_node_num_keys(node);</span><br><span class="line">+      indent(indentation_level);</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"- internal (size %d)\n"</span>, num_keys);</span><br><span class="line">+      <span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; num_keys; i++) &#123;</span><br><span class="line">+        child = *internal_node_child(node, i);</span><br><span class="line">+        print_tree(pager, child, indentation_level + <span class="number">1</span>);</span><br><span class="line">+</span><br><span class="line">+        indent(indentation_level);</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"- key %d\n"</span>, *internal_node_key(node, i));</span><br><span class="line">+      &#125;</span><br><span class="line">+      child = *internal_node_right_child(node);</span><br><span class="line">+      print_tree(pager, child, indentation_level + <span class="number">1</span>);</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<p>并更新对print函数的调用，将缩进级别传递给零.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".btree"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">"Tree:\n"</span>);</span><br><span class="line">-    print_leaf_node(get_page(table-&gt;pager, <span class="number">0</span>));</span><br><span class="line">+    print_tree(table-&gt;pager, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">     <span class="keyword">return</span> META_COMMAND_SUCCESS;</span><br></pre></td></tr></table></figure>
+<p>这是新打印功能的测试用例<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">+  it <span class="string">'allows printing out the structure of a 3-leaf-node btree'</span> <span class="keyword">do</span></span><br><span class="line">+    script = (<span class="number">1</span>..<span class="number">14</span>).map <span class="keyword">do</span> <span class="params">|i|</span></span><br><span class="line">+      <span class="string">"insert <span class="subst">#&#123;i&#125;</span> user<span class="subst">#&#123;i&#125;</span> person<span class="subst">#&#123;i&#125;</span>@example.com"</span></span><br><span class="line">+    <span class="keyword">end</span></span><br><span class="line">+    script &lt;&lt; <span class="string">".btree"</span></span><br><span class="line">+    script &lt;&lt; <span class="string">"insert 15 user15 person15@example.com"</span></span><br><span class="line">+    script &lt;&lt; <span class="string">".exit"</span></span><br><span class="line">+    result = run_script(script)</span><br><span class="line">+</span><br><span class="line">+    expect(result[<span class="number">14</span>...(result.length)]).to match_array([</span><br><span class="line">+      <span class="string">"db &gt; Tree:"</span>,</span><br><span class="line">+      <span class="string">"- internal (size 1)"</span>,</span><br><span class="line">+      <span class="string">"  - leaf (size 7)"</span>,</span><br><span class="line">+      <span class="string">"    - 1"</span>,</span><br><span class="line">+      <span class="string">"    - 2"</span>,</span><br><span class="line">+      <span class="string">"    - 3"</span>,</span><br><span class="line">+      <span class="string">"    - 4"</span>,</span><br><span class="line">+      <span class="string">"    - 5"</span>,</span><br><span class="line">+      <span class="string">"    - 6"</span>,</span><br><span class="line">+      <span class="string">"    - 7"</span>,</span><br><span class="line">+      <span class="string">"- key 7"</span>,</span><br><span class="line">+      <span class="string">"  - leaf (size 7)"</span>,</span><br><span class="line">+      <span class="string">"    - 8"</span>,</span><br><span class="line">+      <span class="string">"    - 9"</span>,</span><br><span class="line">+      <span class="string">"    - 10"</span>,</span><br><span class="line">+      <span class="string">"    - 11"</span>,</span><br><span class="line">+      <span class="string">"    - 12"</span>,</span><br><span class="line">+      <span class="string">"    - 13"</span>,</span><br><span class="line">+      <span class="string">"    - 14"</span>,</span><br><span class="line">+      <span class="string">"db &gt; Need to implement searching an internal node"</span>,</span><br><span class="line">+    ])</span><br><span class="line">+  <span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>新格式有点简化，所以我们需要更新现有的.btree测试:<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">       <span class="string">"db &gt; Executed."</span>,</span><br><span class="line">       <span class="string">"db &gt; Executed."</span>,</span><br><span class="line">       <span class="string">"db &gt; Tree:"</span>,</span><br><span class="line">-      <span class="string">"leaf (size 3)"</span>,</span><br><span class="line">-      <span class="string">"  - 0 : 1"</span>,</span><br><span class="line">-      <span class="string">"  - 1 : 2"</span>,</span><br><span class="line">-      <span class="string">"  - 2 : 3"</span>,</span><br><span class="line">+      <span class="string">"- leaf (size 3)"</span>,</span><br><span class="line">+      <span class="string">"  - 1"</span>,</span><br><span class="line">+      <span class="string">"  - 2"</span>,</span><br><span class="line">+      <span class="string">"  - 3"</span>,</span><br><span class="line">       <span class="string">"db &gt; "</span></span><br><span class="line">     ])</span><br><span class="line">   <span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>这是新测试的.btree输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Tree:</span><br><span class="line">- internal (size 1)</span><br><span class="line">  - leaf (size 7)</span><br><span class="line">    - 1</span><br><span class="line">    - 2</span><br><span class="line">    - 3</span><br><span class="line">    - 4</span><br><span class="line">    - 5</span><br><span class="line">    - 6</span><br><span class="line">    - 7</span><br><span class="line">  - key 7</span><br><span class="line">  - leaf (size 7)</span><br><span class="line">    - 8</span><br><span class="line">    - 9</span><br><span class="line">    - 10</span><br><span class="line">    - 11</span><br><span class="line">    - 12</span><br><span class="line">    - 13</span><br><span class="line">    - 14</span><br></pre></td></tr></table></figure></p>
+<h2 id="主要问题"><a href="#主要问题" class="headerlink" title="主要问题"></a>主要问题</h2><p>如果你一直密切关注，你可能会注意到我们错过了一些大事。看看如果我们尝试插入另一行会发生什么.<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db &gt; insert 15 user15 person15@example.com</span><br><span class="line">Need to implement searching an internal node</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/23/build_own_x/data_base/build_simple_database/Part10_splitting_a_leaf_node/" data-id="cjy2hahvt004i2seoks9tiso2" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/02/24/build_own_x/data_base/build_simple_database/Part11_recursively_seaching_the_B_tree/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Part 11 - Recursively Searching the B-Tree
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/02/23/build_own_x/data_base/build_simple_database/Part9_binary_search_and_duplicate_keys/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Part 9 - Binary Search and Duplicate Keys</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-10-分割叶子节点"><span class="toc-number">1.</span> <span class="toc-text">Part 10 - 分割叶子节点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#切分算法"><span class="toc-number">1.1.</span> <span class="toc-text">切分算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分配新的页"><span class="toc-number">1.2.</span> <span class="toc-text">分配新的页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#叶子节点的大小"><span class="toc-number">1.3.</span> <span class="toc-text">叶子节点的大小</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建一个新的根节点"><span class="toc-number">1.4.</span> <span class="toc-text">创建一个新的根节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中间节点的格式"><span class="toc-number">1.5.</span> <span class="toc-text">中间节点的格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#跟踪-Root"><span class="toc-number">1.6.</span> <span class="toc-text">跟踪 Root</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打印树"><span class="toc-number">1.7.</span> <span class="toc-text">打印树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#主要问题"><span class="toc-number">1.8.</span> <span class="toc-text">主要问题</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

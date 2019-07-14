@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Part 6 - B树介绍 | Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="介绍 B 树B树在SQLite中同时代表了表和索引, 这是一个非常棒的idea. 这一篇文章仅仅介绍数据结构, 所以不涉及代码的改动. 为什么 B 树对于数据库是一个非常棒的结构.  搜索一部分内容非常快(时间复杂度是 log 基本) 插入和删除一个值你也会发现相等的快(重新平衡是常数时间). 便利一个范围的数据也是非常快(当然不能和 map 比).  B 树不像二叉树, B树的 “B”可能代表发">
+<meta name="keywords" content="database,db原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Part 6 - B树介绍">
+<meta property="og:url" content="http://yoursite.com/2019/02/03/build_own_x/data_base/build_simple_database/Part7_introduction_b_tree/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="介绍 B 树B树在SQLite中同时代表了表和索引, 这是一个非常棒的idea. 这一篇文章仅仅介绍数据结构, 所以不涉及代码的改动. 为什么 B 树对于数据库是一个非常棒的结构.  搜索一部分内容非常快(时间复杂度是 log 基本) 插入和删除一个值你也会发现相等的快(重新平衡是常数时间). 便利一个范围的数据也是非常快(当然不能和 map 比).  B 树不像二叉树, B树的 “B”可能代表发">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/B-tree.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree1.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree2.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree3.png">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree4.png">
+<meta property="og:updated_time" content="2019-02-08T01:00:44.691Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Part 6 - B树介绍">
+<meta name="twitter:description" content="介绍 B 树B树在SQLite中同时代表了表和索引, 这是一个非常棒的idea. 这一篇文章仅仅介绍数据结构, 所以不涉及代码的改动. 为什么 B 树对于数据库是一个非常棒的结构.  搜索一部分内容非常快(时间复杂度是 log 基本) 插入和删除一个值你也会发现相等的快(重新平衡是常数时间). 便利一个范围的数据也是非常快(当然不能和 map 比).  B 树不像二叉树, B树的 “B”可能代表发">
+<meta name="twitter:image" content="https://cstack.github.io/db_tutorial/assets/images/B-tree.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build_own_x/data_base/build_simple_database/Part7_introduction_b_tree" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/03/build_own_x/data_base/build_simple_database/Part7_introduction_b_tree/" class="article-date">
+  <time datetime="2019-02-03T10:08:34.000Z" itemprop="datePublished">2019-02-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Part 6 - B树介绍
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="介绍-B-树"><a href="#介绍-B-树" class="headerlink" title="介绍 B 树"></a>介绍 B 树</h1><p>B树在SQLite中同时代表了表和索引, 这是一个非常棒的idea. 这一篇文章仅仅介绍数据结构, 所以不涉及代码的改动.</p>
+<p>为什么 B 树对于数据库是一个非常棒的结构.</p>
+<ul>
+<li>搜索一部分内容非常快(时间复杂度是 log 基本)</li>
+<li>插入和删除一个值你也会发现相等的快(重新平衡是常数时间).</li>
+<li>便利一个范围的数据也是非常快(当然不能和 map 比).</li>
+</ul>
+<p>B 树不像二叉树, B树的 “B”可能代表发现者的名称, 但是也有平衡的意思.下图是一个 B 树的例子:<br><img src="https://cstack.github.io/db_tutorial/assets/images/B-tree.png" alt="example B-Tree"><br>example B-Tree (<a href="https://en.wikipedia.org/wiki/File:B-tree.svg" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/File:B-tree.svg</a>)</p>
+<p>不像二叉树, B树的每个节点可以有 m 个孩子, 这里 m 叫树的 “order”. 为了保证树尽可能的平衡, 我们不得不控制节点个数在 m/2 的数量下.</p>
+<p>一些例外:</p>
+<ul>
+<li>叶子节点有0个孩子</li>
+<li>根节点可能可能有少于 m 个节点,但是至少是有两个的</li>
+<li>如果根节点是一个叶子节点,他就会有0个孩子.</li>
+</ul>
+<p>上图是一个B树,在 Sqlite 中被用于存储索引, 为了存储表数据 Sqlite 用了一个 B+ 树.</p>
+<table>
+<thead>
+<tr>
+<th>title</th>
+<th>B-tree</th>
+<th>B+ tree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pronounced</td>
+<td>“Bee Tree”</td>
+<td>“Bee Plus Tree”</td>
+</tr>
+<tr>
+<td>Used to store</td>
+<td>Indexes</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>Internal nodes store keys</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Internal nodes store values</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Number of children per node</td>
+<td>Less</td>
+<td>More</td>
+</tr>
+<tr>
+<td>Internal nodes vs. leaf nodes</td>
+<td>Same structure</td>
+<td>Different structure</td>
+</tr>
+</tbody>
+</table>
+<p>在我们开始实现索引之前，我将仅讨论B +树，但我只是将其称为B树或b树</p>
+<p>带子节点的节点称为“内部”节点。内部节点和叶节点的结构不同：</p>
+<table>
+<thead>
+<tr>
+<th>For an order-m tree…</th>
+<th>Internal Node</th>
+<th>Leaf Node</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stores</td>
+<td>keys and pointers to children</td>
+<td>keys and values</td>
+</tr>
+<tr>
+<td>Number of keys</td>
+<td>up to m-1</td>
+<td>as many as will fit</td>
+</tr>
+<tr>
+<td>Number of pointers</td>
+<td>number of keys + 1</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Number of values</td>
+<td>none</td>
+<td>number of keys</td>
+</tr>
+<tr>
+<td>Key purpose</td>
+<td>used for routing</td>
+<td>paired with value</td>
+</tr>
+<tr>
+<td>Stores values?</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>让我们通过一个例子来看下B树在插入元素后是如何增长的. 为了简单, 树的 <code>order</code> 是3. 这也意味着: </p>
+<ul>
+<li>每个内部节点最多有三个孩子</li>
+<li>每一个内部节点最多两个键.</li>
+<li>每个内部节点至少有2个子节点</li>
+<li>每个内部节点至少有一个key</li>
+</ul>
+<p>一个空的B树就一个单节点: 根节点. 根节点开始于叶子接口存在0个键值对:<br><img src="https://cstack.github.io/db_tutorial/assets/images/btree1.png" alt="empty btree"><br>empty btree</p>
+<p>如果我们插入一个键值对, 它们将按顺序存储在叶子节点中.</p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/btree2.png" alt="one-node btree"><br>one-node btree</p>
+<p>假设叶节点的容量是两个键/值对。当我们插入另一个时，我们必须拆分叶节点并在每个节点中放置一半对。两个节点都成为新内部节点的子节点，现在它将成为根节点。</p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/btree3.png" alt="two-level btree"><br>two-level btree</p>
+<p>内部节点有1个键和2个指向子节点的指针。如果我们想要查找小于或等于5的键，我们会查看左边的孩子。如果我们想要查找大于5的密钥，我们会找到合适的孩子。<br><img src="https://cstack.github.io/db_tutorial/assets/images/btree4.png" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/03/build_own_x/data_base/build_simple_database/Part7_introduction_b_tree/" data-id="cjy2hahwk00572seowgp24f8g" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/02/08/build_own_x/data_base/build_simple_database/Part8_B_tree_left_node_format/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Part 8 - B-Tree Leaf Node Format
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/02/03/build_own_x/data_base/build_simple_database/Part6_the_cursor_abstrction/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Part 5 - 游标的抽象化</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#介绍-B-树"><span class="toc-number">1.</span> <span class="toc-text">介绍 B 树</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

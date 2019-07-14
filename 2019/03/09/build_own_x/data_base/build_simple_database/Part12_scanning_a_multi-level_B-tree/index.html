@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Part12 扫描多层 B 树我们现在支持构建一个多层的 B 树, 但是对于 select 语句确还不支持, 这是一个插入15条记录的然后打印它们的测试例子.12345678910111213141516171819202122232425262728+  it &apos;prints all rows in a multi-level tree&apos; do+    script = []+    (1..1">
+<meta name="keywords" content="database,db原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2019/03/09/build_own_x/data_base/build_simple_database/Part12_scanning_a_multi-level_B-tree/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Part12 扫描多层 B 树我们现在支持构建一个多层的 B 树, 但是对于 select 语句确还不支持, 这是一个插入15条记录的然后打印它们的测试例子.12345678910111213141516171819202122232425262728+  it &apos;prints all rows in a multi-level tree&apos; do+    script = []+    (1..1">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://cstack.github.io/db_tutorial/assets/images/btree3.png">
+<meta property="og:updated_time" content="2019-03-09T04:52:36.441Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="Part12 扫描多层 B 树我们现在支持构建一个多层的 B 树, 但是对于 select 语句确还不支持, 这是一个插入15条记录的然后打印它们的测试例子.12345678910111213141516171819202122232425262728+  it &apos;prints all rows in a multi-level tree&apos; do+    script = []+    (1..1">
+<meta name="twitter:image" content="https://cstack.github.io/db_tutorial/assets/images/btree3.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-build_own_x/data_base/build_simple_database/Part12_scanning_a_multi-level_B-tree" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/09/build_own_x/data_base/build_simple_database/Part12_scanning_a_multi-level_B-tree/" class="article-date">
+  <time datetime="2019-03-09T03:05:29.000Z" itemprop="datePublished">2019-03-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Part12-扫描多层-B-树"><a href="#Part12-扫描多层-B-树" class="headerlink" title="Part12 扫描多层 B 树"></a>Part12 扫描多层 B 树</h1><p>我们现在支持构建一个多层的 B 树, 但是对于 select 语句确还不支持, 这是一个插入15条记录的然后打印它们的测试例子.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">+  it 'prints all rows in a multi-level tree' do</span><br><span class="line">+    script = []</span><br><span class="line">+    (<span class="number">1.</span><span class="number">.15</span>).each <span class="keyword">do</span> |i|</span><br><span class="line">+      script &lt;&lt; <span class="string">"insert #&#123;i&#125; user#&#123;i&#125; person#&#123;i&#125;@example.com"</span></span><br><span class="line">+    end</span><br><span class="line">+    script &lt;&lt; <span class="string">"select"</span></span><br><span class="line">+    script &lt;&lt; <span class="string">".exit"</span></span><br><span class="line">+    result = run_script(script)</span><br><span class="line">+</span><br><span class="line">+    expect(result[<span class="number">15.</span>..result.length]).to match_array([</span><br><span class="line">+      <span class="string">"db &gt; (1, user1, person1@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(2, user2, person2@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(3, user3, person3@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(4, user4, person4@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(5, user5, person5@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(6, user6, person6@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(7, user7, person7@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(8, user8, person8@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(9, user9, person9@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(10, user10, person10@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(11, user11, person11@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(12, user12, person12@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(13, user13, person13@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(14, user14, person14@example.com)"</span>,</span><br><span class="line">+      <span class="string">"(15, user15, person15@example.com)"</span>,</span><br><span class="line">+      <span class="string">"Executed."</span>, <span class="string">"db &gt; "</span>,</span><br><span class="line">+    ])</span><br><span class="line">+  end</span><br></pre></td></tr></table></figure></p>
+<p>但是当我们跑这个例子的时候, 会发生下面这样的情况:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">db &gt; select</span><br><span class="line">(2, user1, person1@example.com)</span><br><span class="line">Executed.</span><br></pre></td></tr></table></figure></p>
+<p>这太糟糕了, 仅打印了一条语句, 并且看起来这条记录好像损坏了. </p>
+<p>这糟糕的情况是因为 <code>execute_select()</code> 方法在表开始的时候, 我们当前接口<code>table_start()</code> 返回 的是根节点. 但是现在根节点现在是一个中间节点,不包含任何行信息. 打印的数据必须在根节点为叶子时保留. <code>execute_select()</code> 应该返回第0个 cell 最左边的叶子节点.</p>
+<p>所以我们需要改进下旧的实现.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">-<span class="function">Cursor* <span class="title">table_start</span><span class="params">(Table* table)</span> </span>&#123;</span><br><span class="line">-  Cursor* cursor = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Cursor));</span><br><span class="line">-  cursor-&gt;table = table;</span><br><span class="line">-  cursor-&gt;page_num = table-&gt;root_page_num;</span><br><span class="line">-  cursor-&gt;cell_num = <span class="number">0</span>;</span><br><span class="line">-</span><br><span class="line">-  <span class="keyword">void</span>* root_node = get_page(table-&gt;pager, table-&gt;root_page_num);</span><br><span class="line">-  <span class="keyword">uint32_t</span> num_cells = *leaf_node_num_cells(root_node);</span><br><span class="line">-  cursor-&gt;end_of_table = (num_cells == <span class="number">0</span>);</span><br><span class="line">-</span><br><span class="line">-  <span class="keyword">return</span> cursor;</span><br><span class="line">-&#125;</span><br></pre></td></tr></table></figure></p>
+<p>并添加一个新的实现, 如果第0个 key 不存在, 这个方法将会返回一个最低位置的指针回去.<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+<span class="function">Cursor* <span class="title">table_start</span><span class="params">(Table* table)</span> </span>&#123;</span><br><span class="line">+  Cursor* cursor =  table_find(table, <span class="number">0</span>);</span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">void</span>* node = get_page(table-&gt;pager, cursor-&gt;page_num);</span><br><span class="line">+  <span class="keyword">uint32_t</span> num_cells = *leaf_node_num_cells(node);</span><br><span class="line">+  cursor-&gt;end_of_table = (num_cells == <span class="number">0</span>);</span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">return</span> cursor;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过这些改变,它依旧只会打印一个节点的行数据:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">db &gt; select</span><br><span class="line">(1, user1, person1@example.com)</span><br><span class="line">(2, user2, person2@example.com)</span><br><span class="line">(3, user3, person3@example.com)</span><br><span class="line">(4, user4, person4@example.com)</span><br><span class="line">(5, user5, person5@example.com)</span><br><span class="line">(6, user6, person6@example.com)</span><br><span class="line">(7, user7, person7@example.com)</span><br><span class="line">Executed.</span><br><span class="line">db &gt;</span><br></pre></td></tr></table></figure></p>
+<p>有15条数据, 那么就包含1个中间节点和两个叶子节点, 它看起来就像这样:<br><img src="https://cstack.github.io/db_tutorial/assets/images/btree3.png" alt="structure of our btree"><br>structure of our btree</p>
+<p>要扫描整个表，我们需要在到达第一个叶节点后跳转到第二个叶节点。为此，我们将在名为“next_leaf”的叶节点标题中保存一个新字段，该字段将保存右侧叶子的兄弟节点的页码。最右边的叶节点将具有next_leaf值0以表示没有兄弟（无论如何，页0都保留给表的根节点）。</p>
+<p>更新叶节点标头格式以包含新字段:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> const uint32_t LEAF_NODE_NUM_CELLS_SIZE = sizeof(uint32_t);</span><br><span class="line"> const uint32_t LEAF_NODE_NUM_CELLS_OFFSET = COMMON_NODE_HEADER_SIZE;</span><br><span class="line">-const uint32_t LEAF_NODE_HEADER_SIZE =</span><br><span class="line">-    COMMON_NODE_HEADER_SIZE + LEAF_NODE_NUM_CELLS_SIZE;</span><br><span class="line">+const uint32_t LEAF_NODE_NEXT_LEAF_SIZE = sizeof(uint32_t);</span><br><span class="line">+const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET =</span><br><span class="line">+    LEAF_NODE_NUM_CELLS_OFFSET + LEAF_NODE_NUM_CELLS_SIZE;</span><br><span class="line">+const uint32_t LEAF_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE +</span><br><span class="line">+                                       LEAF_NODE_NUM_CELLS_SIZE +</span><br><span class="line">+                                       LEAF_NODE_NEXT_LEAF_SIZE;</span><br></pre></td></tr></table></figure>
+<p>添加一个新的方法去访问新的文件:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+uint32_t* leaf_node_next_leaf(void* node) &#123;</span><br><span class="line">+  <span class="built_in">return</span> node + LEAF_NODE_NEXT_LEAF_OFFSET;</span><br><span class="line">+&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/03/09/build_own_x/data_base/build_simple_database/Part12_scanning_a_multi-level_B-tree/" data-id="cjy2hahvw004n2seo2xsylqqu" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/04/27/backend/go/echo/echo_learn/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/02/24/build_own_x/data_base/build_simple_database/Part11_recursively_seaching_the_B_tree/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Part 11 - Recursively Searching the B-Tree</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Part12-扫描多层-B-树"><span class="toc-number">1.</span> <span class="toc-text">Part12 扫描多层 B 树</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

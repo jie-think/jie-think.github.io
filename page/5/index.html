@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="jie blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/page/5/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="jie blog">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="jie blog">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-build_own_x/os/How to create an OS from scratch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/23/build_own_x/os/How to create an OS from scratch/" class="article-date">
+  <time datetime="2018-09-23T05:21:19.206Z" itemprop="datePublished">2018-09-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="How-to-create-an-OS-from-scratch"><a href="#How-to-create-an-OS-from-scratch" class="headerlink" title="How to create an OS from scratch!"></a>How to create an OS from scratch!</h2><p>参考: <a href="https://github.com/cfenollosa/os-tutorial" target="_blank" rel="noopener">https://github.com/cfenollosa/os-tutorial</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/23/build_own_x/os/How to create an OS from scratch/" data-id="cjy2hahtm002j2seowmi14pdz" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/grpc/服务的注册_发现" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/14/backend/go/grpc/服务的注册_发现/" class="article-date">
+  <time datetime="2018-09-14T12:42:22.000Z" itemprop="datePublished">2018-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/14/backend/go/grpc/服务的注册_发现/">服务的注册,发现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://juejin.im/post/5ad9b9596fb9a07acf55b550" target="_blank" rel="noopener">https://juejin.im/post/5ad9b9596fb9a07acf55b550</a></p>
+<h2 id="微服务之服务的注册和发现"><a href="#微服务之服务的注册和发现" class="headerlink" title="微服务之服务的注册和发现"></a>微服务之服务的注册和发现</h2><p>服务的注册发现功能, 能够很好的解耦服务器之间的调用功能.</p>
+<h2 id="服务注册"><a href="#服务注册" class="headerlink" title="服务注册"></a>服务注册</h2><p>策略: </p>
+<ol>
+<li>将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ).</li>
+<li>心跳续期 </li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Register</span><span class="params">(ctx context.Context, target <span class="keyword">string</span>, update naming.Update, opts ...wrapper.RegistryOptions)</span> <span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> upBytes []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">if</span> upBytes, err = json.Marshal(update); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	er.cancal = cancel</span><br><span class="line">	rgOpt := wrapper.RegistryOption&#123;TTL: wrapper.DefaultRegInfTTL&#125;</span><br><span class="line">	<span class="keyword">for</span> _, opt := <span class="keyword">range</span> opts &#123;</span><br><span class="line">		opt(&amp;rgOpt)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">switch</span> update.Op &#123;</span><br><span class="line">	<span class="keyword">case</span> naming.Add:</span><br><span class="line">		lsRsp, err := er.lsCli.Grant(ctx, <span class="keyword">int64</span>(rgOpt.TTL/time.Second))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//Put服务信息到etcd,并设置key的值TTL,通过后面的KeepAlive接口</span></span><br><span class="line">        <span class="comment">//对TTL进行续期,超过TTL的时间未收到续期请求,则说明服务可能挂了,从而清除服务信息</span></span><br><span class="line">		etcdOpts := []etcd.OpOption&#123;etcd.WithLease(lsRsp.ID)&#125;</span><br><span class="line">		key := target + <span class="string">"/"</span> + update.Addr</span><br><span class="line">		_, err = er.cli.KV.Put(ctx, key, <span class="keyword">string</span>(upBytes), etcdOpts...)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保持心跳</span></span><br><span class="line">		lsRspChan, err := er.lsCli.KeepAlive(context.TODO(), lsRsp.ID)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				_, ok := &lt;-lsRspChan</span><br><span class="line">				<span class="keyword">if</span> !ok &#123;</span><br><span class="line">					grpclog.Fatalf(<span class="string">"%v keepalive channel is closing"</span>, key)</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	<span class="keyword">case</span> naming.Delete:</span><br><span class="line">		_, err = er.cli.Delete(ctx, target+<span class="string">"/"</span>+update.Addr)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, <span class="string">"unsupported op"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p><strong>Resolve()接口</strong><br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用于生成Watcher,监听注册中心中的服务信息变化</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Resolve</span><span class="params">(target <span class="keyword">string</span>)</span> <span class="params">(naming.Watcher, error)</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	w := &amp;etcdWatcher&#123;</span><br><span class="line">		cli:    er.cli,</span><br><span class="line">		target: target + <span class="string">"/"</span>,</span><br><span class="line">		ctx:    ctx,</span><br><span class="line">		cancel: cancel,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> w, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Next() 接口</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Next接口主要用于获取注册的服务信息,通过channel以及watch,当服务信息发生</span></span><br><span class="line"><span class="comment">//变化时,Next接口会将变化返回给grpc框架从而实现服务信息变更.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(ew *etcdWatcher)</span> <span class="title">Next</span><span class="params">()</span> <span class="params">([]*naming.Update, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> updates []*naming.Update</span><br><span class="line">    <span class="comment">//初次获取时,创建监听channel,并返回获取到的服务信息</span></span><br><span class="line">	<span class="keyword">if</span> ew.watchChan == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">//create new chan</span></span><br><span class="line">		resp, err := ew.cli.Get(ew.ctx, ew.target, etcd.WithPrefix(), etcd.WithSerializable())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> _, kv := <span class="keyword">range</span> resp.Kvs &#123;</span><br><span class="line">			<span class="keyword">var</span> upt naming.Update</span><br><span class="line">			<span class="keyword">if</span> err := json.Unmarshal(kv.Value, &amp;upt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//创建etcd的watcher监听target(服务名)的信息.</span></span><br><span class="line">		opts := []etcd.OpOption&#123;etcd.WithRev(resp.Header.Revision + <span class="number">1</span>), etcd.WithPrefix(), etcd.WithPrevKV()&#125;</span><br><span class="line">		ew.watchChan = ew.cli.Watch(context.TODO(), ew.target, opts...)</span><br><span class="line">		<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//阻塞监听,服务发生变化时才返回给上层</span></span><br><span class="line">	wrsp, ok := &lt;-ew.watchChan</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		err := status.Error(codes.Unavailable, <span class="string">"etcd watch closed"</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> wrsp.Err() != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, wrsp.Err()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> _, e := <span class="keyword">range</span> wrsp.Events &#123;</span><br><span class="line">		<span class="keyword">var</span> upt naming.Update</span><br><span class="line">		<span class="keyword">var</span> err error</span><br><span class="line">		<span class="keyword">switch</span> e.Type &#123;</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypePut:</span><br><span class="line">			err = json.Unmarshal(e.Kv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Add</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypeDelete:</span><br><span class="line">			err = json.Unmarshal(e.PrevKv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Delete</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用默认的grpc"><a href="#使用默认的grpc" class="headerlink" title="使用默认的grpc"></a>使用默认的grpc</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cli, _ := clientv3.NewFromURL(<span class="string">"http://127.0.0.1:2379"</span>)</span><br><span class="line">rs := &amp;etcdnaming.GRPCResolver&#123;Client: cli&#125;</span><br><span class="line"></span><br><span class="line">b := grpc.RoundRobin(rs)</span><br><span class="line">dialOpts := []grpc.DialOption&#123;grpc.WithBalancer(b), grpc.WithInsecure()&#125;</span><br><span class="line">conn, err := grpc.Dial(<span class="string">"jie-test"</span>, dialOpts...)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">client := pb.NewGreeterClient(conn)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjy2hahvm00492seozckl7jli" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/etcd/">etcd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/grpc/">grpc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-frontend/learn_admin_manage/admin_manage_jie_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" class="article-date">
+  <time datetime="2018-09-08T14:27:30.000Z" itemprop="datePublished">2018-09-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/frontend/">frontend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/">admin_manage_jie</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="admin-manage-jie"><a href="#admin-manage-jie" class="headerlink" title="admin_manage_jie"></a>admin_manage_jie</h2><p>copy from Material Dashboard React</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" data-id="cjy2hahtq002o2seo0ah0nagu" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/admin-manage/">admin manage</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-self_doc/个人软件安装记录-linux" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/04/self_doc/个人软件安装记录-linux/" class="article-date">
+  <time datetime="2018-09-04T01:51:07.000Z" itemprop="datePublished">2018-09-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/04/self_doc/个人软件安装记录-linux/">个人软件安装记录(linux-ubuntu)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y git</span><br><span class="line"></span><br><span class="line">apt-get install -y tree</span><br><span class="line"></span><br><span class="line">apt-get install -y wget</span><br><span class="line"></span><br><span class="line"><span class="comment">## zsh</span></span><br><span class="line">sh -c <span class="string">"<span class="variable">$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## zsh config</span></span><br><span class="line">plugins=(</span><br><span class="line">  git</span><br><span class="line">  z</span><br><span class="line">  wd</span><br><span class="line">  zsh-autosuggestions</span><br><span class="line">  docker</span><br><span class="line">  docker-compose</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">## zsh install zsh-autosuggestions</span></span><br><span class="line">git <span class="built_in">clone</span> git://github.com/zsh-users/zsh-autosuggestions <span class="variable">$ZSH_CUSTOM</span>/plugins/zsh-autosuggestions</span><br><span class="line"></span><br><span class="line"><span class="comment">## 持续增加中...</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/" data-id="cjy2hahqn000f2seour5pyh8s" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tools安装/">tools安装</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-frontend/css/grid_learn/learn_css_grid" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/02/frontend/css/grid_learn/learn_css_grid/" class="article-date">
+  <time datetime="2018-09-02T02:38:47.663Z" itemprop="datePublished">2018-09-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/frontend/">frontend</a>►<a class="article-category-link" href="/categories/frontend/learn-notebook/">learn notebook</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/02/frontend/css/grid_learn/learn_css_grid/">Learn CSS Grid</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>视频教程推荐(建议先看一些基础概念): <a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a><br>简单教程: <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a><br>详细教程: <a href="https://learncssgrid.com/" target="_blank" rel="noopener">https://learncssgrid.com/</a></p>
+<p>该内容主要来自:<br><a href="https://scrimba.com/g/gR8PTE" target="_blank" rel="noopener">https://scrimba.com/g/gR8PTE</a> and <a href="https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228" target="_blank" rel="noopener">https://medium.freecodecamp.org/learn-css-grid-in-5-minutes-f582e87b1228</a></p>
+<p><img src="https://cdn-images-1.medium.com/max/2000/1*Oc88rInEcNuY-xCN3e1iPQ.png" alt="目标结构"></p>
+<h2 id="重要术语解释"><a href="#重要术语解释" class="headerlink" title="重要术语解释"></a>重要术语解释</h2><p>参考: <a href="https://www.jianshu.com/p/d183265a8dad" target="_blank" rel="noopener">https://www.jianshu.com/p/d183265a8dad</a></p>
+<ol>
+<li><p>网格容器（Grid Container）<br>元素应用display:grid，它是其所有网格项的父元素。下面例子container就是网格容器。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item item-3"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>网格项（Grid Item）</p>
+</li>
+</ol>
+<p>网格容器的子元素，下面的item元素是网格项，但sub-item不是。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span> </span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">class</span>=<span class="string">"sub-item"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<ol start="3">
+<li>网格线（Grid Line）</li>
+</ol>
+<p>组成网格线的分界线。它们可以是列网格线（column grid lines），也可以是行网格线（row grid lines）并且居于行或列的任意一侧，下面黄色线就是列网格线。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-294354d5cb39077a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="grid lines"></p>
+<ol start="4">
+<li><p>网格轨道（Grid Track）<br>两个相邻的网格线之间为网格轨道。你可以认为它们是网格的列或行，下面在第二个和第三个网格线之间的黄色部分为网格轨道。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-6fd45c7949a3f29b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Track"></p>
+</li>
+<li><p>网格单元（Grid Cell）<br>两个相邻的列网格线和两个相邻的行网格线组成的是网格单元，它是最小的网格单元。下面行网格线1（row grid lines 1）、行网格线2（row grid lines 2）和列网格线2（column grid lines 2）、列网格线3（column grid lines 3）组成的黄色区域为网格单元。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-5feacaa8175909c7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Cell"></p>
+</li>
+<li><p>网格区（Grid Area）<br>网格区是由任意数量网格单元组成，下面行网格线1（row grid lines 1）、行网格线3（row grid lines 3）和列网格线1（column grid lines 1）、列网格线3（column grid lines3）组成的黄色区域为网格区。<br><img src="https://upload-images.jianshu.io/upload_images/3600755-2a62922e76f77c3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/383/format/webp" alt="Grid Area"></p>
+</li>
+</ol>
+<h2 id="第一个-grid-布局"><a href="#第一个-grid-布局" class="headerlink" title="第一个 grid 布局"></a>第一个 grid 布局</h2><blockquote>
+<p>The two core ingredients of a CSS Grid are the wrapper (parent) and the items (children). The wrapper is the actual grid and the items are the content inside the grid.<br>CSS Grid的两个核心组成部分是包装器（父）和项（子）。 包装器是实际网格，项目是网格内的内容。</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"wrapper"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>4<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>5<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span>6<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>result:<br><img src="https://cdn-images-1.medium.com/max/1600/1*vTY7C5FMIp8OLkjrgp-vBg.png" alt="first grid layout result"></p>
+<h2 id="Columns-and-rows"><a href="#Columns-and-rows" class="headerlink" title="Columns and rows"></a>Columns and rows</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">100px</span> <span class="number">100px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">50px</span> <span class="number">50px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*fJNIdDiScjhI9CZjdxv3Eg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.wrapper</span> &#123;</span><br><span class="line">    <span class="attribute">display</span>: grid;</span><br><span class="line">    <span class="attribute">grid-template-columns</span>: <span class="number">200px</span> <span class="number">50px</span> <span class="number">100px</span>;</span><br><span class="line">    <span class="attribute">grid-template-rows</span>: <span class="number">100px</span> <span class="number">30px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*M9WbiVEFcseUCW6qeG4lSQ.png" alt=""></p>
+<h2 id="items"><a href="#items" class="headerlink" title="items"></a>items</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column-start</span>: <span class="number">1</span>;</span><br><span class="line">    <span class="attribute">grid-column-end</span>: <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*he7CoAzdQB3sei_WpHOtNg.png" alt=""></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.item1</span> &#123;</span><br><span class="line">    <span class="attribute">grid-column</span>: <span class="number">1</span> / <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn-images-1.medium.com/max/1600/1*l-adYpQCGve7W6DWY949pw.png" alt=""></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/02/frontend/css/grid_learn/learn_css_grid/" data-id="cjy2hahwv005o2seopw5hoh2v" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css grid</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/tools/markfile_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/01/backend/tools/markfile_start_learn/" class="article-date">
+  <time datetime="2018-09-01T07:37:28.000Z" itemprop="datePublished">2018-09-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/01/backend/tools/markfile_start_learn/">markfile start learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://www.cnblogs.com/wang_yb/p/3990952.html" target="_blank" rel="noopener">https://www.cnblogs.com/wang_yb/p/3990952.html</a></p>
+<h2 id="Makefile-简介"><a href="#Makefile-简介" class="headerlink" title="Makefile 简介"></a>Makefile 简介</h2><p>Makefile 是和 make 命令一起配合使用的.</p>
+<p>很多大型项目的编译都是通过 Makefile 来组织的, 如果没有 Makefile, 那很多项目中各种库和代码之间的依赖关系不知会多复杂.</p>
+<p>Makefile的组织流程的能力如此之强, 不仅可以用来编译项目, 还可以用来组织我们平时的一些日常操作. 这个需要大家发挥自己的想象力.</p>
+<h3 id="Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释"><a href="#Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释" class="headerlink" title="Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)"></a>Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)</h3><p>Makefile基本格式如下:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">target ... : prerequisites ...</span><br><span class="line">    command</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>其中,</p>
+<ul>
+<li>target        - 目标文件, 可以是 Object File, 也可以是可执行文件</li>
+<li>prerequisites - 生成 target 所需要的文件或者目标</li>
+<li>command       - make需要执行的命令 (任意的shell命令), Makefile中的命令必须以 <code>[tab] 开头</code></li>
+</ul>
+<ol>
+<li>显示规则 :: 说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)</li>
+<li>隐晦规则 :: make的自动推导功能所执行的规则</li>
+<li>变量定义 :: Makefile中定义的变量</li>
+<li>文件指示 :: Makefile中引用其他Makefile; 指定Makefile中有效部分; 定义一个多行命令</li>
+<li>注释     :: Makefile只有行注释 “#”, 如果要使用或者输出”#”字符, 需要进行转义, “#“</li>
+</ol>
+<h3 id="1-2-GNU-make-的工作方式"><a href="#1-2-GNU-make-的工作方式" class="headerlink" title="1.2 GNU make 的工作方式"></a>1.2 GNU make 的工作方式</h3><ol>
+<li>读入主Makefile (主Makefile中可以引用其他Makefile)</li>
+<li>读入被include的其他Makefile</li>
+<li>初始化文件中的变量</li>
+<li>推导隐晦规则, 并分析所有规则</li>
+<li>为所有的目标文件创建依赖关系链</li>
+<li>根据依赖关系, 决定哪些目标要重新生成</li>
+<li>执行生成命令</li>
+</ol>
+<h2 id="实例解析"><a href="#实例解析" class="headerlink" title="实例解析"></a>实例解析</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/01/backend/tools/markfile_start_learn/" data-id="cjy2haht900292seoj9dx9mbi" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/build-tools/">build tools</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/">markdown</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/tools/apidoc_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/backend/tools/apidoc_start_learn/" class="article-date">
+  <time datetime="2018-08-31T08:02:53.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/backend/tools/apidoc_start_learn/">apidoc start learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="http://apidocjs.com/" target="_blank" rel="noopener">http://apidocjs.com/</a></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p><code>Javadoc-Style</code> (can be used in C#, Go, Dart, Java, JavaScript, PHP, TypeScript and all other Javadoc capable languages):</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install apidoc -g</span><br></pre></td></tr></table></figure>
+<h2 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apidoc -i myapp/ -o apidoc/ -t mytemplate/</span><br></pre></td></tr></table></figure>
+<h2 id="Configuration-apidoc-json"><a href="#Configuration-apidoc-json" class="headerlink" title="Configuration (apidoc.json)"></a>Configuration (apidoc.json)</h2><p>ex:<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"apiDoc basic example"</span>,</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"Custom apiDoc browser title"</span>,</span><br><span class="line">  <span class="attr">"url"</span> : <span class="string">"https://api.github.com/v1"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Header-Footer"><a href="#Header-Footer" class="headerlink" title="Header / Footer"></a>Header / Footer</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"header"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own header title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"header.md"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"footer"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own footer title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"footer.md"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h2><p><code>apidoc.json</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"A basic apiDoc example"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>example.js</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDefine UserNotFoundError</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;put&#125; /user/ Modify User information</span></span><br><span class="line"><span class="comment"> * @apiName PutUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id          Users unique ID.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname] Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [lastname]  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h3 id="Versioning"><a href="#Versioning" class="headerlink" title="Versioning"></a>Versioning</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.1.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information and Date of Registration.</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.2.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname  Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname   Lastname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;Date&#125;   registered Date of Registration.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<p>该版本可用于每个块，也可用于继承块。您不必更改继承块上的版本，解析器会自动检查最近的前任.</p>
+<h2 id="apiDoc-Params"><a href="#apiDoc-Params" class="headerlink" title="apiDoc-Params"></a>apiDoc-Params</h2><p>列几个常用的标签:</p>
+<h3 id="api"><a href="#api" class="headerlink" title="@api"></a>@api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@api &#123;method&#125; path [title]</span><br></pre></td></tr></table></figure>
+<p>Required!<br>Without that indicator, apiDoc parser ignore the documentation block. (apidoc 工具的标识开始)</p>
+<h2 id="apiName"><a href="#apiName" class="headerlink" title="@apiName"></a>@apiName</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiName name</span><br></pre></td></tr></table></figure>
+<h2 id="apiGroup"><a href="#apiGroup" class="headerlink" title="@apiGroup"></a>@apiGroup</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiGroup name</span><br></pre></td></tr></table></figure>
+<h2 id="apiDefine"><a href="#apiDefine" class="headerlink" title="@apiDefine"></a>@apiDefine</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiDefine name [title]</span><br><span class="line">    [description]</span><br></pre></td></tr></table></figure>
+<h2 id="apiUse"><a href="#apiUse" class="headerlink" title="@apiUse"></a>@apiUse</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiUse name</span><br></pre></td></tr></table></figure>
+<h2 id="apiDeprecated"><a href="#apiDeprecated" class="headerlink" title="@apiDeprecated"></a>@apiDeprecated</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDeprecated [text]</span><br></pre></td></tr></table></figure>
+<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated use now (#Group:Name).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Example: to set a link to the GetDetails method of your group User</span></span><br><span class="line"><span class="comment"> * write (#User:GetDetails)</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="apiDescription"><a href="#apiDescription" class="headerlink" title="@apiDescription"></a>@apiDescription</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDescription text</span><br></pre></td></tr></table></figure>
+<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDescription This is the Description.</span></span><br><span class="line"><span class="comment"> * It is multiline capable.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Last line of Description.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="apiParam"><a href="#apiParam" class="headerlink" title="@apiParam"></a>@apiParam</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiParam [(group)] [&#123;type&#125;] [field=defaultValue] [description]</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;post&#125; /user/</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname]  Optional Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; lastname     Mandatory Lastname.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; country="DE" Mandatory with default value "DE".</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; [age=18]     Optional Age with default 18.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam (Login) &#123;String&#125; pass Only logged in users can post this.</span></span><br><span class="line"><span class="comment"> *                                 In generated documentation a separate</span></span><br><span class="line"><span class="comment"> *                                 "Login" Block will be generated.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(group)</td>
+<td>All parameters will be grouped by this name. <br>Without a group, the default <code>Parameter</code> is set.<br>You can set a title and description with @apiDefine.</td>
+</tr>
+<tr>
+<td>{type}</td>
+<td>Parameter type, e.g. <code>{Boolean}</code>, <code>{Number}</code>, <code>{String}</code>, <code>{Object}</code>, <code>{String[]}</code> (array of strings), …</td>
+</tr>
+<tr>
+<td>{type{size}}</td>
+<td>Information about the size of the variable.<br><code>{string{..5}}</code> a string that has max 5 chars.<br><code>{string{2..5}}</code> a string that has min. 2 chars and max 5 chars.<br><code>{number{100-999}}</code> a number between 100 and 999.</td>
+</tr>
+<tr>
+<td>{type=allowedValues}</td>
+<td>Information about allowed values of the variable.<br><code>{string=&quot;small&quot;}</code> a string that can only contain the word “small” (a constant).<br><code>{string=&quot;small&quot;,&quot;huge&quot;}</code> a string that can contain the words “small” or “huge”.<br><code>{number=1,2,3,99}</code> a number with allowed values of 1, 2, 3 and 99.<br><br>Can be combined with size:<br><code>{string {..5}=&quot;small&quot;,&quot;huge&quot;}</code> a string that has max 5 chars and only contain the words “small” or “huge”.</td>
+</tr>
+<tr>
+<td>field</td>
+<td>Variablename</td>
+</tr>
+<tr>
+<td>[field]</td>
+<td>Fieldname with brackets define the Variable as optional.</td>
+</tr>
+<tr>
+<td>=defaultValue</td>
+<td>The parameters default value.</td>
+</tr>
+<tr>
+<td>description</td>
+<td>Description of the field.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="apiParamExample"><a href="#apiParamExample" class="headerlink" title="@apiParamExample"></a>@apiParamExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiParamExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParamExample &#123;json&#125; Request-Example:</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "id": 4711</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiSuccess"><a href="#apiSuccess" class="headerlink" title="@apiSuccess"></a>@apiSuccess</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccess [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
+<h2 id="apiSuccessExample"><a href="#apiSuccessExample" class="headerlink" title="@apiSuccessExample"></a>@apiSuccessExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccessExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample &#123;json&#125; Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiError"><a href="#apiError" class="headerlink" title="@apiError"></a>@apiError</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiError [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The &lt;code&gt;id&lt;/code&gt; of the User was not found.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiErrorExample"><a href="#apiErrorExample" class="headerlink" title="@apiErrorExample"></a>@apiErrorExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiErrorExample [&#123;type&#125;] [title]</span><br><span class="line">                 example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiErrorExample &#123;json&#125; Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/31/backend/tools/apidoc_start_learn/" data-id="cjy2haht400242seo7tjn2w4h" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/apidoc/">apidoc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/learn/">learn</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-self_doc/个人软件安装记录" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/self_doc/个人软件安装记录/" class="article-date">
+  <time datetime="2018-08-31T07:54:58.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/self_doc/个人软件安装记录/">个人软件安装记录(mac osx)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># tree install</span></span></span><br><span class="line">brew install tree</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># apidoc install</span></span></span><br><span class="line">npm install apidoc -g</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh</span></span></span><br><span class="line">sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh config</span></span></span><br><span class="line">plugins=(</span><br><span class="line">  git</span><br><span class="line">  z</span><br><span class="line">  wd</span><br><span class="line">  zsh-autosuggestions</span><br><span class="line">  docker</span><br><span class="line">  docker-compose</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh install zsh-autosuggestions</span></span></span><br><span class="line">git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 持续增加中...</span></span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/31/self_doc/个人软件安装记录/" data-id="cjy2hahqk000e2seomdnxqhh3" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tools安装/">tools安装</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/docker/docker_构建最小_go_app" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/30/backend/docker/docker_构建最小_go_app/" class="article-date">
+  <time datetime="2018-08-30T05:56:07.000Z" itemprop="datePublished">2018-08-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/30/backend/docker/docker_构建最小_go_app/">docker 构建最小 go app</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/" target="_blank" rel="noopener">https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/</a></p>
+<h2 id="写应用"><a href="#写应用" class="headerlink" title="写应用"></a>写应用</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"io/ioutil"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    resp, err := http.Get(<span class="string">"http://www.baidu.com"</span>)</span><br><span class="line">    check(err)</span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    check(err)</span><br><span class="line">    fmt.Println(<span class="built_in">len</span>(body))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">check</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        os.Exit(<span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Dockerize"><a href="#Dockerize" class="headerlink" title="Dockerize"></a>Dockerize</h2><p>basic image</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:<span class="keyword">onbuild</span></span><br></pre></td></tr></table></figure>
+<p>compile Dockerfile</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> golang:latest </span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir /app </span></span><br><span class="line"><span class="bash">ADD . /app/ </span></span><br><span class="line"><span class="bash">WORKDIR /app </span></span><br><span class="line"><span class="bash">RUN go build -o main . </span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/app/main"</span>]</span></span><br></pre></td></tr></table></figure>
+<p>这个构建出来需要500M</p>
+<p>因为 <code>golang:latest</code> 是从 <code>Debian Jessie</code> 构建出来的, 底层是操作系统, so 导致镜像特别大.</p>
+<h2 id="Compile"><a href="#Compile" class="headerlink" title="Compile!!"></a>Compile!!</h2><ol>
+<li>先编译工程</li>
+<li>构建镜像</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go build -o main .</span><br><span class="line">docker build -t example-scratch:v1 -f Dockerfile.scratch .</span><br></pre></td></tr></table></figure>
+<p>Dockerfile.scratch 内容:<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> main /</span></span><br><span class="line"><span class="bash">CMD [<span class="string">"/main"</span>]</span></span><br></pre></td></tr></table></figure></p>
+<p>这样构建是无法工作的, 原因就在于生产的 main 是需要系统的动态链接库.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it example-scratch:v1</span><br><span class="line">standard_init_linux.go:178: <span class="built_in">exec</span> user process caused <span class="string">"exec format error"</span></span><br></pre></td></tr></table></figure>
+<p>解决方法:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .</span><br></pre></td></tr></table></figure>
+<p>禁用cgo，生产一个静态二进制文件, 我们还将操作系统设置为Linux, -a标志意味着重建我们正在使用的所有软件包，这意味着所有导入都将在cgo禁用的情况下重建。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t example-scratch:v2 -f Dockerfile.scratch .</span><br><span class="line">$ docker run -it example-scratch:v2</span><br><span class="line">  118146 <span class="comment"># it work</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/30/backend/docker/docker_构建最小_go_app/" data-id="cjy2hahss001r2seoff9pn7p6" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker-app/">docker app</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-frontend/css/basic_1_0_css_position" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/frontend/css/basic_1_0_css_position/" class="article-date">
+  <time datetime="2018-08-29T14:03:33.251Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/frontend/">frontend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/frontend/css/basic_1_0_css_position/">basic css learn - 1. css display grid</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://atomiks.github.io/30-seconds-of-css/" target="_blank" rel="noopener">https://atomiks.github.io/30-seconds-of-css/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/frontend/css/basic_1_0_css_position/" data-id="cjy2hahtj002g2seo24qlz9qk" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css grid</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/6/">下一页&raquo;</a>
+  </nav>
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title recent-posts">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/13/basic/正则零宽断言/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/12/ide/vscode/vscode-snippet/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/09/backend/styleguide/python/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/03/backend/python/python 项目目录结构/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/02/alg/finance/rsi/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

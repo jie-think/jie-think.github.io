@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="BIASBIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。 乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。 乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/2019/06/29/alg/finance/bias/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="BIASBIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。 乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。 乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-06T06:03:36.254Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="BIASBIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。 乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。 乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-alg/finance/bias" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/29/alg/finance/bias/" class="article-date">
+  <time datetime="2019-06-29T14:20:13.239Z" itemprop="datePublished">2019-06-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="BIAS"><a href="#BIAS" class="headerlink" title="BIAS"></a>BIAS</h1><p>BIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。</p>
+<p>乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。</p>
+<p>乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条以0值为横向中轴之波动伸延的曲线。</p>
+<h2 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h2><ol>
+<li>计算方法 一</li>
+</ol>
+<p>$$BIAS(乖离率) = \frac{当日收盘价-N日平均价}{N日平均价} * 100 \%$$</p>
+<p>其中N，一般5、6、10、12、24、30和72。在实际运用中，短线使用6日乖离率较为有效，中线则放大为10日或12日。</p>
+<ol start="2">
+<li>计算方法 二</li>
+</ol>
+<p>$BIAS=(EMA(收盘价, N) - \frac{MA(收盘价, M)}{MA(收盘价, M)}) * 100$</p>
+<p>其中，N取超短周期，例如4，7，9，12等；M为大周期，例如，38，57，137，254，526等；</p>
+<h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol>
+<li>当取N的值为6:</li>
+</ol>
+<p>1) 如果指数和平均线之间的乖离率达到6%以上,则表示该阶段处于超买区,投资者可以在此进行卖出的操作,如果指数与平均线之间的乖离率达到6%以下时为则显示为超卖区,投资者可在此进行买入操作.</p>
+<p>2) 如果指数和均线乖离率达8%以上时为超买区,投资者可以考虑卖出;指数和平均线间的乖离率达到-3%以下时为超卖区,是交易者进行买进的时机.</p>
+<ol start="2">
+<li>当N取值12时;</li>
+</ol>
+<p>1) 指数和12日平均线间的乖离率达5%以上时为超买区域,是投资者卖出的时机;指数和12日平均线乖离率达-5%以下时为超卖区,是交易买进的时机.</p>
+<p>2)指数与12日平均线乖离率达6%以上时为超买区,是交易卖出的时机;指数与12日平均线的乖离率达-4%以下时为超卖区,看做是交易买进的时机.</p>
+<ol start="3">
+<li><p>如果汇市处于不断上升的时候,可以选择在高价处的正乖离率点卖出操作;反之汇市不断下降,可以选择在最低价的负乖离率数卖出操作.</p>
+</li>
+<li><p>如果遇到汇率在不断下跌的同时,负乖离率增大,空头方向可以在此处进行平仓的操作,比较安全.另外在乖离率等于零以后出现反弹,则可以进行卖出的操作.</p>
+</li>
+</ol>
+<h2 id="组合应用"><a href="#组合应用" class="headerlink" title="组合应用"></a>组合应用</h2><p>在技术性<a href="https://baike.baidu.com/item/%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">反弹</a><a href="https://baike.baidu.com/item/%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">行情</a>中乖离率指标适合与随机指标组合运用，KD指标和BIAS指标可以使得反弹行情中的操作变得及时准确。在反弹行情中，BIAS指标的功用是确认<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>是否<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C" target="_blank" rel="noopener">超跌</a>，而KD指标的作用是显示<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>是否有拐头向上的动能，两者的结合有利于投资者准确判断出抢反弹的最佳时机。具体的应用原则：</p>
+<ol>
+<li><p>将BIAS指标的参数设置为24日，将KD指标的参数设置为9；3；3。</p>
+</li>
+<li><p><a href="https://baike.baidu.com/item/BIAS%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">BIAS指标</a>要小于-6，这只是确认该股超跌的初选条件。</p>
+</li>
+<li><p>KD指标产生黄金交叉，K线上穿D线。</p>
+</li>
+<li><p>KD交叉同时，KD指标中的D值要小于16。</p>
+</li>
+</ol>
+<p>第二种组合，乖离率指标与<a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">布林线指标</a>的结合运用适合在<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">超跌反弹</a>行情中的买入：对于这类反弹行情，投资者不宜采用追涨，而要结合技术分析方法，运用BIAS和布林线指标的组合分析，把握<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>进出时机。具体方法是：</p>
+<ol>
+<li><p>当BIAS的三条<a href="https://baike.baidu.com/item/%E7%9F%AD%E6%9C%9F%E5%9D%87%E7%BA%BF" target="_blank" rel="noopener">短期均线</a>全部小于0时；</p>
+</li>
+<li><p><a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>也已经触及BOLL的下轨线LB；</p>
+</li>
+<li><p><a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF" target="_blank" rel="noopener">布林线</a>正处于不断收敛状态中的；</p>
+</li>
+<li><p>BIAS的短期均线上穿长期均线，并且成交量逐渐放大的。</p>
+</li>
+</ol>
+<p>当符合上述条件时，<a href="https://baike.baidu.com/item/%E6%8A%95%E8%B5%84%E8%80%85" target="_blank" rel="noopener">投资者</a>可以积极择股买入。</p>
+<p><strong>参考</strong></p>
+<p><a href="https://baike.baidu.com/item/%E4%B9%96%E7%A6%BB%E7%8E%87/420286" target="_blank" rel="noopener">https://baike.baidu.com/item/乖离率/420286</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/29/alg/finance/bias/" data-id="cjy2hahrx00132seotbwfnv46" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/07/02/alg/finance/rsi/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/06/27/alg/finance/macd/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#BIAS"><span class="toc-number">1.</span> <span class="toc-text">BIAS</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#计算方法"><span class="toc-number">1.1.</span> <span class="toc-text">计算方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用技巧"><span class="toc-number">1.2.</span> <span class="toc-text">使用技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#组合应用"><span class="toc-number">1.3.</span> <span class="toc-text">组合应用</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>搭建 vpn 服务器 | Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Setp1. install OpenVPN12$ sudo apt-get update$ sudo apt-get install openvpn easy-rsa Setp2. 构建 CA(certificate authority) 目录使用make-cadir拷贝easy-rsa 的模板. 1$ make-cadir ~/openvpn-ca Setp3.  配置 CA 变量~/open">
+<meta name="keywords" content="vpn 服务器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搭建 vpn 服务器">
+<meta property="og:url" content="http://yoursite.com/2018/12/03/devops/build_vpn_server/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="Setp1. install OpenVPN12$ sudo apt-get update$ sudo apt-get install openvpn easy-rsa Setp2. 构建 CA(certificate authority) 目录使用make-cadir拷贝easy-rsa 的模板. 1$ make-cadir ~/openvpn-ca Setp3.  配置 CA 变量~/open">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-04T14:29:46.108Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="搭建 vpn 服务器">
+<meta name="twitter:description" content="Setp1. install OpenVPN12$ sudo apt-get update$ sudo apt-get install openvpn easy-rsa Setp2. 构建 CA(certificate authority) 目录使用make-cadir拷贝easy-rsa 的模板. 1$ make-cadir ~/openvpn-ca Setp3.  配置 CA 变量~/open">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-devops/build_vpn_server" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/03/devops/build_vpn_server/" class="article-date">
+  <time datetime="2018-12-03T14:33:29.000Z" itemprop="datePublished">2018-12-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/devops/">devops</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      搭建 vpn 服务器
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="Setp1-install-OpenVPN"><a href="#Setp1-install-OpenVPN" class="headerlink" title="Setp1. install OpenVPN"></a>Setp1. install OpenVPN</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get install openvpn easy-rsa</span><br></pre></td></tr></table></figure>
+<h2 id="Setp2-构建-CA-certificate-authority-目录"><a href="#Setp2-构建-CA-certificate-authority-目录" class="headerlink" title="Setp2. 构建 CA(certificate authority) 目录"></a>Setp2. 构建 CA(certificate authority) 目录</h2><p>使用<code>make-cadir</code>拷贝<code>easy-rsa</code> 的模板.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make-cadir ~/openvpn-ca</span><br></pre></td></tr></table></figure>
+<h2 id="Setp3-配置-CA-变量"><a href="#Setp3-配置-CA-变量" class="headerlink" title="Setp3.  配置 CA 变量"></a>Setp3.  配置 CA 变量</h2><p><code>~/openvpn-ca/vars</code> 自己喜欢填啥就填啥吧, 不可以空着就是了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line"><span class="built_in">export</span> KEY_NAME=<span class="string">"server"</span> <span class="comment"># 服务器的名字</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> KEY_COUNTRY=<span class="string">"US"</span></span><br><span class="line"><span class="built_in">export</span> KEY_PROVINCE=<span class="string">"CA"</span></span><br><span class="line"><span class="built_in">export</span> KEY_CITY=<span class="string">"SanFrancisco"</span></span><br><span class="line"><span class="built_in">export</span> KEY_ORG=<span class="string">"Fort-Funston"</span></span><br><span class="line"><span class="built_in">export</span> KEY_EMAIL=<span class="string">"me@myhost.mydomain"</span></span><br><span class="line"><span class="built_in">export</span> KEY_OU=<span class="string">"MyOrganizationalUnit"</span></span><br><span class="line"></span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+<h2 id="Setp4-Build-the-Certificate-Authority"><a href="#Setp4-Build-the-Certificate-Authority" class="headerlink" title="Setp4. Build the Certificate Authority"></a>Setp4. Build the Certificate Authority</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/openvpn-ca</span><br><span class="line">$ <span class="built_in">source</span> vars</span><br><span class="line">$ ./clean-all	<span class="comment"># 确保干净的环境中操作</span></span><br><span class="line">$ ./build-ca	<span class="comment"># 构建CA</span></span><br></pre></td></tr></table></figure>
+<h2 id="Setp5-创建服务器证书-key和加密文件"><a href="#Setp5-创建服务器证书-key和加密文件" class="headerlink" title="Setp5.  创建服务器证书,key和加密文件"></a>Setp5.  创建服务器证书,key和加密文件</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ./build-key-server server</span><br><span class="line">$ ./build-dh</span><br><span class="line">$ openvpn --genkey --secret keys/ta.key</span><br></pre></td></tr></table></figure>
+<h2 id="Setp6-创建客户端的证书和key-pair"><a href="#Setp6-创建客户端的证书和key-pair" class="headerlink" title="Setp6. 创建客户端的证书和key pair"></a>Setp6. 创建客户端的证书和key pair</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./build-key client1 <span class="comment"># 不需要密码版</span></span><br><span class="line">$ ./build-key-pass client1 <span class="comment"># 需要密码版</span></span><br></pre></td></tr></table></figure>
+<h2 id="Setp7-配置-OpenVPN-服务"><a href="#Setp7-配置-OpenVPN-服务" class="headerlink" title="Setp7. 配置 OpenVPN 服务"></a>Setp7. 配置 OpenVPN 服务</h2><h3 id="Copy-the-Files-to-the-OpenVPN-Directory"><a href="#Copy-the-Files-to-the-OpenVPN-Directory" class="headerlink" title="Copy the Files to the OpenVPN Directory"></a>Copy the Files to the OpenVPN Directory</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/openvpn-ca/keys</span><br><span class="line">sudo cp ca.crt server.crt server.key ta.key dh2048.pem /etc/openvpn</span><br><span class="line"><span class="comment"># 拷贝 vpn 服务器</span></span><br><span class="line">gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz | sudo tee /etc/openvpn/server.conf</span><br></pre></td></tr></table></figure>
+<h3 id="调整-OpenVPN-的配置"><a href="#调整-OpenVPN-的配置" class="headerlink" title="调整 OpenVPN 的配置"></a>调整 OpenVPN 的配置</h3><p><strong>Basic Configuration</strong></p>
+<p><code>vi /etc/openvpn/server.conf</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">tls-auth ta.key 0 <span class="comment"># This file is secret</span></span><br><span class="line">key-direction 0</span><br><span class="line"></span><br><span class="line">cipher AES-128-CBC</span><br><span class="line"></span><br><span class="line">auth SHA256</span><br><span class="line"></span><br><span class="line">user nobody</span><br><span class="line">group nogroup</span><br><span class="line"></span><br><span class="line">push <span class="string">"redirect-gateway def1 bypass-dhcp"</span></span><br><span class="line"></span><br><span class="line">push <span class="string">"dhcp-option DNS 208.67.222.222"</span></span><br><span class="line">push <span class="string">"dhcp-option DNS 208.67.220.220"</span></span><br><span class="line"></span><br><span class="line">port 443</span><br><span class="line">proto tcp</span><br><span class="line"></span><br><span class="line">cert server.crt</span><br><span class="line">key server.key</span><br></pre></td></tr></table></figure>
+<h2 id="Setp8-调整网络的服务配置"><a href="#Setp8-调整网络的服务配置" class="headerlink" title="Setp8. 调整网络的服务配置"></a>Setp8. 调整网络的服务配置</h2><p><code>vi /etc/sysctl.conf</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure>
+<h3 id="Adjust-the-UFW-Rules-to-Masquerade-Client-Connections"><a href="#Adjust-the-UFW-Rules-to-Masquerade-Client-Connections" class="headerlink" title="Adjust the UFW Rules to Masquerade Client Connections"></a>Adjust the UFW Rules to Masquerade Client Connections</h3><p>防火墙先不考虑</p>
+<h2 id="Setp9-开始-OpenVPN-服务器"><a href="#Setp9-开始-OpenVPN-服务器" class="headerlink" title="Setp9. 开始 OpenVPN 服务器"></a>Setp9. 开始 OpenVPN 服务器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start openvpn@server</span><br><span class="line">systemctl status openvpn@server</span><br></pre></td></tr></table></figure>
+<h2 id="Setp10-创建客户端的配置和基础设施"><a href="#Setp10-创建客户端的配置和基础设施" class="headerlink" title="Setp10. 创建客户端的配置和基础设施"></a>Setp10. 创建客户端的配置和基础设施</h2><h3 id="Creating-the-Client-Config-Directory-Structure"><a href="#Creating-the-Client-Config-Directory-Structure" class="headerlink" title="Creating the Client Config Directory Structure"></a>Creating the Client Config Directory Structure</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/client-configs/files</span><br><span class="line">chmod 700 ~/client-configs/files</span><br></pre></td></tr></table></figure>
+<h3 id="Creating-a-Base-Configuration"><a href="#Creating-a-Base-Configuration" class="headerlink" title="Creating a Base Configuration"></a>Creating a Base Configuration</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf</span><br></pre></td></tr></table></figure>
+<p>编辑<code>~/client-configs/base.conf</code>文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">remote &#123;server_IP_address&#125; &#123;1194&#125;</span><br><span class="line"></span><br><span class="line">proto udp</span><br><span class="line"></span><br><span class="line">user nobody</span><br><span class="line">group nogroup</span><br><span class="line"></span><br><span class="line">ca ca.crt</span><br><span class="line">cert client.crt</span><br><span class="line">key client.key</span><br><span class="line"></span><br><span class="line">cipher AES-128-CBC</span><br><span class="line">auth SHA256</span><br><span class="line"></span><br><span class="line">key-direction 1</span><br><span class="line"></span><br><span class="line"># script-security 2</span><br><span class="line"># up /etc/openvpn/update-resolv-conf</span><br><span class="line"># down /etc/openvpn/update-resolv-conf</span><br></pre></td></tr></table></figure>
+<h3 id="Creating-a-Configuration-Generation-Script"><a href="#Creating-a-Configuration-Generation-Script" class="headerlink" title="Creating a Configuration Generation Script"></a>Creating a Configuration Generation Script</h3><p><code>vi ~/client-configs/make_config.sh</code></p>
+<p>内容如下:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># First argument: Client identifier</span></span><br><span class="line"></span><br><span class="line">KEY_DIR=~/openvpn-ca/keys</span><br><span class="line">OUTPUT_DIR=~/client-configs/files</span><br><span class="line">BASE_CONFIG=~/client-configs/base.conf</span><br><span class="line"></span><br><span class="line">cat <span class="variable">$&#123;BASE_CONFIG&#125;</span> \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;ca&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/ca.crt \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/ca&gt;\n&lt;cert&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.crt \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/cert&gt;\n&lt;key&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.key \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/key&gt;\n&lt;tls-auth&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/ta.key \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/tls-auth&gt;'</span>) \</span><br><span class="line">    &gt; <span class="variable">$&#123;OUTPUT_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.ovpn</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 700 ~/client-configs/make_config.sh</span><br></pre></td></tr></table></figure>
+<h2 id="Step-11-Generate-Client-Configurations"><a href="#Step-11-Generate-Client-Configurations" class="headerlink" title="Step 11: Generate Client Configurations"></a>Step 11: Generate Client Configurations</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/client-configs</span><br><span class="line">./make_config.sh client1</span><br><span class="line">ls ~/client-configs/files</span><br></pre></td></tr></table></figure>
+<p><strong>将文件拷贝到目标系统中</strong></p>
+<p>参考: <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04" target="_blank" rel="noopener">https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjy2hahpy00042seoyyi7aqkq" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vpn-服务器/">vpn 服务器</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2018/12/06/frontend/flutter/flutter_learn_plan/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Learn flutter
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/11/30/mac/防火墙问题/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">Mac 上防火墙的倒腾</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp1-install-OpenVPN"><span class="toc-number">1.</span> <span class="toc-text">Setp1. install OpenVPN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp2-构建-CA-certificate-authority-目录"><span class="toc-number">2.</span> <span class="toc-text">Setp2. 构建 CA(certificate authority) 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp3-配置-CA-变量"><span class="toc-number">3.</span> <span class="toc-text">Setp3.  配置 CA 变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp4-Build-the-Certificate-Authority"><span class="toc-number">4.</span> <span class="toc-text">Setp4. Build the Certificate Authority</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp5-创建服务器证书-key和加密文件"><span class="toc-number">5.</span> <span class="toc-text">Setp5.  创建服务器证书,key和加密文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp6-创建客户端的证书和key-pair"><span class="toc-number">6.</span> <span class="toc-text">Setp6. 创建客户端的证书和key pair</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp7-配置-OpenVPN-服务"><span class="toc-number">7.</span> <span class="toc-text">Setp7. 配置 OpenVPN 服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Copy-the-Files-to-the-OpenVPN-Directory"><span class="toc-number">7.1.</span> <span class="toc-text">Copy the Files to the OpenVPN Directory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#调整-OpenVPN-的配置"><span class="toc-number">7.2.</span> <span class="toc-text">调整 OpenVPN 的配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp8-调整网络的服务配置"><span class="toc-number">8.</span> <span class="toc-text">Setp8. 调整网络的服务配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Adjust-the-UFW-Rules-to-Masquerade-Client-Connections"><span class="toc-number">8.1.</span> <span class="toc-text">Adjust the UFW Rules to Masquerade Client Connections</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp9-开始-OpenVPN-服务器"><span class="toc-number">9.</span> <span class="toc-text">Setp9. 开始 OpenVPN 服务器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp10-创建客户端的配置和基础设施"><span class="toc-number">10.</span> <span class="toc-text">Setp10. 创建客户端的配置和基础设施</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-the-Client-Config-Directory-Structure"><span class="toc-number">10.1.</span> <span class="toc-text">Creating the Client Config Directory Structure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-a-Base-Configuration"><span class="toc-number">10.2.</span> <span class="toc-text">Creating a Base Configuration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-a-Configuration-Generation-Script"><span class="toc-number">10.3.</span> <span class="toc-text">Creating a Configuration Generation Script</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-11-Generate-Client-Configurations"><span class="toc-number">11.</span> <span class="toc-text">Step 11: Generate Client Configurations</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
