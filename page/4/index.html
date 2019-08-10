@@ -69,6 +69,486 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/" class="article-date">
+  <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/">Part 2 - 世上最简单的 SQL 编译器和虚拟机</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Part-2-世上最简单的-SQL-编译器和虚拟机"><a href="#Part-2-世上最简单的-SQL-编译器和虚拟机" class="headerlink" title="Part 2 - 世上最简单的 SQL 编译器和虚拟机"></a>Part 2 - 世上最简单的 SQL 编译器和虚拟机</h1><p>sqlite 的前端是一个 SQL 编辑器, 解析一个字符串和输出一个内部的字节编码. </p>
+<p>这个字节编码通过虚拟机执行它.</p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="SQLite Architecture"><br>SQLite Architecture (<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
+<p>将整件事情分解为两步主要有两个优点:</p>
+<ul>
+<li>减少每一块的复杂度(例如: 虚拟机不用去考虑语法的错误)</li>
+<li>允许编译常见错误,并且缓存字节码以提高效率.</li>
+</ul>
+<p>顺着这个思路, 让我重构一下主函数, 并且让其支持两个新的关键词:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">   <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">     print_prompt();</span><br><span class="line">     read_input(input_buffer);</span><br><span class="line"></span><br><span class="line">-    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">-      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">-    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">-      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+    <span class="keyword">if</span> (input_buffer-&gt;buffer[<span class="number">0</span>] == <span class="string">'.'</span>) &#123;</span><br><span class="line">+      <span class="keyword">switch</span> (do_meta_command(input_buffer)) &#123;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_SUCCESS):</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_UNRECOGNIZED_COMMAND):</span><br><span class="line">+          <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">+</span><br><span class="line">+    Statement statement;</span><br><span class="line">+    <span class="keyword">switch</span> (prepare_statement(input_buffer, &amp;statement)) &#123;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_SUCCESS):</span><br><span class="line">+        <span class="keyword">break</span>;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_UNRECOGNIZED_STATEMENT):</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"Unrecognized keyword at start of '%s'.\n"</span>,</span><br><span class="line">+               input_buffer-&gt;buffer);</span><br><span class="line">+        <span class="keyword">continue</span>;</span><br><span class="line">+    &#125;</span><br><span class="line">+</span><br><span class="line">+    execute_statement(&amp;statement);</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Executed.\n"</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>.exit</code> 不是 SQL 命令,被称为 “元命令”. 他们开始于 <code>.</code> 号, 所有我们需要先检查它们, 并在分离函数中处理他们.</p>
+<p>下一步,我们添加一步将输入的行转换成内部的 statement. 这是我们前端的 hacky 版本.</p>
+<p>最后,我们将预处理好的 statement 传给 <code>execute_statement</code> 函数, 这个函数最终将会变成我们的虚拟机.</p>
+<p>注意, 这个新的函数均返回 enums 来表示成功或者失败:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> MetaCommandResult_t &#123;</span><br><span class="line">  META_COMMAND_SUCCESS,</span><br><span class="line">  META_COMMAND_UNRECOGNIZED_COMMAND</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> MetaCommandResult_t MetaCommandResult;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> PrepareResult_t &#123; PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT &#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> PrepareResult_t PrepareResult;</span><br></pre></td></tr></table></figure></p>
+<p><code>do_meta_command</code> 函数仅仅是一个包装了退出函数,为更多的命令留下空间.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MetaCommandResult <span class="title">do_meta_command</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> META_COMMAND_UNRECOGNIZED_COMMAND;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们的<code>prepared statement</code>枚举 现在仅包含两个值, 它将来将会包含更多的参数在声明中.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> StatementType_t &#123; STATEMENT_INSERT, STATEMENT_SELECT &#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> StatementType_t StatementType;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> &#123;</span></span><br><span class="line">  StatementType type;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> <span class="title">Statement</span>;</span></span><br></pre></td></tr></table></figure>
+<p><code>prepare_statement</code> (我们的 SQL 编译器) 现在并不能理解 SQL, 他现在仅仅能理解两个单词.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">PrepareResult <span class="title">prepare_statement</span><span class="params">(InputBuffer* input_buffer,</span></span></span><br><span class="line"><span class="function"><span class="params">                                Statement* statement)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strncmp</span>(input_buffer-&gt;buffer, <span class="string">"insert"</span>, <span class="number">6</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    statement-&gt;type = STATEMENT_INSERT;</span><br><span class="line">    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">"select"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    statement-&gt;type = STATEMENT_SELECT;</span><br><span class="line">    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> PREPARE_UNRECOGNIZED_STATEMENT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意,我们现在使用 <code>strncmp</code> 以 insert 关键词来匹配 insert 其后将会跟随着要插入的数据(例如: insert 1 cstack <a href="mailto:foo@bar.com" target="_blank" rel="noopener">foo@bar.com</a>)</p>
+<p>最后 <code>execute_statement</code> 函数现在仅仅是打印了一些东西.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">execute_statement</span><span class="params">(Statement* statement)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (statement-&gt;type) &#123;</span><br><span class="line">    <span class="keyword">case</span> (STATEMENT_INSERT):</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"This is where we would do an insert.\n"</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> (STATEMENT_SELECT):</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"This is where we would do a select.\n"</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这里将不会返回任何错误码,因为这里没有啥错误可能产生</p>
+<p>随着代码的开发,我们可以发现两个新的单词了.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">~ ./db</span><br><span class="line">db &gt; insert foo bar</span><br><span class="line">This is <span class="built_in">where</span> we would <span class="keyword">do</span> an insert.</span><br><span class="line">Executed.</span><br><span class="line">db &gt; delete foo</span><br><span class="line">Unrecognized keyword at start of <span class="string">'delete foo'</span>.</span><br><span class="line">db &gt; select</span><br><span class="line">This is <span class="built_in">where</span> we would <span class="keyword">do</span> a select.</span><br><span class="line">Executed.</span><br><span class="line">db &gt; .tables</span><br><span class="line">Unrecognized <span class="built_in">command</span> <span class="string">'.tables'</span></span><br><span class="line">db &gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure>
+<p>我们的数据库的架子正在形成… 如果能存储数据将会更加友好? 这是下一章节的内容, 我们将会实现插入和 select, 创建世界上最差的数据库存储, 下面是本章修改的代码对照:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">@@ <span class="number">-10</span>,<span class="number">6</span> +<span class="number">10</span>,<span class="number">23</span> @@ <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> &#123;</span></span><br><span class="line"> &#125;;</span><br><span class="line"> <span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> <span class="title">InputBuffer</span>;</span></span><br><span class="line"> </span><br><span class="line">+<span class="keyword">enum</span> MetaCommandResult_t &#123;</span><br><span class="line">+  META_COMMAND_SUCCESS,</span><br><span class="line">+  META_COMMAND_UNRECOGNIZED_COMMAND</span><br><span class="line">+&#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> MetaCommandResult_t MetaCommandResult;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">enum</span> PrepareResult_t &#123; PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT &#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> PrepareResult_t PrepareResult;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">enum</span> StatementType_t &#123; STATEMENT_INSERT, STATEMENT_SELECT &#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> StatementType_t StatementType;</span><br><span class="line">+</span><br><span class="line">+<span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> &#123;</span></span><br><span class="line">+  StatementType type;</span><br><span class="line">+&#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> <span class="title">Statement</span>;</span></span><br><span class="line">+</span><br><span class="line"> <span class="function">InputBuffer* <span class="title">new_input_buffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(InputBuffer));</span><br><span class="line">   input_buffer-&gt;buffer = <span class="literal">NULL</span>;</span><br><span class="line">@@ <span class="number">-35</span>,<span class="number">16</span> +<span class="number">52</span>,<span class="number">66</span> @@ <span class="function"><span class="keyword">void</span> <span class="title">read_input</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">   input_buffer-&gt;buffer[bytes_read - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">+<span class="function">MetaCommandResult <span class="title">do_meta_command</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">+  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+    <span class="keyword">return</span> META_COMMAND_UNRECOGNIZED_COMMAND;</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function">PrepareResult <span class="title">prepare_statement</span><span class="params">(InputBuffer* input_buffer,</span></span></span><br><span class="line"><span class="function"><span class="params">+                                Statement* statement)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strncmp</span>(input_buffer-&gt;buffer, <span class="string">"insert"</span>, <span class="number">6</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    statement-&gt;type = STATEMENT_INSERT;</span><br><span class="line">+    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">+  &#125;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">"select"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    statement-&gt;type = STATEMENT_SELECT;</span><br><span class="line">+    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">+  &#125;</span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">return</span> PREPARE_UNRECOGNIZED_STATEMENT;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">execute_statement</span><span class="params">(Statement* statement)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">switch</span> (statement-&gt;type) &#123;</span><br><span class="line">+    <span class="keyword">case</span> (STATEMENT_INSERT):</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"This is where we would do an insert.\n"</span>);</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+    <span class="keyword">case</span> (STATEMENT_SELECT):</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"This is where we would do a select.\n"</span>);</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">   <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">     print_prompt();</span><br><span class="line">     read_input(input_buffer);</span><br><span class="line"> </span><br><span class="line">-    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">-      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">-    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">-      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+    <span class="keyword">if</span> (input_buffer-&gt;buffer[<span class="number">0</span>] == <span class="string">'.'</span>) &#123;</span><br><span class="line">+      <span class="keyword">switch</span> (do_meta_command(input_buffer)) &#123;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_SUCCESS):</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_UNRECOGNIZED_COMMAND):</span><br><span class="line">+          <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">+</span><br><span class="line">+    Statement statement;</span><br><span class="line">+    <span class="keyword">switch</span> (prepare_statement(input_buffer, &amp;statement)) &#123;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_SUCCESS):</span><br><span class="line">+        <span class="keyword">break</span>;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_UNRECOGNIZED_STATEMENT):</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"Unrecognized keyword at start of '%s'.\n"</span>,</span><br><span class="line">+               input_buffer-&gt;buffer);</span><br><span class="line">+        <span class="keyword">continue</span>;</span><br><span class="line">+    &#125;</span><br><span class="line">+</span><br><span class="line">+    execute_statement(&amp;statement);</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Executed.\n"</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/" data-id="cjy2hcgyb004p8seonz431hxs" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-build_own_x/data_base/build_simple_database/Part1_Introduction_and_setting_up_the_REPL" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Part1_Introduction_and_setting_up_the_REPL/" class="article-date">
+  <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Part1_Introduction_and_setting_up_the_REPL/">Part 1 - 介绍和设置 REPL</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Part-1-介绍和设置-REPL"><a href="#Part-1-介绍和设置-REPL" class="headerlink" title="Part 1 - 介绍和设置 REPL"></a>Part 1 - 介绍和设置 REPL</h1><blockquote>
+<p>下面涉及一些专业术语,不做具体翻译,第一次出现时可能会解释下.</p>
+</blockquote>
+<p>作为一个 web 开发者, 在工作中每天都会使用到关系型数据库,但是它对于我就像是一个黑箱子一样. 我存在好多问题:</p>
+<ul>
+<li>在内存和磁盘上, 数据保存的格式是啥?</li>
+<li>什么时候会从内存中移动到硬盘上?</li>
+<li>为什么每个表仅有一个主键呢?</li>
+<li>事务回滚是如何工作的呢?</li>
+<li>索引是如何格式化? FIXME(Jx)  (How are indexes formatted?)</li>
+<li>啥时候全表扫描会发生呢?</li>
+<li>保存前的预准备格式是啥样的呢? FIXME(Jx) (What format is a prepared statement saved in?)</li>
+</ul>
+<p>换而言之,它是如何工作的呢?</p>
+<p>为了弄清这些事情,我从头写了一个数据库. 它是已 sqlite 为原型, 因为sqlite 的设计相对于 mysql 和 PostgreSQL 简单不少. 所以能够更好的理解它, 整个数据存储在单个文件中.</p>
+<h2 id="Sqlite"><a href="#Sqlite" class="headerlink" title="Sqlite"></a>Sqlite</h2><p>Sqlite 官网有许多内部<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">设计文档</a> , 这里拷贝一份 <a href="https://play.google.com/store/books/details?id=9Z6IQQnX1JEC" target="_blank" rel="noopener">Sqlite 数据库系统的设计和实现文档</a></p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/arch1.gif" alt="sqlite architecture"><br>sqlite architecture (<a href="https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki" target="_blank" rel="noopener">https://www.sqlite.org/zipvfs/doc/trunk/www/howitworks.wiki</a>)</p>
+<p>一个查询是通过一条长链的组件来取回或者修改数据. 前端组件的组成:</p>
+<ul>
+<li>tokenizer (标记生成器)</li>
+<li>parser (解析器)</li>
+<li>code generator (代码生成器)</li>
+</ul>
+<p>给前端输入一个 SQL 查询, 输出的是 Sqlite 虚拟机的字节码(本质上是一个可以在数据库上运行的编译程序)</p>
+<p>后端组件的组成:</p>
+<ul>
+<li>virtual machine</li>
+<li>B-tree</li>
+<li>pager</li>
+<li>os interface</li>
+</ul>
+<p><code>virtual machine</code>: 虚拟机接收前端传过来的字节码, 它能够操作一个或者多个表或者索引, 所有的这些都是存储在一个数据结构中, is B 树. VM 其本质其实是一个字节指令, 一个大的 switch 语句.</p>
+<p><code>B-tree</code>: 每个 B 树都是有许多个节点组成的, 每个节点是一个页. B树可以通过向 <code>pager</code> 发送指令从硬盘中取回一页 或者是将数据保存回硬盘.</p>
+<p><code>pager</code>: 接收指令读取或者写入一页数据. 它的主要责任是在适当的时候读或写数据库文件. 同时会在内存中保存一份最近读取的页, 并且确定在什么时候需要就这页数据回写到硬盘.</p>
+<p><code>os interface</code>: 根据操作系统的不同会有很大的不同, 在这份教程中, 不会去支持多操作系统.</p>
+<p>千里之行始于足下, so 让我们从第一步开始吧: the REPL</p>
+<h2 id="制作一个简单的-REPL"><a href="#制作一个简单的-REPL" class="headerlink" title="制作一个简单的 REPL"></a>制作一个简单的 REPL</h2><p>Sqlite 开始于 read-execute-print(读取-执行-打印) 的循环, 从命令行开始吧:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~ sqlite3</span><br><span class="line">SQLite version 3.16.0 2016-11-04 19:09:39</span><br><span class="line">Enter <span class="string">".help"</span> <span class="keyword">for</span> usage hints.</span><br><span class="line">Connected to a transient <span class="keyword">in</span>-memory database.</span><br><span class="line">Use <span class="string">".open FILENAME"</span> to reopen on a persistent database.</span><br><span class="line">sqlite&gt; create table users (id int, username varchar(255), email varchar(255));</span><br><span class="line">sqlite&gt; .tables</span><br><span class="line">users</span><br><span class="line">sqlite&gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure></p>
+<p>要做到这一点我们需要在主程序中用一个无限循环打印提示,  获取一行输入, 然后处理这行输入.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">  InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    print_prompt();</span><br><span class="line">    read_input(input_buffer);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们将定义一个 InputBuffer 使用一个简单的包装器, 需要存储 <code>getline()</code> 的信息.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> &#123;</span></span><br><span class="line">  <span class="keyword">char</span>* buffer;</span><br><span class="line">  <span class="keyword">size_t</span> buffer_length;</span><br><span class="line">  <span class="keyword">ssize_t</span> input_length;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> <span class="title">InputBuffer</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="function">InputBuffer* <span class="title">new_input_buffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  InputBuffer* input_buffer = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(InputBuffer));</span><br><span class="line">  input_buffer-&gt;buffer = <span class="literal">NULL</span>;</span><br><span class="line">  input_buffer-&gt;buffer_length = <span class="number">0</span>;</span><br><span class="line">  input_buffer-&gt;input_length = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> input_buffer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下一步打印提示, 在每一行输入之前都需要打印它</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_prompt</span><span class="params">()</span> </span>&#123; <span class="built_in">printf</span>(<span class="string">"db &gt; "</span>); &#125;</span><br></pre></td></tr></table></figure>
+<p>为了读取一行输入,需要使用到<code>getline()</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ssize_t</span> getline(<span class="keyword">char</span> **lineptr, <span class="keyword">size_t</span> *n, FILE *stream);</span><br></pre></td></tr></table></figure>
+<p>buffer 开始的时候是 null 的, 所以在 getline 分配足够的内存来保存输入的内容.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_input</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">ssize_t</span> bytes_read =</span><br><span class="line">      getline(&amp;(input_buffer-&gt;buffer), &amp;(input_buffer-&gt;buffer_length), <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (bytes_read &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Error reading input\n"</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Ignore trailing newline(忽略换行符)</span></span><br><span class="line">  input_buffer-&gt;input_length = bytes_read - <span class="number">1</span>;</span><br><span class="line">  input_buffer-&gt;buffer[bytes_read - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后,我们将执行命令, 在这仅有一个可解析的命令 <code>.exit</code> , 输入其它的内容都会继续循环.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">  <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译运行下吧~<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">~ ./db</span><br><span class="line">db &gt; .tables</span><br><span class="line">Unrecognized <span class="built_in">command</span> <span class="string">'.tables'</span>.</span><br><span class="line">db &gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure></p>
+<p>完整实例:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> &#123;</span></span><br><span class="line">  <span class="keyword">char</span>* buffer;</span><br><span class="line">  <span class="keyword">size_t</span> buffer_length;</span><br><span class="line">  <span class="keyword">ssize_t</span> input_length;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> <span class="title">InputBuffer</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="function">InputBuffer* <span class="title">new_input_buffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  InputBuffer* input_buffer = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(InputBuffer));</span><br><span class="line">  input_buffer-&gt;buffer = <span class="literal">NULL</span>;</span><br><span class="line">  input_buffer-&gt;buffer_length = <span class="number">0</span>;</span><br><span class="line">  input_buffer-&gt;input_length = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> input_buffer;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_prompt</span><span class="params">()</span> </span>&#123; <span class="built_in">printf</span>(<span class="string">"db &gt; "</span>); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_input</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">ssize_t</span> bytes_read =</span><br><span class="line">      getline(&amp;(input_buffer-&gt;buffer), &amp;(input_buffer-&gt;buffer_length), <span class="built_in">stdin</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (bytes_read &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Error reading input\n"</span>);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Ignore trailing newline</span></span><br><span class="line">  input_buffer-&gt;input_length = bytes_read - <span class="number">1</span>;</span><br><span class="line">  input_buffer-&gt;buffer[bytes_read - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">  InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    print_prompt();</span><br><span class="line">    read_input(input_buffer);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Part1_Introduction_and_setting_up_the_REPL/" data-id="cjy2hcgye004s8seoknubkd90" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-build_own_x/data_base/build_simple_database/Readme_Index" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" class="article-date">
+  <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/">Let&#39;s Build a Simple Database</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Let’s-Build-a-Simple-Database"><a href="#Let’s-Build-a-Simple-Database" class="headerlink" title="Let’s Build a Simple Database"></a>Let’s Build a Simple Database</h1><p>原文: <a href="https://cstack.github.io/db_tutorial/" target="_blank" rel="noopener">https://cstack.github.io/db_tutorial/</a></p>
+<p>从 C 重新开始写 Sqlite</p>
+<h2 id="数据库是如何工作的"><a href="#数据库是如何工作的" class="headerlink" title="数据库是如何工作的?"></a>数据库是如何工作的?</h2><ul>
+<li>在内存和磁盘上, 数据保存的格式是啥?</li>
+<li>什么时候会从内存中移动到硬盘上?</li>
+<li>为什么每个表仅有一个主键呢?</li>
+<li>事务回滚是如何工作的呢?</li>
+<li>索引是如何格式化? FIXME(Jx)  (How are indexes formatted?)</li>
+<li>啥时候全表扫描会发生呢?</li>
+<li>保存前的预准备格式是啥样的呢? FIXME(Jx) (What format is a prepared statement saved in?)</li>
+</ul>
+<p>总而言之, 数据库是如何工作的呢?</p>
+<p>为了理解这个, 我将会用 C 重新构建一个 Sqlite , 并且会记录其过程.</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li>Part 1 - 介绍和设置 REPL</li>
+<li>Part 2 - 世上最简单的 SQL 编译器和虚拟机</li>
+<li>Part 3 - 一个在内存, 仅追加的 单表数据库</li>
+<li>Part 4 - 第一个单元测试类(和一些Bugs)</li>
+<li>Part 5 - 持久化到硬盘</li>
+<li>Part 6 - 游标的抽象化</li>
+<li>Part 7 - 介绍 B 树</li>
+<li>Part 8 - B 树叶子接口格式化</li>
+<li>Part 9 - 二分查找和重复键</li>
+<li>Part 10 - 拆分叶子节点</li>
+<li>Part 11 - 递归搜索 B 树</li>
+<li>Part 12 - 扫描多层级的 B 树</li>
+<li>Part 13 - 拆分后更新父节点</li>
+</ul>
+<blockquote>
+<p>“What I cannot create, I do not understand.” – <a href="https://en.m.wikiquote.org/wiki/Richard_Feynman" target="_blank" rel="noopener">Richard Feynman</a></p>
+</blockquote>
+<h3 id="Sqlite-架构图"><a href="#Sqlite-架构图" class="headerlink" title="Sqlite 架构图"></a>Sqlite 架构图</h3><p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="Sqlite 架构图"></p>
+<p>Sqlite 架构图: <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" data-id="cjy2hcgz8005j8seozg5o361g" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-build_own_x/data_base/build_simple_database_task" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database_task/" class="article-date">
+  <time datetime="2019-01-26T07:23:30.094Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h2><p>one weak one Part</p>
+<h3 id="1-翻译原文"><a href="#1-翻译原文" class="headerlink" title="1. 翻译原文"></a>1. 翻译原文</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 0 - Index readme</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="2-基础总结"><a href="#2-基础总结" class="headerlink" title="2. 基础总结"></a>2. 基础总结</h3><ul>
+<li style="list-style: none"><input type="checkbox"> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox"> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="3-follow-it-write-a-simple-DB"><a href="#3-follow-it-write-a-simple-DB" class="headerlink" title="3. follow it write a simple DB"></a>3. follow it write a simple DB</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/" data-id="cjy2hcgvq002g8seo5runmo7g" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/raft/raft_think" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/alg/raft/raft_think/" class="article-date">
+  <time datetime="2018-12-10T11:54:15.000Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/10/alg/raft/raft_think/">关于 Raft 的 think</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="日志复制问题"><a href="#日志复制问题" class="headerlink" title="日志复制问题"></a>日志复制问题</h2><p>由 leader 发送日志给 follower </p>
+<p>心跳和日志拷贝是在一起的.</p>
+<p>TK: 日志复制的二段提交问题????</p>
+<p>日志复制是二段提交的: 发送日志给各个 follower, 超过一半的 follower 接收成功了, 就发起一个 commit 提交.</p>
+<p>如果leader的任期到期后会自动转换成 follower 等待下次选举的开始.</p>
+<p>应该做个时序图??</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/alg/raft/raft_think/" data-id="cjy2hcguy001t8seoi9o5o16i" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/raft-think/">raft think</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/raft/ReadRaft" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/09/alg/raft/ReadRaft/" class="article-date">
+  <time datetime="2018-12-09T14:31:08.000Z" itemprop="datePublished">2018-12-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://github.com/shishujuan/mit6.824-2017-raft.git" target="_blank" rel="noopener">https://github.com/shishujuan/mit6.824-2017-raft.git</a></p>
+<p><code>raft.go @Make</code></p>
+<ol>
+<li>初始化 rf</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">state=Follower <span class="comment">// 初始化成 Folloer</span></span><br><span class="line"></span><br><span class="line">rf.heartbeatInterval = time.Duration(HeartbeatInterval) * time.Millisecond <span class="comment">// 50 ms</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>启动 bot</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">electionTimeout := getRandomElectionTimeout() <span class="comment">// 范围 &#123;300 + [0,100)&#125;ms</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> state &#123;</span><br><span class="line">    <span class="keyword">case</span> Follower:</span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.appendEntryCh: <span class="comment">// 不用去处理接收的日志吗?</span></span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.grantVoteCh:   <span class="comment">// ??</span></span><br><span class="line">        <span class="keyword">case</span> &lt;-time.After(electionTimeout): <span class="comment">// 选举超时, Follower -&gt; Candidate</span></span><br><span class="line">            rf.mu.Lock()</span><br><span class="line">            rf.convertToCandidate()</span><br><span class="line">            rf.mu.Unlock()</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">case</span> Candidate:</span><br><span class="line">        <span class="keyword">go</span> rf.leaderElection() <span class="comment">// 1. 发起选举</span></span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.appendEntryCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.grantVoteCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.leaderCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-time.After(electionTimeout):</span><br><span class="line">            rf.mu.Lock()</span><br><span class="line">            rf.convertToCandidate() <span class="comment">// 选举超时, 重新开始选举</span></span><br><span class="line">            rf.mu.Unlock()</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">case</span> Leader:</span><br><span class="line">        rf.startAppendEntries() <span class="comment">// 开始去追加日志</span></span><br><span class="line">        time.Sleep(rf.heartbeatInterval) <span class="comment">// 心跳间隙</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjy2hcguk001m8seomuka8koe" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/raft-learn/">raft learn</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-devops/shadowsocks_server" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/07/devops/shadowsocks_server/" class="article-date">
+  <time datetime="2018-12-07T07:28:31.000Z" itemprop="datePublished">2018-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/devops/">devops</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/07/devops/shadowsocks_server/">搭建 shadowsocks 服务器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install python-pip</span><br><span class="line">pip install shadowsocks</span><br></pre></td></tr></table></figure>
+<h2 id="start-service"><a href="#start-service" class="headerlink" title="start service"></a>start service</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -p 443 -k password -m rc4-md5</span><br></pre></td></tr></table></figure>
+<p>如果要后台运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ssserver -p 443 -k password -m rc4-md5 --user nobody -d start</span><br></pre></td></tr></table></figure>
+<p>如果要停止：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ssserver -d stop</span><br></pre></td></tr></table></figure>
+<p>如果要检查日志：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo less /var/<span class="built_in">log</span>/shadowsocks.log</span><br></pre></td></tr></table></figure>
+<h3 id="启动示例"><a href="#启动示例" class="headerlink" title="启动示例"></a>启动示例</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -p 8837 -k passwd --user nobody -d start</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjy2hcgrk00098seocwoql82w" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shadowsocks-服务器/">shadowsocks 服务器</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-frontend/flutter/flutter_learn_plan" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/06/frontend/flutter/flutter_learn_plan/" class="article-date">
@@ -104,7 +584,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjy2hahtt002p2seo55tcv6t2" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjy2hcgvw002p8seotf8kyyxv" class="article-share-link">分享</a>
       
       
       
@@ -177,7 +657,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjy2hahpy00042seoyyi7aqkq" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjy2hcgr400048seo9juy9izi" class="article-share-link">分享</a>
       
       
       
@@ -230,7 +710,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjy2hahqg000a2seo40w02dun" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjy2hcgre00088seoxytuopk1" class="article-share-link">分享</a>
       
       
       
@@ -244,407 +724,10 @@
 
 
   
-    <article id="post-backend/go/goStandardLib/log" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/29/backend/go/goStandardLib/log/" class="article-date">
-  <time datetime="2018-11-29T09:31:17.960Z" itemprop="datePublished">2018-11-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="log"><a href="#log" class="headerlink" title="log"></a>log</h1><h3 id="引用-log-包"><a href="#引用-log-包" class="headerlink" title="引用 log 包"></a>引用 log 包</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log.Printf(<span class="string">"hello log %s"</span>, <span class="string">"!!"</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"># Printf</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Printf</span><span class="params">(format <span class="keyword">string</span>, v ...<span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">	std.Output(<span class="number">2</span>, fmt.Sprintf(format, v...))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># std 启用的是系统标准错误流</span><br><span class="line"><span class="keyword">var</span> std = New(os.Stderr, <span class="string">""</span>, LstdFlags)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">(out io.Writer, prefix <span class="keyword">string</span>, flag <span class="keyword">int</span>)</span> *<span class="title">Logger</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Logger&#123;out: out, prefix: prefix, flag: flag&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># Logger </span><br><span class="line"><span class="keyword">type</span> Logger <span class="keyword">struct</span> &#123;</span><br><span class="line">	mu     sync.Mutex <span class="comment">// ensures atomic writes; protects the following fields</span></span><br><span class="line">	prefix <span class="keyword">string</span>     <span class="comment">// prefix to write at beginning of each line</span></span><br><span class="line">	flag   <span class="keyword">int</span>        <span class="comment">// properties</span></span><br><span class="line">	out    io.Writer  <span class="comment">// destination for output</span></span><br><span class="line">	buf    []<span class="keyword">byte</span>     <span class="comment">// for accumulating text to write</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output writes the output for a logging event. The string s contains</span></span><br><span class="line"><span class="comment">// the text to print after the prefix specified by the flags of the</span></span><br><span class="line"><span class="comment">// Logger. A newline is appended if the last character of s is not</span></span><br><span class="line"><span class="comment">// already a newline. Calldepth is used to recover the PC and is</span></span><br><span class="line"><span class="comment">// provided for generality, although at the moment on all pre-defined</span></span><br><span class="line"><span class="comment">// paths it will be 2.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(l *Logger)</span> <span class="title">Output</span><span class="params">(calldepth <span class="keyword">int</span>, s <span class="keyword">string</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	now := time.Now() <span class="comment">// get this early.</span></span><br><span class="line">	<span class="keyword">var</span> file <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">var</span> line <span class="keyword">int</span></span><br><span class="line">	l.mu.Lock()</span><br><span class="line">	<span class="keyword">defer</span> l.mu.Unlock()</span><br><span class="line">	<span class="keyword">if</span> l.flag&amp;(Lshortfile|Llongfile) != <span class="number">0</span> &#123;</span><br><span class="line">		<span class="comment">// Release lock while getting caller info - it's expensive.</span></span><br><span class="line">		l.mu.Unlock()</span><br><span class="line">		<span class="keyword">var</span> ok <span class="keyword">bool</span></span><br><span class="line">		_, file, line, ok = runtime.Caller(calldepth)</span><br><span class="line">		<span class="keyword">if</span> !ok &#123;</span><br><span class="line">			file = <span class="string">"???"</span></span><br><span class="line">			line = <span class="number">0</span></span><br><span class="line">		&#125;</span><br><span class="line">		l.mu.Lock()</span><br><span class="line">	&#125;</span><br><span class="line">	l.buf = l.buf[:<span class="number">0</span>]</span><br><span class="line">	l.formatHeader(&amp;l.buf, now, file, line)</span><br><span class="line">	l.buf = <span class="built_in">append</span>(l.buf, s...)</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(s) == <span class="number">0</span> || s[<span class="built_in">len</span>(s)<span class="number">-1</span>] != <span class="string">'\n'</span> &#123;</span><br><span class="line">		l.buf = <span class="built_in">append</span>(l.buf, <span class="string">'\n'</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	_, err := l.out.Write(l.buf)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjy2hahv4003u2seo21qw1ge6" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/goStandardLib/sort" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/29/backend/go/goStandardLib/sort/" class="article-date">
-  <time datetime="2018-11-29T08:43:58.955Z" itemprop="datePublished">2018-11-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h1><p>接口:</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A type, typically a collection, that satisfies sort.Interface can be</span></span><br><span class="line"><span class="comment">// sorted by the routines in this package. The methods require that the</span></span><br><span class="line"><span class="comment">// elements of the collection be enumerated by an integer index.</span></span><br><span class="line"><span class="comment">// 元素集合的操作接口</span></span><br><span class="line"><span class="keyword">type</span> Interface <span class="keyword">interface</span> &#123;</span><br><span class="line">	<span class="comment">// Len is the number of elements in the collection.</span></span><br><span class="line">    <span class="comment">// 集合中元素的个数</span></span><br><span class="line">	Len() <span class="keyword">int</span></span><br><span class="line">	<span class="comment">// Less reports whether the element with</span></span><br><span class="line">	<span class="comment">// index i should sort before the element with index j.</span></span><br><span class="line">    <span class="comment">// 元素 i 是否应该在元素 j 之前</span></span><br><span class="line">	Less(i, j <span class="keyword">int</span>) <span class="keyword">bool</span></span><br><span class="line">	<span class="comment">// Swap swaps the elements with indexes i and j.</span></span><br><span class="line">    <span class="comment">// 交换元素 i 和 j</span></span><br><span class="line">	Swap(i, j <span class="keyword">int</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Sort-接口"><a href="#Sort-接口" class="headerlink" title="Sort 接口"></a>Sort 接口</h2><p>Sort 用的是快排</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sort</span><span class="params">(data Interface)</span></span> &#123;</span><br><span class="line">	n := data.Len()</span><br><span class="line">	quickSort(data, <span class="number">0</span>, n, maxDepth(n))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="quickSort"><a href="#quickSort" class="headerlink" title="quickSort()"></a>quickSort()</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">quickSort</span><span class="params">(data Interface, a, b, maxDepth <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> b-a &gt; <span class="number">12</span> &#123; <span class="comment">// Use ShellSort for slices &lt;= 12 elements</span></span><br><span class="line">		<span class="keyword">if</span> maxDepth == <span class="number">0</span> &#123;</span><br><span class="line">			heapSort(data, a, b)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		maxDepth--</span><br><span class="line">		mlo, mhi := doPivot(data, a, b)</span><br><span class="line">		<span class="comment">// Avoiding recursion on the larger subproblem guarantees</span></span><br><span class="line">		<span class="comment">// a stack depth of at most lg(b-a).</span></span><br><span class="line">		<span class="keyword">if</span> mlo-a &lt; b-mhi &#123;</span><br><span class="line">			quickSort(data, a, mlo, maxDepth)</span><br><span class="line">			a = mhi <span class="comment">// i.e., quickSort(data, mhi, b)</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			quickSort(data, mhi, b, maxDepth)</span><br><span class="line">			b = mlo <span class="comment">// i.e., quickSort(data, a, mlo)</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> b-a &gt; <span class="number">1</span> &#123;</span><br><span class="line">		<span class="comment">// Do ShellSort pass with gap 6</span></span><br><span class="line">		<span class="comment">// It could be written in this simplified form cause b-a &lt;= 12</span></span><br><span class="line">		<span class="keyword">for</span> i := a + <span class="number">6</span>; i &lt; b; i++ &#123;</span><br><span class="line">			<span class="keyword">if</span> data.Less(i, i<span class="number">-6</span>) &#123;</span><br><span class="line">				data.Swap(i, i<span class="number">-6</span>)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		insertionSort(data, a, b)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>大于12用快排,小于等于12插排, 为啥是12呢? (元素个数小于13时插入排序会比快排快吗?)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjy2hahvh00432seo11t1jzrd" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/cron/cron_source_code_read" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/29/backend/go/cron/cron_source_code_read/" class="article-date">
-  <time datetime="2018-11-29T02:48:10.074Z" itemprop="datePublished">2018-11-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="cron-source-code-read"><a href="#cron-source-code-read" class="headerlink" title="cron source code read"></a>cron source code read</h1><p>github: <a href="https://github.com/jakecoffman/cron" target="_blank" rel="noopener">https://github.com/jakecoffman/cron</a></p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>Cron</strong></p>
-<p>​    控制板, 保存了所有的任务,有停止,添加,移除,snapshot 等操作通道.</p>
-<p><strong>Entry</strong></p>
-<p>​    任务项: 包含了一个 schedule 和一个需要执行的 func</p>
-<p><strong>Schedule</strong></p>
-<p>​    日程表: 描述了工作周期</p>
-<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><p>步骤:</p>
-<blockquote>
-<ol>
-<li>new 控制板</li>
-<li>添加任务项</li>
-<li>启动任务</li>
-</ol>
-</blockquote>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new 控制板</span></span><br><span class="line">c := cron.New()</span><br><span class="line"><span class="comment">// 2. 添加任务项</span></span><br><span class="line">c.AddFunc(<span class="string">"0 5 * * * *"</span>,  <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every 5 minutes"</span>) &#125;, <span class="string">"Often"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@hourly"</span>,      <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour"</span>) &#125;, <span class="string">"Frequent"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@every 1h30m"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour thirty"</span>) &#125;, <span class="string">"Less Frequent"</span>)</span><br><span class="line"><span class="comment">// 3. 启动任务</span></span><br><span class="line">c.Start()</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Funcs are invoked in their own goroutine, asynchronously.</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">// Funcs may also be added to a running Cron</span></span><br><span class="line">c.AddFunc(<span class="string">"@daily"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every day"</span>) &#125;, <span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Inspect the cron job entries' next and previous run times.</span></span><br><span class="line">inspect(c.Entries())</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Remove an entry from the cron by name.</span></span><br><span class="line">c.RemoveJob(<span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line">c.Stop()  <span class="comment">// Stop the scheduler (does not stop any jobs already running).</span></span><br></pre></td></tr></table></figure>
-<h2 id="详细解析"><a href="#详细解析" class="headerlink" title="详细解析"></a>详细解析</h2><h3 id="newCron"><a href="#newCron" class="headerlink" title="newCron"></a>newCron</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">()</span> *<span class="title">Cron</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Cron&#123;</span><br><span class="line">		entries:  <span class="literal">nil</span>,</span><br><span class="line">		add:      <span class="built_in">make</span>(<span class="keyword">chan</span> *Entry),</span><br><span class="line">		remove:   <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>),</span><br><span class="line">		stop:     <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;),</span><br><span class="line">		snapshot: <span class="built_in">make</span>(<span class="keyword">chan</span> entries),</span><br><span class="line">		running:  <span class="literal">false</span>,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="AddFunc"><a href="#AddFunc" class="headerlink" title="AddFunc"></a>AddFunc</h3><p>AddFunc -&gt; AddJob</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">AddJob</span><span class="params">(spec <span class="keyword">string</span>, cmd Job, name <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	c.Schedule(Parse(spec), cmd, name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Parse</code> 功能: 解析 <code>spec</code> 生成 <code>schedule</code> ,<strong>生成的<code>schedule</code>很有意思哦!!</strong></p>
-<p><code>Schedule</code>主要职能:</p>
-<blockquote>
-<ol>
-<li>new Entry</li>
-<li>添加 entry 到 cron 的 entries 中</li>
-</ol>
-</blockquote>
-<h3 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h3><p>go 程启动</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	c.running = <span class="literal">true</span></span><br><span class="line">	<span class="keyword">go</span> c.run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// for 中 select 了解下</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">run</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Figure out the next activation times for each entry.</span></span><br><span class="line">	now := time.Now().Local()</span><br><span class="line">	<span class="keyword">for</span> _, entry := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">		entry.Next = entry.Schedule.Next(now)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// Determine the next entry to run.</span></span><br><span class="line">		sort.Sort(byTime(c.entries))</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> effective time.Time</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(c.entries) == <span class="number">0</span> || c.entries[<span class="number">0</span>].Next.IsZero() &#123;</span><br><span class="line">			<span class="comment">// If there are no entries yet, just sleep - it still handles new entries</span></span><br><span class="line">			<span class="comment">// and stop requests.</span></span><br><span class="line">			effective = now.AddDate(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			effective = c.entries[<span class="number">0</span>].Next</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> now = &lt;-time.After(effective.Sub(now)):</span><br><span class="line">			<span class="comment">// Run every entry whose next time was this effective time.</span></span><br><span class="line">			<span class="keyword">for</span> _, e := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">				<span class="keyword">if</span> e.Next != effective &#123;</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">go</span> e.Job.Run()</span><br><span class="line">				e.Prev = e.Next</span><br><span class="line">				e.Next = e.Schedule.Next(effective)</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> newEntry := &lt;-c.add:</span><br><span class="line">			i := c.entries.pos(newEntry.Name)</span><br><span class="line">			<span class="keyword">if</span> i != <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			c.entries = <span class="built_in">append</span>(c.entries, newEntry)</span><br><span class="line">			newEntry.Next = newEntry.Schedule.Next(time.Now().Local())</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> name := &lt;-c.remove:</span><br><span class="line">			i := c.entries.pos(name)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> i == <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			c.entries = c.entries[:i+<span class="built_in">copy</span>(c.entries[i:], c.entries[i+<span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.snapshot:</span><br><span class="line">			c.snapshot &lt;- c.entrySnapshot()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.stop:</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 'now' should be updated after newEntry and snapshot cases.</span></span><br><span class="line">		now = time.Now().Local()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h2><p>位比较来筛选出下一个执行的时间点, 了解下?</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/cron/cron_source_code_read/" data-id="cjy2hahuv003q2seo1u98mhcf" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/goStandardLib/REDEME" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/10/backend/go/goStandardLib/REDEME/" class="article-date">
-  <time datetime="2018-11-10T01:46:46.584Z" itemprop="datePublished">2018-11-10</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="golang-Standard-library"><a href="#golang-Standard-library" class="headerlink" title="golang Standard library"></a><a href="https://golang.org/pkg/#stdlib" target="_blank" rel="noopener">golang Standard library</a></h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/10/backend/go/goStandardLib/REDEME/" data-id="cjy2hahvb003z2seolwsxhcx7" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/3_raft领导选取" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/25/alg/raft/3_raft领导选取/" class="article-date">
-  <time datetime="2018-10-25T10:35:09.100Z" itemprop="datePublished">2018-10-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
-<ol>
-<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
-<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
-</ol>
-<p><strong>候选操作过程：</strong></p>
-<blockquote>
-<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
-</blockquote>
-<ol>
-<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
-<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
-<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/3_raft领导选取/" data-id="cjy2hahsj001l2seox2gyjrgq" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/1_raft基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/25/alg/raft/1_raft基础/" class="article-date">
-  <time datetime="2018-10-25T10:33:24.559Z" itemprop="datePublished">2018-10-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="raft-基础理论"><a href="#raft-基础理论" class="headerlink" title="raft 基础理论"></a>raft 基础理论</h1><p>参考: <a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
-<p>问题分解为：领导选取、日志复制、安全和成员变化</p>
-<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="复制状态机"><a href="#复制状态机" class="headerlink" title="复制状态机"></a>复制状态机</h3><p><img src="https://upload-images.jianshu.io/upload_images/3412164-922866cdd2dd47c6.png" alt="复制状态机"></p>
-<ul>
-<li>复制状态机通过复制日志来实现：<ul>
-<li>日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令</li>
-<li>状态机：状态机会按顺序执行这些命令</li>
-<li>一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的</li>
-</ul>
-</li>
-</ul>
-<h3 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h3><p>每台服务器均有可能存在下面三种情况:</p>
-<ol>
-<li>领导者</li>
-<li>候选人</li>
-<li>追随者</li>
-</ol>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-07ae960bce59aab5.png" alt="服务器转态转换图"></p>
-<p>追随者只响应其他服务器的请求。如果追随者没有收到任何消息，它会成为一个候选人并且开始一次选举。收到大多数服务器投票的候选人会成为新的领导人。领导人在它们宕机之前会一直保持领导人的状态。</p>
-<h3 id="任期"><a href="#任期" class="headerlink" title="任期"></a>任期</h3><p>Raft 算法将时间划分成为任意不同长度的任期（term）。任期用连续的数字进行表示。每一个任期的开始都是一次选举（election），一个或多个候选人会试图成为领导人。如果一个候选人赢得了选举，它就会在该任期的剩余时间担任领导人。在某些情况下，选票会被瓜分，有可能没有选出领导人，那么，将会开始另一个任期，并且立刻开始下一次选举。Raft 算法保证在给定的一个任期最多只有一个领导人。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-d67cbaab1479a864.png" alt="任期示意图"></p>
-<h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><p>Raft 算法中服务器节点之间通信使用远程过程调用（RPCs），并且基本的一致性算法只需要两种类型的 RPCs。请求投票（<code>RequestVote</code>） RPCs 由候选人在选举期间发起，然后附加条目（<code>AppendEntries</code>）RPCs 由领导人发起，用来复制日志和提供一种心跳机制。为了在服务器之间传输快照增加了第三种 RPC。当服务器没有及时的收到 RPC 的响应时，会进行重试， 并且他们能够并行的发起 RPCs 来获得最佳的性能。</p>
-<p>RPC有三种：</p>
-<ol>
-<li>RequestVote RPC：候选人在选举期间发起</li>
-<li>AppendEntries RPC：领导人发起的一种心跳机制，复制日志也在该命令中完成</li>
-<li>InstallSnapshot RPC: 领导者使用该RPC来发送快照给太落后的追随者。</li>
-</ol>
-<p>超时设置：</p>
-<ol>
-<li>BroadcastTime :  领导者的心跳超时时间</li>
-<li>Election Timeout: 追随者设置的候选超时时间</li>
-<li>MTBT :指的是单个服务器发生故障的间隔时间的平均数</li>
-</ol>
-<p>BroadcastTime &lt;&lt; ElectionTimeout &lt;&lt; MTBF<br> 两个原则：</p>
-<ol>
-<li>BroadcastTime应该比ElectionTimeout小一个数量级，为的是使领导人能够持续发送心跳信息（heartbeat）来阻止追随者们开始选举；</li>
-<li>ElectionTimeout也要比MTBF小几个数量级，为的是使得系统稳定运行。</li>
-</ol>
-<p>一般BroadcastTime大约为0.5毫秒到20毫秒，ElectionTimeout一般在10ms到500ms之间。大多数服务器的MTBF都在几个月甚至更长。</p>
-<h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
-<ol>
-<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
-<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
-</ol>
-<p><strong>候选操作过程：</strong></p>
-<blockquote>
-<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
-</blockquote>
-<ol>
-<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
-<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
-<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
-</ol>
-<ul>
-<li>注意事项：</li>
-</ul>
-<ol>
-<li>服务器在一个任期内，最多能给一个候选人投票，采用先到先服务原则；</li>
-<li>候选者等待投票时，可能会接收到来自其它声明为领导人的的AppendEntries RPC。如果该领导人的任期（RPC中有）比当前候选人的当前任期要大，则候选人认为该领导人合法，并转换成追随者；如果RPC中的任期小于候选人的当前任期，则候选人拒绝此次RPC，继续保持候选人状态；</li>
-<li>候选人既没有赢得选举也没有输掉选举：如果许多追随者在同一时刻都成为了候选人，选票会被分散，可能没有候选人能获得大多数的选票。当这种情形发生时，每一个候选人都会超时，并且通过自增任期号和发起另一轮 RequestVote RPC 来开始新的选举。然而，如果没有其它手段来分配选票的话，这种情形可能会无限的重复下去。所以Raft使用的随机的选举超时时间（150~300ms之间），来避免这种情况发生。</li>
-</ol>
-<ul>
-<li>问题探讨：为什么这里没有谈收到其他候选者的RequestVote RPC请求？<br> 可能的解释：</li>
-</ul>
-<ol>
-<li>候选者已经给自己投票了，一个候选者在一个任期只会给一个人投票，不会给其他人再投票了；</li>
-<li>也有可能算法本身设定候选者就拒绝所有的其他服务器的请求。</li>
-</ol>
-<h2 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h2><p><img src="https://upload-images.jianshu.io/upload_images/3412164-7bfb13d382599f65.png" alt="日志复制问题"></p>
-<p>接受命令的过程：</p>
-<ol>
-<li>领导者接受客户端请求；</li>
-<li>领导者把指令追加到日志；</li>
-<li>发送AppendEntries RPC到追随者；</li>
-<li>领导者收到大多数追随者的确认后，领导者Commit该日志，把日志在状态机中回放，并返回结果给客户端；</li>
-</ol>
-<p>提交过程：</p>
-<ol>
-<li>在下一个心跳阶段，领导者再次发送AppendEntries RPC给追随者，日志已经commited；</li>
-<li>追随者收到Commited日志后，将日志在状态机中回放。</li>
-</ol>
-<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>到目前为止描述的机制并不能充分的保证每一个状态机会按照相同的顺序执行相同的指令，例如：一个跟随者可能会进入不可用状态同时领导人已经提交了若干的日志条目，然后这个跟随者可能会被选举为领导人并且覆盖这些日志条目；因此，不同的状态机可能会执行不同的指令序列。</p>
-<h3 id="1-领导者追加日志（Append-Only"><a href="#1-领导者追加日志（Append-Only" class="headerlink" title="1. 领导者追加日志（Append-Only)"></a>1. 领导者追加日志（Append-Only)</h3><p>领导者永远不会覆盖已经存在的日志条目；<br>日志永远只有一个流向：从领导者到追随者；</p>
-<h3 id="2-选举限制：投票阻止没有全部日志条目的服务器赢得选举"><a href="#2-选举限制：投票阻止没有全部日志条目的服务器赢得选举" class="headerlink" title="2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举"></a>2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举</h3><p>如果投票者的日志比候选人的新，拒绝投票请求；<br>这意味着要赢得选举，候选者的日志至少和大多数服务器的日志一样新，那么它一定包含全部的已经提交的日志条目。</p>
-<h3 id="3-永远不提交任期之前的日志条目（只提交任期内的日志条目）"><a href="#3-永远不提交任期之前的日志条目（只提交任期内的日志条目）" class="headerlink" title="3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）"></a>3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）</h3><p>在Raft算法中，当一个日志被安全的复制到绝大多数的机器上面，即AppendEntries RPC在绝大多数服务器正确返回了，那么这个日志就是被提交了，然后领导者会更新commit index。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-45a235af7798e8f2.png" alt=""></p>
-<p>如果允许提交任期之前的日志条目，那么在步骤c中，我们就会把之前任期为2的日志提交到其他服务器中去，并造成了大多数机器存在了日志为2的情况。所以造成了d中S5中任期为3的日志条目会覆盖掉已经提交的日志的情况。</p>
-<p>Raft 从来不会通过计算复制的数目来提交之前人气的日志条目。只有领导人当前任期的日志条目才能通过计算数目来进行提交。一旦当前任期的日志条目以这种方式被提交，那么由于日志匹配原则（Log Matching Property），之前的日志条目也都会被间接的提交。</p>
-<p>论文中的这段话比较难理解，更加直观的说：由于Raft不会提交任期之前的日志条目，那么就不会从b过渡到c的情况，只能从b发生S5down机的情况下直接过渡到e，这样就产生的更新的任期，这样S5就没有机会被选为领导者了。</p>
-<h3 id="4-候选者和追随者崩溃"><a href="#4-候选者和追随者崩溃" class="headerlink" title="4. 候选者和追随者崩溃"></a>4. 候选者和追随者崩溃</h3><p>候选者和追随者崩溃的情况处理要简单的多。如果这类角色崩溃了，那么后续发送给他们的 RequestVote和AppendEntries的所有RCP都会失败，Raft算法中处理这类失败就是简单的无限重试的方式。<br> 　　如果这些服务器重新可用，那么这些RPC就会成功返回。如果一个服务器完成了一个RPC，但是在响应Leader前崩溃了，那么当他再次可用的时候还会收到相同的RPC请求，此时接收服务器负责检查，比如如果收到了已经包含该条日志的RPC请求，可以直接忽略这个请求，确保对系统是无害的。</p>
-<h2 id="成员变化问题"><a href="#成员变化问题" class="headerlink" title="成员变化问题"></a>成员变化问题</h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/1_raft基础/" data-id="cjy2hahsg001j2seo4pl4769u" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/goraft_read" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/24/alg/raft/goraft_read/" class="article-date">
-  <time datetime="2018-10-24T13:25:59.811Z" itemprop="datePublished">2018-10-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="GoRaft-Read"><a href="#GoRaft-Read" class="headerlink" title="GoRaft Read"></a>GoRaft Read</h1><p>建议粗略的看一下原理：<a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
-<h3 id="整体文件目录结构"><a href="#整体文件目录结构" class="headerlink" title="整体文件目录结构"></a>整体文件目录结构</h3><p>raft<br>    ├── LICENSE<br>    ├── Makefile<br>    ├── README.md<br>    ├── append_entries.go<br>    ├── append_entries_test.go<br>    ├── command.go<br>    ├── commands.go<br>    ├── config.go<br>    ├── context.go<br>    ├── debug.go<br>    ├── event.go<br>    ├── event_dispatcher.go<br>    ├── event_dispatcher_test.go<br>    ├── http_transporter.go<br>    ├── http_transporter_test.go<br>    ├── log.go<br>    ├── log_entry.go<br>    ├── log_test.go<br>    ├── peer.go<br>    ├── protobuf<br>    │   ├── append_entries_request.pb.go<br>    │   ….<br>    ├── request_vote.go<br>    ├── server.go<br>    ├── server_test.go<br>    ├── snapshot.go<br>    ├── snapshot_test.go<br>    ├── statemachine.go<br>    ├── statemachine_test.go<br>    ├── test.go<br>    ├── transporter.go<br>    ├── util.go<br>    └── z_test.go</p>
-<h3 id="文件作用详解"><a href="#文件作用详解" class="headerlink" title="文件作用详解"></a>文件作用详解</h3><p><strong>append_entries.go </strong></p>
-<p>entries：项，日志中的一条指令？</p>
-<p>存在两个结构体：</p>
-<p>AppendEntriesRequest</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to append entries to the log.</span></span><br><span class="line"><span class="comment">// 这个请求是发送给服务端的增加一项到日志中</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term         <span class="keyword">uint64</span></span><br><span class="line">	PrevLogIndex <span class="keyword">uint64</span></span><br><span class="line">	PrevLogTerm  <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex  <span class="keyword">uint64</span></span><br><span class="line">	LeaderName   <span class="keyword">string</span></span><br><span class="line">	Entries      []*protobuf.LogEntry</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>AppendEntriesResponse</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="comment">// 从服务端返回的应答</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb     *protobuf.AppendEntriesResponse</span><br><span class="line">	peer   <span class="keyword">string</span></span><br><span class="line">	<span class="built_in">append</span> <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>command.go</strong></p>
-<p>一些和命令相关的接口定义:</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> commandTypes <span class="keyword">map</span>[<span class="keyword">string</span>]Command</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	commandTypes = <span class="keyword">map</span>[<span class="keyword">string</span>]Command&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Command represents an action to be taken on the replicated state machine.</span></span><br><span class="line"><span class="keyword">type</span> Command <span class="keyword">interface</span> &#123;</span><br><span class="line">	CommandName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CommandApply represents the interface to apply a command to the server.</span></span><br><span class="line"><span class="keyword">type</span> CommandApply <span class="keyword">interface</span> &#123;</span><br><span class="line">	Apply(Context) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>commands.go</strong></p>
-<p>定义了一些指令的接口和结构体</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Join command interface</span></span><br><span class="line"><span class="keyword">type</span> JoinCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Join command</span></span><br><span class="line"><span class="keyword">type</span> DefaultJoinCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name             <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command interface</span></span><br><span class="line"><span class="keyword">type</span> LeaveCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command</span></span><br><span class="line"><span class="keyword">type</span> DefaultLeaveCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// NOP command</span></span><br><span class="line"><span class="keyword">type</span> NOPCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>context.go</strong></p>
-<p>context</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Context represents the current state of the server. It is passed into</span></span><br><span class="line"><span class="comment">// a command when the command is being applied since the server methods</span></span><br><span class="line"><span class="comment">// are locked.</span></span><br><span class="line"><span class="comment">// Context表示服务器的当前状态。 由于服务器方法被锁定，因此在应用命令时将其传递给命令</span></span><br><span class="line"><span class="keyword">type</span> Context <span class="keyword">interface</span> &#123;</span><br><span class="line">	Server() Server</span><br><span class="line">	CurrentTerm() <span class="keyword">uint64</span></span><br><span class="line">	CurrentIndex() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// context is the concrete implementation of Context.</span></span><br><span class="line"><span class="comment">// context是Context的具体实现</span></span><br><span class="line"><span class="keyword">type</span> context <span class="keyword">struct</span> &#123;</span><br><span class="line">	server       Server</span><br><span class="line">	currentIndex <span class="keyword">uint64</span></span><br><span class="line">	currentTerm  <span class="keyword">uint64</span></span><br><span class="line">	commitIndex  <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>event_dispatcher.go</strong></p>
-<p>事件调度者</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// eventDispatcher is responsible for managing listeners for named events</span></span><br><span class="line"><span class="comment">// and dispatching event notifications to those listeners.</span></span><br><span class="line"><span class="comment">// eventDispatcher负责管理命名事件的侦听器并将事件通知分派给这些侦听器</span></span><br><span class="line"><span class="keyword">type</span> eventDispatcher <span class="keyword">struct</span> &#123;</span><br><span class="line">	sync.RWMutex</span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	listeners <span class="keyword">map</span>[<span class="keyword">string</span>]eventListeners</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// EventListener is a function that can receive event notifications.</span></span><br><span class="line"><span class="comment">// EventListener 是一个函数,能够接受事件通知</span></span><br><span class="line"><span class="keyword">type</span> EventListener <span class="function"><span class="keyword">func</span><span class="params">(Event)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> <span class="title">represents</span> <span class="title">a</span> <span class="title">collection</span> <span class="title">of</span> <span class="title">individual</span> <span class="title">listeners</span>.</span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> 一个监听器的收集器</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">eventListeners</span> []<span class="title">EventListener</span></span></span><br></pre></td></tr></table></figure>
-<p><strong>event.go</strong></p>
-<p>定义了事件</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Event represents an action that occurred within the Raft library.</span></span><br><span class="line"><span class="comment">// Listeners can subscribe to event types by using the Server.AddEventListener() function.</span></span><br><span class="line"><span class="comment">// Event 表示在Raft库中发生的操作。 监听器可以使用Server.AddEventListener（）函数订阅事件类型。</span></span><br><span class="line"><span class="keyword">type</span> Event <span class="keyword">interface</span> &#123;</span><br><span class="line">	Type() <span class="keyword">string</span></span><br><span class="line">	Source() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	Value() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	PrevValue() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// event is the concrete implementation of the Event interface.</span></span><br><span class="line"><span class="comment">// event 是 Event 接口的一个实现</span></span><br><span class="line"><span class="keyword">type</span> event <span class="keyword">struct</span> &#123;</span><br><span class="line">	typ       <span class="keyword">string</span></span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	value     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	prevValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>http_transporter.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An HTTPTransporter is a default transport layer used to communicate between</span></span><br><span class="line"><span class="comment">// multiple servers.</span></span><br><span class="line"><span class="comment">// HTTPTransporter 是用于在多个服务器之间进行通信的默认传输层</span></span><br><span class="line"><span class="keyword">type</span> HTTPTransporter <span class="keyword">struct</span> &#123;</span><br><span class="line">	DisableKeepAlives    <span class="keyword">bool</span></span><br><span class="line">	prefix               <span class="keyword">string</span></span><br><span class="line">	appendEntriesPath    <span class="keyword">string</span></span><br><span class="line">	requestVotePath      <span class="keyword">string</span></span><br><span class="line">	snapshotPath         <span class="keyword">string</span></span><br><span class="line">	snapshotRecoveryPath <span class="keyword">string</span></span><br><span class="line">	httpClient           http.Client</span><br><span class="line">	Transport            *http.Transport</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HTTPMuxer <span class="keyword">interface</span> &#123;</span><br><span class="line">	HandleFunc(<span class="keyword">string</span>, <span class="function"><span class="keyword">func</span><span class="params">(http.ResponseWriter, *http.Request)</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p><strong>log_entry.go</strong></p>
-<p>日志中的一项</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log entry stores a single item in the log.</span></span><br><span class="line"><span class="comment">// 日志中的单独一项</span></span><br><span class="line"><span class="keyword">type</span> LogEntry <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb       *protobuf.LogEntry</span><br><span class="line">	Position <span class="keyword">int64</span> <span class="comment">// position in the log file</span></span><br><span class="line">	log      *Log</span><br><span class="line">	event    *ev</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>log.go</strong></p>
-<p>日志</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log is a collection of log entries that are persisted to durable storage.</span></span><br><span class="line"><span class="comment">// Log 是 log entries 的一个收集器, 可以持久存储到持久存储器</span></span><br><span class="line"><span class="keyword">type</span> Log <span class="keyword">struct</span> &#123;</span><br><span class="line">	ApplyFunc   <span class="function"><span class="keyword">func</span><span class="params">(*LogEntry, Command)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span></span><br><span class="line"><span class="function">	<span class="title">file</span>        *<span class="title">os</span>.<span class="title">File</span></span></span><br><span class="line"><span class="function">	<span class="title">path</span>        <span class="title">string</span></span></span><br><span class="line"><span class="function">	<span class="title">entries</span>     []*<span class="title">LogEntry</span></span></span><br><span class="line"><span class="function">	<span class="title">commitIndex</span> <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">mutex</span>       <span class="title">sync</span>.<span class="title">RWMutex</span></span></span><br><span class="line"><span class="function">	<span class="title">startIndex</span>  <span class="title">uint64</span> // <span class="title">the</span> <span class="title">index</span> <span class="title">before</span> <span class="title">the</span> <span class="title">first</span> <span class="title">entry</span> <span class="title">in</span> <span class="title">the</span> <span class="title">Log</span> <span class="title">entries</span></span></span><br><span class="line"><span class="function">	<span class="title">startTerm</span>   <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">initialized</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">The</span> <span class="title">results</span> <span class="title">of</span> <span class="title">the</span> <span class="title">applying</span> <span class="title">a</span> <span class="title">log</span> <span class="title">entry</span>.</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">logResult</span> <span class="title">struct</span></span> &#123;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	err         error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>peer.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A peer is a reference to another server involved in the consensus protocol.</span></span><br><span class="line"><span class="comment">// Peer 是对共识协议中涉及的另一个服务器的引用</span></span><br><span class="line"><span class="keyword">type</span> Peer <span class="keyword">struct</span> &#123;</span><br><span class="line">	server            *server</span><br><span class="line">	Name              <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString  <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">	prevLogIndex      <span class="keyword">uint64</span></span><br><span class="line">	stopChan          <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line">	lastActivity      time.Time</span><br><span class="line">	sync.RWMutex</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>request_vote.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer          *Peer</span><br><span class="line">	Term          <span class="keyword">uint64</span></span><br><span class="line">	LastLogIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastLogTerm   <span class="keyword">uint64</span></span><br><span class="line">	CandidateName <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server after a vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer        *Peer</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	VoteGranted <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>server.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A server is involved in the consensus protocol and can act as a follower,</span></span><br><span class="line"><span class="comment">// candidate or a leader.</span></span><br><span class="line"><span class="keyword">type</span> Server <span class="keyword">interface</span> &#123;</span><br><span class="line">	Name() <span class="keyword">string</span></span><br><span class="line">	Context() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	StateMachine() StateMachine</span><br><span class="line">	Leader() <span class="keyword">string</span></span><br><span class="line">	State() <span class="keyword">string</span></span><br><span class="line">	Path() <span class="keyword">string</span></span><br><span class="line">	LogPath() <span class="keyword">string</span></span><br><span class="line">	SnapshotPath(lastIndex <span class="keyword">uint64</span>, lastTerm <span class="keyword">uint64</span>) <span class="keyword">string</span></span><br><span class="line">	Term() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">	VotedFor() <span class="keyword">string</span></span><br><span class="line">	MemberCount() <span class="keyword">int</span></span><br><span class="line">	QuorumSize() <span class="keyword">int</span></span><br><span class="line">	IsLogEmpty() <span class="keyword">bool</span></span><br><span class="line">	LogEntries() []*LogEntry</span><br><span class="line">	LastCommandName() <span class="keyword">string</span></span><br><span class="line">	GetState() <span class="keyword">string</span></span><br><span class="line">	ElectionTimeout() time.Duration</span><br><span class="line">	SetElectionTimeout(duration time.Duration)</span><br><span class="line">	HeartbeatInterval() time.Duration</span><br><span class="line">	SetHeartbeatInterval(duration time.Duration)</span><br><span class="line">	Transporter() Transporter</span><br><span class="line">	SetTransporter(t Transporter)</span><br><span class="line">	AppendEntries(req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	RequestVote(req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	RequestSnapshot(req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SnapshotRecoveryRequest(req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">	AddPeer(name <span class="keyword">string</span>, connectiongString <span class="keyword">string</span>) error</span><br><span class="line">	RemovePeer(name <span class="keyword">string</span>) error</span><br><span class="line">	Peers() <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	Init() error</span><br><span class="line">	Start() error</span><br><span class="line">	Stop()</span><br><span class="line">	Running() <span class="keyword">bool</span></span><br><span class="line">	Do(command Command) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">	TakeSnapshot() error</span><br><span class="line">	LoadSnapshot() error</span><br><span class="line">	AddEventListener(<span class="keyword">string</span>, EventListener)</span><br><span class="line">	FlushCommitIndex()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span> &#123;</span><br><span class="line">	*eventDispatcher</span><br><span class="line"></span><br><span class="line">	name        <span class="keyword">string</span></span><br><span class="line">	path        <span class="keyword">string</span></span><br><span class="line">	state       <span class="keyword">string</span></span><br><span class="line">	transporter Transporter</span><br><span class="line">	context     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	currentTerm <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	votedFor   <span class="keyword">string</span></span><br><span class="line">	log        *Log</span><br><span class="line">	leader     <span class="keyword">string</span></span><br><span class="line">	peers      <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	mutex      sync.RWMutex</span><br><span class="line">	syncedPeer <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">	stopped           <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	c                 <span class="keyword">chan</span> *ev</span><br><span class="line">	electionTimeout   time.Duration</span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line"></span><br><span class="line">	snapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	<span class="comment">// PendingSnapshot is an unfinished snapshot.</span></span><br><span class="line">	<span class="comment">// After the pendingSnapshot is saved to disk,</span></span><br><span class="line">	<span class="comment">// it will be set to snapshot and also will be</span></span><br><span class="line">	<span class="comment">// set to nil.</span></span><br><span class="line">	pendingSnapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	stateMachine            StateMachine</span><br><span class="line">	maxLogEntriesPerRequest <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	connectionString <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">	routineGroup sync.WaitGroup</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// An internal event to be processed by the server's event loop.</span></span><br><span class="line"><span class="keyword">type</span> ev <span class="keyword">struct</span> &#123;</span><br><span class="line">	target      <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	c           <span class="keyword">chan</span> error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>snapshot.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Snapshot represents an in-memory representation of the current state of the system.</span></span><br><span class="line"><span class="keyword">type</span> Snapshot <span class="keyword">struct</span> &#123;</span><br><span class="line">	LastIndex <span class="keyword">uint64</span> <span class="string">`json:"lastIndex"`</span></span><br><span class="line">	LastTerm  <span class="keyword">uint64</span> <span class="string">`json:"lastTerm"`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Cluster configuration.</span></span><br><span class="line">	Peers []*Peer <span class="string">`json:"peers"`</span></span><br><span class="line">	State []<span class="keyword">byte</span>  <span class="string">`json:"state"`</span></span><br><span class="line">	Path  <span class="keyword">string</span>  <span class="string">`json:"path"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">	Peers      []*Peer</span><br><span class="line">	State      []<span class="keyword">byte</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	Success     <span class="keyword">bool</span></span><br><span class="line">	CommitIndex <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned if the follower entered snapshot state</span></span><br><span class="line"><span class="keyword">type</span> SnapshotResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Success <span class="keyword">bool</span> <span class="string">`json:"success"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>statemachine.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// StateMachine is the interface for allowing the host application to save and</span></span><br><span class="line"><span class="comment">// recovery the state machine. This makes it possible to make snapshots</span></span><br><span class="line"><span class="comment">// and compact the log.</span></span><br><span class="line"><span class="keyword">type</span> StateMachine <span class="keyword">interface</span> &#123;</span><br><span class="line">	Save() ([]<span class="keyword">byte</span>, error)</span><br><span class="line">	Recovery([]<span class="keyword">byte</span>) error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>transporter.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Transporter is the interface for allowing the host application to transport</span></span><br><span class="line"><span class="comment">// requests to other nodes.</span></span><br><span class="line"><span class="keyword">type</span> Transporter <span class="keyword">interface</span> &#123;</span><br><span class="line">	SendVoteRequest(server Server, peer *Peer, req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	SendAppendEntriesRequest(server Server, peer *Peer, req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	SendSnapshotRequest(server Server, peer *Peer, req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SendSnapshotRecoveryRequest(server Server, peer *Peer, req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/24/alg/raft/goraft_read/" data-id="cjy2hahso001o2seo6v4pcuoz" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/">下一页&raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/">下一页&raquo;</a>
   </nav>
 </section>
            
@@ -667,23 +750,23 @@
       <ul>
         
           <li>
-            <a href="/2019/07/13/basic/正则零宽断言/">(no title)</a>
+            <a href="/2019/08/10/self_doc/文件加密/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/12/ide/vscode/vscode-snippet/">(no title)</a>
+            <a href="/2019/08/09/basic/protobuf/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/09/backend/styleguide/python/">(no title)</a>
+            <a href="/2019/08/08/frontend/优秀项目/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/03/backend/python/python 项目目录结构/">(no title)</a>
+            <a href="/2019/08/08/alg/一致性hash/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/02/alg/finance/rsi/">(no title)</a>
+            <a href="/2019/07/22/alg/finance/atr/">(no title)</a>
           </li>
         
       </ul>

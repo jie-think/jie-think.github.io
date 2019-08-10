@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Jie-Think</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="jie blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jie-Think">
+<meta property="og:url" content="http://yoursite.com/page/8/index.html">
+<meta property="og:site_name" content="Jie-Think">
+<meta property="og:description" content="jie blog">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jie-Think">
+<meta name="twitter:description" content="jie blog">
+  
+    <link rel="alternate" href="/atom.xml" title="Jie-Think" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Jie-Think</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-build_own_x/data_base/build_simple_database/模块功能概述" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" class="article-date">
+  <time datetime="2018-05-17T11:59:57.000Z" itemprop="datePublished">2018-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/">Build a Simple Database - 模块功能概述</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="https://cstack.github.io/db_tutorial/assets/images/arch2.gif"></p>
+<p>sqlite architecture (<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
+<p>小结:</p>
+<p>core: 主要的构成模块: interface, sqlCommand Processor, Virtual Machine</p>
+<p>SQL Compiler: Tokenizer, Parser, Code Generator</p>
+<p>Backend: B-Tree, Pager, OS Interface</p>
+<p>翻译:(<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>SQLite的工作原理是将SQL文本编译为<a href="https://www.sqlite.org/opcode.html" target="_blank" rel="noopener">字节码</a>，然后使用虚拟机运行该字节码。</p>
+<p>sqlite3_prepare_v2（）和相关接口充当用于将SQL文本转换为字节码的编译器。 sqlite3_stmt对象是用于实现单个SQL语句的单个字节码程序的容器。 sqlite3_step（）接口将一个字节码程序传递给虚拟机，并运行该程序直到它完成，或者形成一行结果返回，或者发生致命错误或中断。</p>
+<h3 id="Interface"><a href="#Interface" class="headerlink" title="Interface"></a>Interface</h3><p>许多C语言接口可以在源文件main.c，legacy.c和vdbeapi.c中找到，尽管一些例程分散在其他文件中，在这些文件中它们可以访问具有文件范围的数据结构。sqlite3_get_table（）例程在table.c中实现。 sqlite3_mprintf（）例程在printf.c中找到。 sqlite3_complete（）接口位于tokenize.c中。 TCL接口由tclsqlite.c实现。</p>
+<p>为避免名称冲突，SQLite库中的所有外部符号都以前缀sqlite3开头。那些用于外部使用的符号（换句话说，那些构成SQLite API的符号）会添加一个下划线，因此以sqlite3_开头。扩展API有时会在下划线之前添加扩展名;例如：sqlite3rbu_或sqlite3session_。</p>
+<h3 id="Tokenizer"><a href="#Tokenizer" class="headerlink" title="Tokenizer"></a>Tokenizer</h3><p>当包含SQL语句的字符串要被评估时，它首先被发送到标记器。标记器将SQL文本分解为标记并将这些标记逐个传递给解析器。标记器是在文件tokenize.c中手动编码的</p>
+<p>请注意，在此设计中，标记器调用解析器。熟悉YACC和BISON的人可能习惯于以相反的方式做事 - 让解析器调用标记器。不过，令牌分析器调用分析器会更好，因为它可以做成线程安全的并且运行速度更快。</p>
+<h3 id="Parser"><a href="#Parser" class="headerlink" title="Parser"></a>Parser</h3><p>解析器根据其上下文为令牌分配含义。 SQLite的解析器是使用Lemon解析器生成器生成的。Lemon和YACC / BISON一样工作，但它使用了不太容易出错的不同输入语法。Lemon还生成一个可重入且线程安全的解析器。Lemon定义了非终端析构函数的概念，以便在遇到语法错误时不会泄漏内存。驱动Lemon并定义SQLite可理解的SQL语言的语法文件可在parse.y中找到。</p>
+<p>因为Lemon是一个通常在开发机器上找不到的程序，Lemon的完整源代码（只有一个C文件）包含在SQLite分发的“tool”子目录中。</p>
+<h3 id="Code-Generator"><a href="#Code-Generator" class="headerlink" title="Code Generator"></a>Code Generator</h3><p>解析器将令牌组装成解析树之后，代码生成器运行以分析解析器树并生成执行SQL语句工作的字节码。准备好的语句对象是这个字节码的容器。代码生成器中有许多文件，其中包括：attach.c，auth.c，build.c，delete.c，expr.c，insert.c，pragma.c，select.c，trigger.c，update.c ，vacuum.c，where.c，wherecode.c和whereexpr.c。在这些文件中，大部分严重的魔法都是在这里发生的。 expr.c处理表达式的代码生成。其中* .c处理SELECT，UPDATE和DELETE语句中WHERE子句的代码生成。文件attach.c，delete.c，insert.c，select.c，trigger.c update.c和vacuum.c处理具有相同名称的SQL语句的代码生成。 （这些文件中的每一个都根据需要调用expr.c和where.c中的例程。）所有其他SQL语句都由build.c编码。 auth.c文件实现sqlite3_set_authorizer（）的功能</p>
+<p>代码生成器，特别是* .c和select.c中的逻辑有时称为查询规划器。对于任何特定的SQL语句，可能有数百，数千或数百万种不同的算法来计算答案。查询计划员是一个AI，致力于从数百万个选择中选择最佳算法。</p>
+<h3 id="Bytecode-Engine"><a href="#Bytecode-Engine" class="headerlink" title="Bytecode Engine"></a>Bytecode Engine</h3><p>由代码生成器创建的字节码程序由虚拟机运行。</p>
+<p>虚拟机本身完全包含在单个源文件vdbe.c中。 vdbe.h头文件定义了虚拟机和SQLite库的其余部分之间的接口，vdbeInt.h定义了虚拟机本身专用的结构和接口。其他各种vdbe * .c文件都是虚拟机的助手。 vdbeaux.c文件包含虚拟机使用的实用程序以及库的其余部分用于构建VM程序的接口模块。 vdbeapi.c文件包含虚拟机的外部接口，如sqlite3_bind_int（）和sqlite3_step（）。各个值（字符串，整数，浮点数和BLOB）存储在由vdbemem.c实现的名为“Mem”的内部对象中。</p>
+<p>SQLite使用C语言例程的回调来实现SQL函数。即使内置的SQL函数也是这样实现的。大多数内置的SQL函数（例如：abs（），count（），substr（）等）都可以在func.c源文件中找到。日期和时间转换函数可在date.c中找到。一些函数如coalesce（）和typeof（）直接由代码生成器实现为字节码。</p>
+<h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B-Tree"></a>B-Tree</h3><p>SQLite数据库使用btree.c源文件中的B-tree实现在磁盘上进行维护。数据库中的每个表和索引都使用单独的B树。所有B树都存储在同一个磁盘文件中。文件格式细节稳定且定义明确，并保证向前兼容。</p>
+<p>B树子系统和SQLite库的其余部分的接口由头文件btree.h定义。</p>
+<h3 id="Page-Cache"><a href="#Page-Cache" class="headerlink" title="Page Cache"></a>Page Cache</h3><p>B树模块以固定大小的页面从磁盘请求信息。默认的page_size是4096字节，但可以是512到65536字节之间的任意两个幂。页面缓存负责读取，写入和缓存这些页面。页面缓存还提供了回滚和原子提交抽象，并负责锁定数据库文件。 B树驱动程序请求页面缓存中的特定页面，并在需要修改页面或提交或回滚更改时通知页面缓存。页面缓存处理了确保请求被快速，安全和有效地处理的所有细节.</p>
+<p>主页面缓存实现在pager.c文件中。 WAL模式逻辑位于单独的wal.c中。内存中缓存由pcache.c和pcache1.c文件实现。页面缓存子系统和SQLite其余部分之间的接口由头文件pager.h定义。</p>
+<p>###OS Interface</p>
+<p>为了提供跨操作系统的可移植性，SQLite使用称为VFS的抽象对象。每个VFS都提供了打开，读取，写入和关闭磁盘上的文件以及执行其他特定于操作系统的任务（如查找当前时间或获取随机性以初始化内置伪随机数生成器的方法）。 SQLite当前为unix（在os_unix.c文件中）和Windows（在os_win.c文件中）提供了VFSes。</p>
+<h3 id="Utilities"><a href="#Utilities" class="headerlink" title="Utilities"></a>Utilities</h3><p>内存分配，无格式字符串比较例程，便携式文本到数字转换例程以及其他实用程序位于util.c中。解析器使用的符号表由散列表中的哈希表维护。 utf.c源文件包含Unicode转换子例程。 SQLite在printf.c中有它自己的printf（）（有一些扩展）的私有实现，在random.c中有它自己的伪随机数生成器（PRNG）。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结:"></a>总结:</h3><p>sqlite(数据库)将数据持久化,并将其做到了极致吧.(引人深思)</p>
+<p>整体结构, 主要分成三部分: 1. core, 2. SQL Compiler, 3. Backend</p>
+<p>其主要流程也相当清晰:</p>
+<p>   interface -&gt; sqlCommand Processor -&gt; Virtual Machine</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" data-id="cjy2hcgza005n8seosu3dajic" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/sorting/Dual_pivot_Quicksort" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" class="article-date">
+  <time datetime="2018-04-27T06:55:52.000Z" itemprop="datePublished">2018-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/27/alg/sorting/Dual_pivot_Quicksort/">Dual pivot Quicksort</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>time: 2018-04-27 14:55:52</p>
+<p>参考：<a href="https://www.geeksforgeeks.org/dual-pivot-quicksort/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/dual-pivot-quicksort/</a></p>
+<blockquote>
+<p>  The idea of dual pivot quick sort is to take two pivots, one in the left end of the array and the second, in the right end of the array. The left pivot must be less than or equal to the right pivot, so we swap them if necessary.</p>
+<p>  Then, we begin partitioning the array into three parts: in the first part, all elements will be less than the left pivot, in the second part all elements will be greater or equal to the left pivot and also will be less than or equal to the right pivot, and in the third part all elements will be greater than the right pivot. Then, we shift the two pivots to their appropriate positions as we see in the below bar, and after that we begin quicksorting these three parts recursively, using this method.</p>
+<p>  Dual pivot quick sort is a little bit faster than the original single pivot quicksort.But still, the worst case will remain O(n^2) when the array is already sorted in an increasing or decreasing order.</p>
+</blockquote>
+<p><img src="http://contribute.geeksforgeeks.org/wp-content/uploads/dual.png" alt="An example"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to implement dual pivot QuickSort</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">partition</span><span class="params">(<span class="keyword">int</span>* arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high, <span class="keyword">int</span>* lp)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>* a, <span class="keyword">int</span>* b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> temp = *a;</span><br><span class="line">	*a = *b;</span><br><span class="line">	*b = temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DualPivotQuickSort</span><span class="params">(<span class="keyword">int</span>* arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (low &lt; high) &#123;</span><br><span class="line">		<span class="comment">// lp means left pivot, and rp means right pivot.</span></span><br><span class="line">		<span class="keyword">int</span> lp, rp; </span><br><span class="line">		rp = partition(arr, low, high, &amp;lp);</span><br><span class="line">		DualPivotQuickSort(arr, low, lp - <span class="number">1</span>);</span><br><span class="line">		DualPivotQuickSort(arr, lp + <span class="number">1</span>, rp - <span class="number">1</span>);</span><br><span class="line">		DualPivotQuickSort(arr, rp + <span class="number">1</span>, high);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">partition</span><span class="params">(<span class="keyword">int</span>* arr, <span class="keyword">int</span> low, <span class="keyword">int</span> high, <span class="keyword">int</span>* lp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"------- begin partition --------\n"</span>);</span><br><span class="line">	<span class="keyword">if</span> (arr[low] &gt; arr[high])</span><br><span class="line">		swap(&amp;arr[low], &amp;arr[high]);</span><br><span class="line">	<span class="comment">// p is the left pivot, and q is the right pivot.</span></span><br><span class="line">	<span class="keyword">int</span> j = low + <span class="number">1</span>,g = high - <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">int</span> k = low + <span class="number">1</span>, p = arr[low], q = arr[high];</span><br><span class="line">	<span class="keyword">while</span> (k &lt;= g) &#123;</span><br><span class="line">	    <span class="built_in">printf</span>(<span class="string">"j: %d value: %d, g: %d value: %d, k: %d value: %d\n"</span>, j, arr[j], g, arr[g], k, arr[k]);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// if elements are less than the left pivot</span></span><br><span class="line">		<span class="keyword">if</span> (arr[k] &lt; p) &#123;</span><br><span class="line">			swap(&amp;arr[k], &amp;arr[j]);</span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// if elements are greater than or equal </span></span><br><span class="line">		<span class="comment">// to the right pivot</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (arr[k] &gt;= q) &#123;</span><br><span class="line">			<span class="keyword">while</span> (arr[g] &gt; q &amp;&amp; k &lt; g)</span><br><span class="line">				g--;</span><br><span class="line">			swap(&amp;arr[k], &amp;arr[g]);</span><br><span class="line">			g--;</span><br><span class="line">			<span class="keyword">if</span> (arr[k] &lt; p) &#123;</span><br><span class="line">				swap(&amp;arr[k], &amp;arr[j]);</span><br><span class="line">				j++;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		k++;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">"%d "</span>, arr[i]);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	j--;</span><br><span class="line">	g++;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// bring pivots to their appropriate positions.</span></span><br><span class="line">	swap(&amp;arr[low], &amp;arr[j]);</span><br><span class="line">	swap(&amp;arr[high], &amp;arr[g]);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// returning the indeces of the pivots.</span></span><br><span class="line">	*lp = j; <span class="comment">// because we cannot return two elements </span></span><br><span class="line">			<span class="comment">// from a function.</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"------- end partition --------\n"</span>);</span><br><span class="line">	<span class="keyword">return</span> g;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Driver code</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> arr[] = &#123; <span class="number">24</span>, <span class="number">8</span>, <span class="number">42</span>, <span class="number">75</span>, <span class="number">29</span>, <span class="number">77</span>, <span class="number">38</span>, <span class="number">57</span> &#125;;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"24, 8, 42, 75, 29, 77, 38, 57\n"</span>);</span><br><span class="line">	DualPivotQuickSort(arr, <span class="number">0</span>, <span class="number">7</span>);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"Sorted array: "</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d "</span>, arr[i]);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">24, 8, 42, 75, 29, 77, 38, 57</span><br><span class="line">------- begin partition --------</span><br><span class="line">j: 1 value: 8, g: 6 value: 38, k: 1 value: 8</span><br><span class="line">24 8 42 75 29 77 38 57 </span><br><span class="line">j: 2 value: 42, g: 6 value: 38, k: 2 value: 42</span><br><span class="line">24 8 42 75 29 77 38 57 </span><br><span class="line">j: 2 value: 42, g: 6 value: 38, k: 3 value: 75</span><br><span class="line">24 8 42 38 29 77 75 57 </span><br><span class="line">j: 2 value: 42, g: 5 value: 77, k: 4 value: 29</span><br><span class="line">24 8 42 38 29 77 75 57 </span><br><span class="line">j: 2 value: 42, g: 5 value: 77, k: 5 value: 77</span><br><span class="line">24 8 42 38 29 77 75 57 </span><br><span class="line">------- end partition --------</span><br><span class="line">------- begin partition --------</span><br><span class="line">j: 3 value: 38, g: 3 value: 38, k: 3 value: 38</span><br><span class="line">8 24 29 38 42 57 75 77 </span><br><span class="line">------- end partition --------</span><br><span class="line">------- begin partition --------</span><br><span class="line">------- end partition --------</span><br><span class="line">Sorted array: 8 24 29 38 42 57 75 77</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>基本的处理流程：</p>
+<ol>
+<li><p>选定最低位和最高位作为轴 num，也就是有两个轴。</p>
+</li>
+<li><p>lowPoint = low + 1 和 highPoint = high - 1 作为选轴的开始点。</p>
+</li>
+<li><p>scanPoint = lowPoint 一直扫描到 highPoint， 如果 scanPoint_Value &lt; low_Value : swap(lowPoint_Value, scanPoint_Value) elseif (scanPoint_Value &gt;= high_Value) : swap(highPoint_Value, scanPoint_Value)</p>
+</li>
+<li><p>最后 swap(low_Value, (lowPoint - 1).Value), swap(high_Value, (highPoint + 1)_Value)</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" data-id="cjy2hcgv0001v8seolhaktw4m" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sorting/">sorting</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/page/7/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span>
+  </nav>
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title recent-posts">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/08/10/self_doc/文件加密/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/09/basic/protobuf/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/08/frontend/优秀项目/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/08/alg/一致性hash/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/22/alg/finance/atr/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2019 jie&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;qq646958863@163.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
