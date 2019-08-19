@@ -69,6 +69,413 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-block_chain/contractLearn/Zombie_Con_Ch3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/" class="article-date">
+  <time datetime="2018-08-29T13:14:48.227Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/">Zombie T3</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>涉及内容：<code>智能协议的所有权</code>，<code>Gas的花费</code>，<code>代码优化</code>，和<code>代码安全</code></p>
+<h2 id="ch1-智能协议的永固性"><a href="#ch1-智能协议的永固性" class="headerlink" title="ch1. 智能协议的永固性"></a>ch1. 智能协议的永固性</h2><p>在你把智能协议传上以太坊之后，它就变得<code>不可更改</code>, 这种永固性意味着你的代码永远不能被调整或更新。</p>
+<p><strong>尽量不要写死代码</strong></p>
+<h2 id="ch2-Ownable-Contracts"><a href="#ch2-Ownable-Contracts" class="headerlink" title="ch2. Ownable Contracts"></a>ch2. Ownable Contracts</h2><p>OpenZeppelin库的Ownable 合约：OpenZeppelin 是主打安保和社区审查的智能合约库，您可以在自己的 DApps中引用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @title Ownable</span><br><span class="line"> * @dev The Ownable contract has an owner address, and provides basic authorization control</span><br><span class="line"> * functions, this simplifies the implementation of &quot;user permissions&quot;.</span><br><span class="line"> */</span><br><span class="line">contract Ownable &#123;</span><br><span class="line">  address public owner;</span><br><span class="line">  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev The Ownable constructor sets the original `owner` of the contract to the sender</span><br><span class="line">   * account.</span><br><span class="line">   */</span><br><span class="line">  function Ownable() public &#123;</span><br><span class="line">    owner = msg.sender;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Throws if called by any account other than the owner.</span><br><span class="line">   */</span><br><span class="line">  modifier onlyOwner() &#123;</span><br><span class="line">    require(msg.sender == owner);</span><br><span class="line">    _;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * @dev Allows the current owner to transfer control of the contract to a newOwner.</span><br><span class="line">   * @param newOwner The address to transfer ownership to.</span><br><span class="line">   */</span><br><span class="line">  function transferOwnership(address newOwner) public onlyOwner &#123;</span><br><span class="line">    require(newOwner != address(0));</span><br><span class="line">    OwnershipTransferred(owner, newOwner);</span><br><span class="line">    owner = newOwner;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>构造函数: <code>function Ownable()</code> 是一个 constructor (构造函数)，构造函数不是必须的，它与合约同名，构造函数一生中唯一的一次执行，就是在合约最初被创建的时候。</p>
+</li>
+<li><p>函数修饰符：<code>modifier onlyOwner()</code> 修饰符跟函数很类似，不过是用来修饰其他已有函数用的， 在其他语句执行前，为它检查下先验条件。<code>_;</code> 类似于 ruby 中的 <code>yield</code></p>
+</li>
+</ul>
+<p>所以<code>Ownable</code>合约基本都会这么干：</p>
+<ol>
+<li>合约创建，构造函数先行，将其 owner 设置为msg.sender（其部署者）</li>
+<li>为它加上一个修饰符 onlyOwner，它会限制陌生人的访问，将访问某些函数的权限锁定在 owner 上。</li>
+<li>允许将合约所有权转让给他人。</li>
+</ol>
+<h2 id="ch4-Gas"><a href="#ch4-Gas" class="headerlink" title="ch4. Gas"></a>ch4. Gas</h2><p><strong>重要概念：</strong> <code>Gas - 驱动以太坊DApps的能源</code></p>
+<p>在 Solidity 中，你的用户想要每次执行你的 DApp 都需要支付一定的 gas，gas 可以用以太币购买，因此，用户每次跑 DApp 都得花费以太币。</p>
+<p>一个 DApp 收取多少 gas 取决于功能逻辑的复杂程度。每个操作背后，都在计算完成这个操作所需要的计算资源，（比如，存储数据就比做个加法运算贵得多）， 一次操作所需要花费的 gas 等于这个操作背后的所有运算花销的总和。</p>
+<p>由于运行你的程序需要花费用户的真金白银，在以太坊中代码的编程语言，比其他任何编程语言都更强调优化。同样的功能，使用笨拙的代码开发的程序，比起经过精巧优化的代码来，运行花费更高，这显然会给成千上万的用户带来大量不必要的开销。</p>
+<h3 id="为什么要用-gas-来驱动？"><a href="#为什么要用-gas-来驱动？" class="headerlink" title="为什么要用 gas 来驱动？"></a>为什么要用 gas 来驱动？</h3><p>以太坊就像一个巨大、缓慢、但非常安全的电脑。当你运行一个程序的时候，网络上的每一个节点都在进行相同的运算，以验证它的输出 —— 这就是所谓的”去中心化“ 由于数以千计的节点同时在验证着每个功能的运行，这可以确保它的数据不会被被监控，或者被刻意修改。</p>
+<p>可能会有用户用无限循环堵塞网络，抑或用密集运算来占用大量的网络资源，为了防止这种事情的发生，以太坊的创建者为以太坊上的资源制定了价格，想要在以太坊上运算或者存储，你需要先付费。</p>
+<h3 id="省-gas-的招数：结构封装-（Struct-packing）"><a href="#省-gas-的招数：结构封装-（Struct-packing）" class="headerlink" title="省 gas 的招数：结构封装 （Struct packing）"></a>省 gas 的招数：结构封装 （Struct packing）</h3><p>在第1课中，我们提到除了基本版的 uint 外，还有其他变种 uint：uint8，uint16，uint32等。</p>
+<p>通常情况下我们不会考虑使用 unit 变种，因为无论如何定义 uint的大小，Solidity 为它保留256位的存储空间。例如，使用 uint8 而不是uint（uint256）不会为你节省任何 gas。</p>
+<p>除非，把 unit 绑定到 struct 里面。</p>
+<p>如果一个 struct 中有多个 uint，则尽可能使用较小的 uint, Solidity 会将这些 uint 打包在一起，从而占用较少的存储空间。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct NormalStruct &#123;</span><br><span class="line">  uint a;</span><br><span class="line">  uint b;</span><br><span class="line">  uint c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct MiniMe &#123;</span><br><span class="line">  uint32 a;</span><br><span class="line">  uint32 b;</span><br><span class="line">  uint c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>// 因为使用了结构打包，<code>mini</code> 比 <code>normal</code> 占用的空间更少<br>NormalStruct normal = NormalStruct(10, 20, 30);<br>MiniMe mini = MiniMe(10, 20, 30);<br>所以，当 uint 定义在一个 struct 中的时候，尽量使用最小的整数子类型以节约空间。 并且把同样类型的变量放一起（即在 struct 中将把变量按照类型依次放置），这样 Solidity 可以将存储空间最小化。例如，有两个 struct：</p>
+<p>uint c; uint32 a; uint32 b; 和 uint32 a; uint c; uint32 b;</p>
+<p>前者比后者需要的gas更少，因为前者把uint32放一起了。</p>
+<h2 id="ch5-时间单位"><a href="#ch5-时间单位" class="headerlink" title="ch5. 时间单位"></a>ch5. 时间单位</h2><p>Solidity 使用自己的本地时间单位。</p>
+<p>变量 <code>now</code> 将返回当前的unix时间戳（自1970年1月1日以来经过的秒数）。</p>
+<p>Solidity 还包含秒(seconds)，分钟(minutes)，小时(hours)，天(days)，周(weeks) 和 年(years) 等时间单位。它们都会转换成对应的秒数放入 uint 中。所以 1分钟 就是 60，1小时是 3600（60秒×60分钟），1天是86400（24小时×60分钟×60秒），以此类推。</p>
+<p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">uint lastUpdated;</span><br><span class="line"></span><br><span class="line">// 将‘上次更新时间’ 设置为 ‘现在’</span><br><span class="line">function updateTimestamp() public &#123;</span><br><span class="line">  lastUpdated = now;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果到上次`updateTimestamp` 超过5分钟，返回 &apos;true&apos;</span><br><span class="line">// 不到5分钟返回 &apos;false&apos;</span><br><span class="line">function fiveMinutesHavePassed() public view returns (bool) &#123;</span><br><span class="line">  return (now &gt;= (lastUpdated + 5 minutes));</span><br></pre></td></tr></table></figure></p>
+<h2 id="ch6-结构体作为参数传入"><a href="#ch6-结构体作为参数传入" class="headerlink" title="ch6. 结构体作为参数传入"></a>ch6. 结构体作为参数传入</h2><p>由于结构体的存储指针可以以参数的方式传递给一个 private 或 internal 的函数，因此结构体可以在多个函数之间相互传递。</p>
+<p>遵循这样的语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function _doStuff(Zombie storage _zombie) internal &#123;</span><br><span class="line">  // do stuff with _zombie</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ch7-公有函数和安全性"><a href="#ch7-公有函数和安全性" class="headerlink" title="ch7. 公有函数和安全性"></a>ch7. 公有函数和安全性</h2><p>你必须仔细地检查所有声明为 public 和 external的函数，一个个排除用户滥用它们的可能，谨防安全漏洞。请记住，如果这些函数没有类似 onlyOwner 这样的函数修饰符，用户能利用各种可能的参数去调用它们。</p>
+<h2 id="ch8-进一步了解函数修饰符"><a href="#ch8-进一步了解函数修饰符" class="headerlink" title="ch8. 进一步了解函数修饰符"></a>ch8. 进一步了解函数修饰符</h2><h3 id="带参数的函数修饰符"><a href="#带参数的函数修饰符" class="headerlink" title="带参数的函数修饰符"></a>带参数的函数修饰符</h3><p>之前我们已经读过一个简单的函数修饰符了：onlyOwner。函数修饰符也可以带参数。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 存储用户年龄的映射</span><br><span class="line">mapping (uint =&gt; uint) public age;</span><br><span class="line"></span><br><span class="line">// 限定用户年龄的修饰符</span><br><span class="line">modifier olderThan(uint _age, uint _userId) &#123;</span><br><span class="line">  require(age[_userId] &gt;= _age);</span><br><span class="line">  _;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 必须年满16周岁才允许开车 (至少在美国是这样的).</span><br><span class="line">// 我们可以用如下参数调用`olderThan` 修饰符:</span><br><span class="line">function driveCar(uint _userId) public olderThan(16, _userId) &#123;</span><br><span class="line">  // 其余的程序逻辑</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看到了吧， olderThan 修饰符可以像函数一样接收参数，是“宿主”函数 driveCar 把参数传递给它的修饰符的。</p>
+<h2 id="ch10-利用-‘View’-函数节省-Gas"><a href="#ch10-利用-‘View’-函数节省-Gas" class="headerlink" title="ch10. 利用 ‘View’ 函数节省 Gas"></a>ch10. 利用 ‘View’ 函数节省 Gas</h2><h3 id="“view”-函数不花-“gas”"><a href="#“view”-函数不花-“gas”" class="headerlink" title="“view” 函数不花 “gas”"></a>“view” 函数不花 “gas”</h3><p>当玩家从外部调用一个view函数，是不需要支付一分 gas 的。</p>
+<p>这是因为 view 函数不会真正改变区块链上的任何数据 - <code>它们只是读取</code>。因此用 view 标记一个函数，意味着告诉 web3.js，<code>运行这个函数只需要查询你的本地以太坊节点</code>，而不需要在区块链上创建一个事务（事务需要运行在每个节点上，因此花费 gas）。</p>
+<p>稍后我们将介绍如何在自己的节点上设置 web3.js。但现在，你关键是要记住，在所能只读的函数上标记上表示“只读”的“external view 声明，就能为你的玩家减少在 DApp 中 gas 用量。</p>
+<p>注意：如果一个 view 函数在另一个函数的内部被调用，而调用函数与 view 函数的不属于同一个合约，也会产生调用成本。这是因为如果主调函数在以太坊创建了一个事务，它仍然需要逐个节点去验证。所以标记为 view 的函数只有在外部调用时才是免费的。</p>
+<h2 id="ch11-存储非常昂贵"><a href="#ch11-存储非常昂贵" class="headerlink" title="ch11. 存储非常昂贵"></a>ch11. 存储非常昂贵</h2><p>Solidity 使用storage(存储)是相当昂贵的，”写入“操作尤其贵。</p>
+<p>这是因为，无论是写入还是更改一段数据， 这都将永久性地写入区块链。”永久性“啊！需要在全球数千个节点的硬盘上存入这些数据，随着区块链的增长，拷贝份数更多，存储量也就越大。这是需要成本的！</p>
+<p>为了降低成本，不到万不得已，避免将数据写入存储。这也会导致效率低下的编程逻辑 - 比如每次调用一个函数，都需要在 memory(内存) 中重建一个数组，而不是简单地将上次计算的数组给存储下来以便快速查找。</p>
+<p>在大多数编程语言中，遍历大数据集合都是昂贵的。但是在 Solidity 中，使用一个标记了external view的函数，遍历比 storage 要便宜太多，因为 view 函数不会产生任何花销。 （gas可是真金白银啊！）。</p>
+<p>我们将在下一章讨论for循环，现在我们来看一下看如何如何在内存中声明数组。</p>
+<p>在内存中声明数组<br>在数组后面加上 memory关键字， 表明这个数组是仅仅在内存中创建，不需要写入外部存储，并且在函数调用结束时它就解散了。与在程序结束时把数据保存进 storage 的做法相比，内存运算可以大大节省gas开销 – 把这数组放在view里用，完全不用花钱。</p>
+<p>以下是申明一个内存数组的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function getArray() external pure returns(uint[]) &#123;</span><br><span class="line">  // 初始化一个长度为3的内存数组</span><br><span class="line">  uint[] memory values = new uint[](3);</span><br><span class="line">  // 赋值</span><br><span class="line">  values.push(1);</span><br><span class="line">  values.push(2);</span><br><span class="line">  values.push(3);</span><br><span class="line">  // 返回数组</span><br><span class="line">  return values;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个小例子展示了一些语法规则，下一章中，我们将通过一个实际用例，展示它和 for 循环结合的做法。</p>
+<p>注意：内存数组 必须 用长度参数（在本例中为3）创建。目前不支持 array.push()之类的方法调整数组大小，在未来的版本可能会支持长度修改。</p>
+<h2 id="使用-for-循环"><a href="#使用-for-循环" class="headerlink" title="使用 for 循环"></a>使用 for 循环</h2><p>for循环的语法在 Solidity 和 JavaScript 中类似。</p>
+<p>来看一个创建偶数数组的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function getEvens() pure external returns(uint[]) &#123;</span><br><span class="line">  uint[] memory evens = new uint[](5);</span><br><span class="line">  // 在新数组中记录序列号</span><br><span class="line">  uint counter = 0;</span><br><span class="line">  // 在循环从1迭代到10：</span><br><span class="line">  for (uint i = 1; i &lt;= 10; i++) &#123;</span><br><span class="line">    // 如果 `i` 是偶数...</span><br><span class="line">    if (i % 2 == 0) &#123;</span><br><span class="line">      // 把它加入偶数数组</span><br><span class="line">      evens[counter] = i;</span><br><span class="line">      //索引加一， 指向下一个空的‘even’</span><br><span class="line">      counter++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return evens;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数将返回一个形为 [2,4,6,8,10] 的数组。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/block_chain/contractLearn/Zombie_Con_Ch3/" data-id="cjzhtsckd002qy3s6dc3ozcar" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/智能合约/">智能合约</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/redis/redis_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/backend/go/redis/redis_start_learn/" class="article-date">
+  <time datetime="2018-08-29T13:07:26.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/backend/go/redis/redis_start_learn/">redis ops learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="连接测试"><a href="#连接测试" class="headerlink" title="连接测试"></a>连接测试</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"github.com/go-redis/redis"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	client := redis.NewClient(&amp;redis.Options&#123;</span><br><span class="line">		Addr: <span class="string">"localhost:6379"</span>,</span><br><span class="line">		Password: <span class="string">""</span>,      <span class="comment">//默认空密码</span></span><br><span class="line">		DB: <span class="number">0</span>,             <span class="comment">//使用默认数据库</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> client.Close()       <span class="comment">//最后关闭</span></span><br><span class="line"></span><br><span class="line">	pong, err := client.Ping().Result()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"Connected result: "</span>, pong)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ops-strings"><a href="#ops-strings" class="headerlink" title="ops: strings"></a>ops: strings</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ops: strings</span></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">client.Set(<span class="string">"hello"</span>, <span class="string">"hello redis"</span>,<span class="number">0</span>) <span class="comment">//忽略错误</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//// get string</span></span><br><span class="line">str := client.Get(<span class="string">"hello"</span>)</span><br><span class="line">fmt.Println(str)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// del string</span></span><br><span class="line">client.Del(<span class="string">"strtest"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="ops-lists"><a href="#ops-lists" class="headerlink" title="ops: lists"></a>ops: lists</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ops: lists</span></span><br><span class="line"><span class="comment">//// push</span></span><br><span class="line">client.LPush(<span class="string">"list"</span>,<span class="string">"one"</span>,<span class="string">"two"</span>,<span class="string">"three"</span>) <span class="comment">//rpush则在尾部插入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//// rm, pop</span></span><br><span class="line">client.LRem(<span class="string">"list"</span>,<span class="number">2</span>,<span class="string">"three"</span>) <span class="comment">//删除list中前2个value为 ‘three’的元素</span></span><br><span class="line">client.LPop(<span class="string">"list"</span>) <span class="comment">//删除头部的值，同理RPop删除尾部的值。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// range</span></span><br><span class="line">list, _ := client.LRange(<span class="string">"list"</span>, <span class="number">0</span>, <span class="number">2</span>).Result()</span><br><span class="line">fmt.Println(<span class="string">"List: "</span>, list)</span><br></pre></td></tr></table></figure>
+<h2 id="ops-hashes"><a href="#ops-hashes" class="headerlink" title="ops: hashes"></a>ops: hashes</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hashes</span></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">user := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">user[<span class="string">"name"</span>] = <span class="string">"jim"</span></span><br><span class="line">user[<span class="string">"gender"</span>] = <span class="string">"man"</span></span><br><span class="line">user[<span class="string">"age"</span>] = <span class="number">23</span></span><br><span class="line">client.HMSet(<span class="string">"user"</span>,user)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// set</span></span><br><span class="line">client.HSet(<span class="string">"user"</span>, <span class="string">"name"</span>,<span class="string">"tom"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// get</span></span><br><span class="line">name := client.HGet(<span class="string">"user"</span>,<span class="string">"name"</span>)</span><br><span class="line">fmt.Print(name)</span><br><span class="line"></span><br><span class="line"><span class="comment">//// getAll</span></span><br><span class="line">hash, _ := client.HGetAll(<span class="string">"user"</span>).Result()</span><br><span class="line"><span class="keyword">for</span> k, v:= <span class="keyword">range</span> hash&#123;</span><br><span class="line">	fmt.Printf(<span class="string">"key: %v, value: %v "</span>,k, v)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参考: <a href="https://www.jianshu.com/p/4045a3721b3c" target="_blank" rel="noopener">https://www.jianshu.com/p/4045a3721b3c</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/redis/redis_start_learn/" data-id="cjzhtsclk004hy3s6xd3ts8ss" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/grpc/grpc_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/backend/go/grpc/grpc_start_learn/" class="article-date">
+  <time datetime="2018-08-29T12:21:53.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/backend/go/grpc/grpc_start_learn/">grpc start learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="ex-helloworld-start"><a href="#ex-helloworld-start" class="headerlink" title="ex helloworld start"></a>ex helloworld start</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>建立流程:</p>
+<ol>
+<li>建 proto3 文件, 定义 service</li>
+<li>service 开发</li>
+<li>client 开发</li>
+</ol>
+<h2 id="1-proto-文件"><a href="#1-proto-文件" class="headerlink" title="1. proto 文件"></a>1. proto 文件</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The greeting service definition.</span></span><br><span class="line">service Greeter &#123;</span><br><span class="line">  <span class="comment">// Sends a greeting</span></span><br><span class="line">  rpc SayHello (HelloRequest) returns (HelloReply) &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request message containing the user's name.</span></span><br><span class="line">message HelloRequest &#123;</span><br><span class="line">  <span class="keyword">string</span> name = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response message containing the greetings</span></span><br><span class="line">message HelloReply &#123;</span><br><span class="line">  <span class="keyword">string</span> message = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义了一个 service Greeter , 参数: SayHello, return: HelloReply</p>
+<h2 id="2-service-开发"><a href="#2-service-开发" class="headerlink" title="2. service 开发"></a>2. service 开发</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	port = <span class="string">":50051"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// server is used to implement helloworld.GreeterServer.</span></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现 helloworld.GreeterServer 方法</span></span><br><span class="line"><span class="comment">// SayHello implements helloworld.GreeterServer</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span> <span class="title">SayHello</span><span class="params">(ctx context.Context, in *pb.HelloRequest)</span> <span class="params">(*pb.HelloReply, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;pb.HelloReply&#123;Message: <span class="string">"Hello "</span> + in.Name&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lis, err := net.Listen(<span class="string">"tcp"</span>, port)         <span class="comment">// 开启监听</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"failed to listen: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	s := grpc.NewServer()                       <span class="comment">// 建一个 grpc Server</span></span><br><span class="line">	pb.RegisterGreeterServer(s, &amp;server&#123;&#125;)      <span class="comment">// 将 RegisterGreeterServer 服务绑定到 grpc 上</span></span><br><span class="line">	<span class="comment">// Register reflection service on gRPC server.</span></span><br><span class="line">	reflection.Register(s)                      <span class="comment">// 将服务注册到 rpc 上</span></span><br><span class="line">	<span class="keyword">if</span> err := s.Serve(lis); err != <span class="literal">nil</span> &#123;        <span class="comment">// s.Serve(lis) 是将 grpc 服务绑定监听端口</span></span><br><span class="line">		log.Fatalf(<span class="string">"failed to serve: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程:</p>
+<blockquote>
+<ol>
+<li>开一个监听端口</li>
+<li>建立一个 rpc 服务</li>
+<li>将服务绑定到 rpc 上</li>
+<li>将服务注册到 rpc 上</li>
+<li>绑定 grpc 服务 和 端口监听</li>
+</ol>
+</blockquote>
+<h2 id="3-client-使用-grpc-服务"><a href="#3-client-使用-grpc-服务" class="headerlink" title="3. client 使用 grpc 服务"></a>3. client 使用 grpc 服务</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"golang.org/x/net/context"</span></span><br><span class="line">	<span class="string">"google.golang.org/grpc"</span></span><br><span class="line">	pb <span class="string">"google.golang.org/grpc/examples/helloworld/helloworld"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	address     = <span class="string">"localhost:50051"</span></span><br><span class="line">	defaultName = <span class="string">"jie"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Set up a connection to the server.</span></span><br><span class="line">	conn, err := grpc.Dial(address, grpc.WithInsecure()) <span class="comment">// 创建客户端</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()                                  <span class="comment">// 延迟关闭连接</span></span><br><span class="line">	c := pb.NewGreeterClient(conn)                      <span class="comment">// 新建一个Greeter连接客户端</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Contact the server and print out its response.</span></span><br><span class="line">	name := defaultName</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(os.Args) &gt; <span class="number">1</span> &#123;</span><br><span class="line">		name = os.Args[<span class="number">1</span>]</span><br><span class="line">	&#125;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.Background(), time.Second) <span class="comment">// 设置超时 时间</span></span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line">	r, err := c.SayHello(ctx, &amp;pb.HelloRequest&#123;Name: name&#125;) <span class="comment">// 使用客户端调用远程方法</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"could not greet: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">"Greeting: %s"</span>, r.Message)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程: </p>
+<blockquote>
+<ol>
+<li>创建客户端</li>
+<li>新建一个Greeter连接客户端</li>
+<li>设置超时 时间</li>
+<li>使用客户端调用远程方法</li>
+<li>cloes客户端连接 and cancel()</li>
+</ol>
+</blockquote>
+<p>总结:</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/grpc/grpc_start_learn/" data-id="cjzhtscll004jy3s6b0fa3cx8" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/grpc/">grpc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/gin/gin_learn_start" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/backend/go/gin/gin_learn_start/" class="article-date">
+  <time datetime="2018-08-29T12:12:00.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/backend/go/gin/gin_learn_start/">gin learn start</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="learn-go-gin"><a href="#learn-go-gin" class="headerlink" title="learn go gin"></a>learn go gin</h2><p><strong>Params:</strong></p>
+<ol>
+<li><p>Get req params</p>
+<blockquote>
+<ol>
+<li>如何启动一个服务器.</li>
+<li>url 地址中的参数获取.</li>
+<li>Get 参数的获取.</li>
+</ol>
+</blockquote>
+</li>
+<li><p>post req params</p>
+<blockquote>
+<ol>
+<li>如何获取 POST 请求的参数.</li>
+</ol>
+</blockquote>
+</li>
+<li><p>结构化获取参数</p>
+<blockquote>
+<ol start="2">
+<li>如何定义</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<p><strong>return:</strong></p>
+<ol>
+<li>string</li>
+<li>json</li>
+</ol>
+<p><strong>拦截器:</strong></p>
+<ol>
+<li>如何定义和使用拦截器</li>
+</ol>
+<h2 id="Params"><a href="#Params" class="headerlink" title="Params"></a>Params</h2><h3 id="1-启动一个简单的服务器"><a href="#1-启动一个简单的服务器" class="headerlink" title="1. 启动一个简单的服务器"></a>1. 启动一个简单的服务器</h3><p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/gin-gonic/gin"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  r := gin.Default()</span><br><span class="line">  r.GET(<span class="string">"/ping"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    c.JSON(<span class="number">200</span>, gin.H&#123;</span><br><span class="line">      <span class="string">"message"</span>: <span class="string">"pong"</span>,</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">  r.Run() <span class="comment">// listen and serve on 0.0.0.0:8080</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:8080/ping</span><br></pre></td></tr></table></figure>
+<p><strong>summary:</strong></p>
+<blockquote>
+<ol>
+<li>导包: <code>import &quot;github.com/gin-gonic/gin&quot;</code></li>
+<li>启动一个默认的路由: <code>r := gin.Default()</code></li>
+<li>注册路径: <code>r.GET(&quot;/ping&quot;, handlers ...HandlerFunc)</code></li>
+<li>启动服务: <code>r.Run()</code> , 默认在8080端口</li>
+</ol>
+</blockquote>
+<h3 id="2-Parameters-in-path"><a href="#2-Parameters-in-path" class="headerlink" title="2. Parameters in path"></a>2. Parameters in path</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// This handler will match /user/john but will not match /user/ or /user</span></span><br><span class="line">  router.GET(<span class="string">"/user/:name"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    name := c.Param(<span class="string">"name"</span>)</span><br><span class="line">    c.String(http.StatusOK, <span class="string">"Hello %s"</span>, name)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// However, this one will match /user/john/ and also /user/john/send</span></span><br><span class="line">  <span class="comment">// If no other routers match /user/john, it will redirect to /user/john/</span></span><br><span class="line">  router.GET(<span class="string">"/user/:name/*action"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    name := c.Param(<span class="string">"name"</span>)</span><br><span class="line">    action := c.Param(<span class="string">"action"</span>)</span><br><span class="line">    message := name + <span class="string">" is "</span> + action</span><br><span class="line">    c.String(http.StatusOK, message)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-Querystring-parameters"><a href="#3-Querystring-parameters" class="headerlink" title="3. Querystring parameters"></a>3. Querystring parameters</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Query string parameters are parsed using the existing underlying request object.</span></span><br><span class="line">  <span class="comment">// The request responds to a url matching:  /welcome?firstname=Jane&amp;lastname=Doe</span></span><br><span class="line">  router.GET(<span class="string">"/welcome"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    firstname := c.DefaultQuery(<span class="string">"firstname"</span>, <span class="string">"Guest"</span>)</span><br><span class="line">    lastname := c.Query(<span class="string">"lastname"</span>) <span class="comment">// shortcut for c.Request.URL.Query().Get("lastname")</span></span><br><span class="line"></span><br><span class="line">    c.String(http.StatusOK, <span class="string">"Hello %s %s"</span>, firstname, lastname)</span><br><span class="line">  &#125;)</span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-POST-参数解析"><a href="#4-POST-参数解析" class="headerlink" title="4. POST 参数解析"></a>4. POST 参数解析</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line"></span><br><span class="line">  router.POST(<span class="string">"/form_post"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    message := c.PostForm(<span class="string">"message"</span>)</span><br><span class="line">    nick := c.DefaultPostForm(<span class="string">"nick"</span>, <span class="string">"anonymous"</span>)</span><br><span class="line"></span><br><span class="line">    c.JSON(<span class="number">200</span>, gin.H&#123;</span><br><span class="line">      <span class="string">"status"</span>:  <span class="string">"posted"</span>,</span><br><span class="line">      <span class="string">"message"</span>: message,</span><br><span class="line">      <span class="string">"nick"</span>:    nick,</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5-上传文件"><a href="#5-上传文件" class="headerlink" title="5. 上传文件"></a>5. 上传文件</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line">  <span class="comment">// Set a lower memory limit for multipart forms (default is 32 MiB)</span></span><br><span class="line">  <span class="comment">// router.MaxMultipartMemory = 8 &lt;&lt; 20  // 8 MiB</span></span><br><span class="line">  router.POST(<span class="string">"/upload"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="comment">// single file</span></span><br><span class="line">    file, _ := c.FormFile(<span class="string">"file"</span>)</span><br><span class="line">    log.Println(file.Filename)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Upload the file to specific dst.</span></span><br><span class="line">    <span class="comment">// c.SaveUploadedFile(file, dst)</span></span><br><span class="line"></span><br><span class="line">    c.String(http.StatusOK, fmt.Sprintf(<span class="string">"'%s' uploaded!"</span>, file.Filename))</span><br><span class="line">  &#125;)</span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST http://localhost:8080/upload \</span><br><span class="line">  -F <span class="string">"file=@/Users/appleboy/test.zip"</span> \</span><br><span class="line">  -H <span class="string">"Content-Type: multipart/form-data"</span></span><br></pre></td></tr></table></figure>
+<h3 id="多文件上传"><a href="#多文件上传" class="headerlink" title="多文件上传"></a>多文件上传</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line">  <span class="comment">// Set a lower memory limit for multipart forms (default is 32 MiB)</span></span><br><span class="line">  <span class="comment">// router.MaxMultipartMemory = 8 &lt;&lt; 20  // 8 MiB</span></span><br><span class="line">  router.POST(<span class="string">"/upload"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="comment">// Multipart form</span></span><br><span class="line">    form, _ := c.MultipartForm()</span><br><span class="line">    files := form.File[<span class="string">"upload[]"</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, file := <span class="keyword">range</span> files &#123;</span><br><span class="line">      log.Println(file.Filename)</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Upload the file to specific dst.</span></span><br><span class="line">      <span class="comment">// c.SaveUploadedFile(file, dst)</span></span><br><span class="line">    &#125;</span><br><span class="line">    c.String(http.StatusOK, fmt.Sprintf(<span class="string">"%d files uploaded!"</span>, <span class="built_in">len</span>(files)))</span><br><span class="line">  &#125;)</span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST http://localhost:8080/upload \</span><br><span class="line">  -F <span class="string">"upload[]=@/Users/appleboy/test1.zip"</span> \</span><br><span class="line">  -F <span class="string">"upload[]=@/Users/appleboy/test2.zip"</span> \</span><br><span class="line">  -H <span class="string">"Content-Type: multipart/form-data"</span></span><br></pre></td></tr></table></figure>
+<h3 id="Grouping-routes-分组路由"><a href="#Grouping-routes-分组路由" class="headerlink" title="Grouping routes(分组路由)"></a>Grouping routes(分组路由)</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Simple group: v1</span></span><br><span class="line">  v1 := router.Group(<span class="string">"/v1"</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    v1.POST(<span class="string">"/login"</span>, loginEndpoint)</span><br><span class="line">    v1.POST(<span class="string">"/submit"</span>, submitEndpoint)</span><br><span class="line">    v1.POST(<span class="string">"/read"</span>, readEndpoint)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Simple group: v2</span></span><br><span class="line">  v2 := router.Group(<span class="string">"/v2"</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    v2.POST(<span class="string">"/login"</span>, loginEndpoint)</span><br><span class="line">    v2.POST(<span class="string">"/submit"</span>, submitEndpoint)</span><br><span class="line">    v2.POST(<span class="string">"/read"</span>, readEndpoint)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>分组有利于在分组上定义拦截器.</strong></p>
+<h3 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="comment">// Creates a router without any middleware by default</span></span><br><span class="line">  r := gin.New()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Global middleware</span></span><br><span class="line">  <span class="comment">// Logger middleware will write the logs to gin.DefaultWriter even if you set with GIN_MODE=release.</span></span><br><span class="line">  <span class="comment">// By default gin.DefaultWriter = os.Stdout</span></span><br><span class="line">  r.Use(gin.Logger())</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Recovery middleware recovers from any panics and writes a 500 if there was one.</span></span><br><span class="line">  r.Use(gin.Recovery())</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Per route middleware, you can add as many as you desire.</span></span><br><span class="line">  r.GET(<span class="string">"/benchmark"</span>, MyBenchLogger(), benchEndpoint)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Authorization group</span></span><br><span class="line">  <span class="comment">// authorized := r.Group("/", AuthRequired())</span></span><br><span class="line">  <span class="comment">// exactly the same as:</span></span><br><span class="line">  authorized := r.Group(<span class="string">"/"</span>)</span><br><span class="line">  <span class="comment">// per group middleware! in this case we use the custom created</span></span><br><span class="line">  <span class="comment">// AuthRequired() middleware just in the "authorized" group.</span></span><br><span class="line">  authorized.Use(AuthRequired())</span><br><span class="line">  &#123;</span><br><span class="line">    authorized.POST(<span class="string">"/login"</span>, loginEndpoint)</span><br><span class="line">    authorized.POST(<span class="string">"/submit"</span>, submitEndpoint)</span><br><span class="line">    authorized.POST(<span class="string">"/read"</span>, readEndpoint)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// nested group</span></span><br><span class="line">    testing := authorized.Group(<span class="string">"testing"</span>)</span><br><span class="line">    testing.GET(<span class="string">"/analytics"</span>, analyticsEndpoint)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Listen and serve on 0.0.0.0:8080</span></span><br><span class="line">  r.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Model-binding-and-validation"><a href="#Model-binding-and-validation" class="headerlink" title="Model binding and validation"></a>Model binding and validation</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Binding from JSON</span></span><br><span class="line"><span class="keyword">type</span> Login <span class="keyword">struct</span> &#123;</span><br><span class="line">  User     <span class="keyword">string</span> <span class="string">`form:"user" json:"user" xml:"user"  binding:"required"`</span></span><br><span class="line">  Password <span class="keyword">string</span> <span class="string">`form:"password" json:"password" xml:"password" binding:"required"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  router := gin.Default()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Example for binding JSON (&#123;"user": "manu", "password": "123"&#125;)</span></span><br><span class="line">  router.POST(<span class="string">"/loginJSON"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> json Login</span><br><span class="line">    <span class="keyword">if</span> err := c.ShouldBindJSON(&amp;json); err != <span class="literal">nil</span> &#123;</span><br><span class="line">      c.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">"error"</span>: err.Error()&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> json.User != <span class="string">"manu"</span> || json.Password != <span class="string">"123"</span> &#123;</span><br><span class="line">      c.JSON(http.StatusUnauthorized, gin.H&#123;<span class="string">"status"</span>: <span class="string">"unauthorized"</span>&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;<span class="string">"status"</span>: <span class="string">"you are logged in"</span>&#125;)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Example for binding XML (</span></span><br><span class="line">  <span class="comment">//  &lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;root&gt;</span></span><br><span class="line">  <span class="comment">//    &lt;user&gt;user&lt;/user&gt;</span></span><br><span class="line">  <span class="comment">//    &lt;password&gt;123&lt;/user&gt;</span></span><br><span class="line">  <span class="comment">//  &lt;/root&gt;)</span></span><br><span class="line">  router.POST(<span class="string">"/loginXML"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> xml Login</span><br><span class="line">    <span class="keyword">if</span> err := c.ShouldBindXML(&amp;xml); err != <span class="literal">nil</span> &#123;</span><br><span class="line">      c.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">"error"</span>: err.Error()&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> xml.User != <span class="string">"manu"</span> || xml.Password != <span class="string">"123"</span> &#123;</span><br><span class="line">      c.JSON(http.StatusUnauthorized, gin.H&#123;<span class="string">"status"</span>: <span class="string">"unauthorized"</span>&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;<span class="string">"status"</span>: <span class="string">"you are logged in"</span>&#125;)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Example for binding a HTML form (user=manu&amp;password=123)</span></span><br><span class="line">  router.POST(<span class="string">"/loginForm"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> form Login</span><br><span class="line">    <span class="comment">// This will infer what binder to use depending on the content-type header.</span></span><br><span class="line">    <span class="keyword">if</span> err := c.ShouldBind(&amp;form); err != <span class="literal">nil</span> &#123;</span><br><span class="line">      c.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">"error"</span>: err.Error()&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> form.User != <span class="string">"manu"</span> || form.Password != <span class="string">"123"</span> &#123;</span><br><span class="line">      c.JSON(http.StatusUnauthorized, gin.H&#123;<span class="string">"status"</span>: <span class="string">"unauthorized"</span>&#125;)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;<span class="string">"status"</span>: <span class="string">"you are logged in"</span>&#125;)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Listen and serve on 0.0.0.0:8080</span></span><br><span class="line">  router.Run(<span class="string">":8080"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v -X POST \</span><br><span class="line">  http://localhost:8080/loginJSON \</span><br><span class="line">  -H <span class="string">'content-type: application/json'</span> \</span><br><span class="line">  -d <span class="string">'&#123; "user": "manu" &#125;'</span></span><br></pre></td></tr></table></figure>
+<h3 id="params-summary"><a href="#params-summary" class="headerlink" title="params summary"></a>params summary</h3><p>参数解析方法:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// router.GET("/user/:name/*action", handlers ...HandlerFunc)</span></span><br><span class="line">name := c.Param(<span class="string">"name"</span>)</span><br><span class="line">action := c.Param(<span class="string">"action"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// req Url: /welcome?firstname=Jane&amp;lastname=Doe</span></span><br><span class="line">firstname := c.DefaultQuery(<span class="string">"firstname"</span>, <span class="string">"Guest"</span>)</span><br><span class="line">lastname := c.Query(<span class="string">"lastname"</span>) <span class="comment">// shortcut for c.Request.URL.Query().Get("lastname")</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// POST</span></span><br><span class="line">message := c.PostForm(<span class="string">"message"</span>)</span><br><span class="line">nick := c.DefaultPostForm(<span class="string">"nick"</span>, <span class="string">"anonymous"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上传文件</span></span><br><span class="line">file, _ := c.FormFile(<span class="string">"file"</span>)</span><br><span class="line"><span class="comment">// 多文件上传</span></span><br><span class="line">form, _ := c.MultipartForm()</span><br><span class="line">files := form.File[<span class="string">"upload[]"</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义结构体</span></span><br><span class="line"><span class="keyword">type</span> Login <span class="keyword">struct</span> &#123;</span><br><span class="line">  User     <span class="keyword">string</span> <span class="string">`form:"user" json:"user" xml:"user"  binding:"required"`</span></span><br><span class="line">  Password <span class="keyword">string</span> <span class="string">`form:"password" json:"password" xml:"password" binding:"required"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// bind JSON:  &#123;"user": "manu", "password": "123"&#125;</span></span><br><span class="line">c.ShouldBindJSON(&amp;json)</span><br><span class="line"><span class="comment">// bind XML:   </span></span><br><span class="line"><span class="comment">//  &lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="comment">//  &lt;root&gt;</span></span><br><span class="line"><span class="comment">//    &lt;user&gt;user&lt;/user&gt;</span></span><br><span class="line"><span class="comment">//    &lt;password&gt;123&lt;/user&gt;</span></span><br><span class="line"><span class="comment">//  &lt;/root&gt;</span></span><br><span class="line">c.ShouldBindXML(&amp;xml)</span><br><span class="line"><span class="comment">// bind form:  user=manu&amp;password=123</span></span><br><span class="line">c.ShouldBind(&amp;form)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/gin/gin_learn_start/" data-id="cjzhtsclg0048y3s6wk4vfr9j" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gin/">gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/goose/goose_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/backend/go/goose/goose_start_learn/" class="article-date">
+  <time datetime="2018-08-29T12:12:00.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/backend/go/goose/goose_start_learn/">goose learn start</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="what-goose"><a href="#what-goose" class="headerlink" title="what goose"></a>what goose</h2><blockquote>
+<p>goose is a database migration tool.<br>You can manage your database’s evolution by creating incremental SQL or Go scripts.</p>
+</blockquote>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><p>这个前提是需要安装 golang, 并会就 <code>goose</code> 命令生成到 <code>$GOPATH/bin</code> 目录下.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> go get bitbucket.org/liamstask/goose/cmd/goose</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> goose</span></span><br><span class="line"></span><br><span class="line">goose is a database migration management system for Go projects.</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line">    goose [options] &lt;subcommand&gt; [subcommand options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  -env string</span><br><span class="line">    	which DB environment to use (default "development")</span><br><span class="line">  -path string</span><br><span class="line">    	folder containing db info (default "db")</span><br><span class="line">  -pgschema string</span><br><span class="line">    	which postgres-schema to migrate (default = none)</span><br><span class="line"></span><br><span class="line">Commands:</span><br><span class="line">    up         Migrate the DB to the most recent version available</span><br><span class="line">    down       Roll back the version by 1</span><br><span class="line">    redo       Re-run the latest migration</span><br><span class="line">    status     dump the migration status for the current DB</span><br><span class="line">    create     Create the scaffolding for a new migration</span><br><span class="line">    dbversion  Print the current version of the database</span><br></pre></td></tr></table></figure>
+<h3 id="create"><a href="#create" class="headerlink" title="create"></a>create</h3><p>创建一个新的 migration , 这个创建的是 go migration<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose create AddSomeColumns</span><br></pre></td></tr></table></figure></p>
+<p>如果是创建 sql migration 的话, 在后边加个 sql 即可.<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose create AddSomeColumns sql</span><br></pre></td></tr></table></figure></p>
+<h3 id="up"><a href="#up" class="headerlink" title="up"></a>up</h3><p>应用所有可用的 migrations</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose up</span><br></pre></td></tr></table></figure>
+<h3 id="down"><a href="#down" class="headerlink" title="down"></a>down</h3><p>从当前版本回滚单个 migrations<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose down</span><br></pre></td></tr></table></figure></p>
+<h3 id="redo"><a href="#redo" class="headerlink" title="redo"></a>redo</h3><p>回滚最近应用的 migrations ，然后再次运行它。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose redo</span><br></pre></td></tr></table></figure>
+<h3 id="status"><a href="#status" class="headerlink" title="status"></a>status</h3><p>打印所有 migrations 的状态：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose status</span><br></pre></td></tr></table></figure>
+<h3 id="dbversion"><a href="#dbversion" class="headerlink" title="dbversion"></a>dbversion</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goose dbversion</span><br></pre></td></tr></table></figure>
+<h2 id="个人实验数据"><a href="#个人实验数据" class="headerlink" title="个人实验数据"></a>个人实验数据</h2><h3 id="配置如下"><a href="#配置如下" class="headerlink" title="配置如下:"></a>配置如下:</h3><p>目录结构:</p>
+<p>jieLearn/<br>├── dbconf.yml<br>└── migrations<br>    ├── 20180829163647_jieTest.sql<br>    └── 20180829165529_addC4Col.sql</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat dbconf.yml</span></span><br><span class="line"></span><br><span class="line">development:</span><br><span class="line">    driver: mysql</span><br><span class="line">    open: root:password@tcp(127.0.0.1:3306)/jie_test?timeout=200ms&amp;parseTime=true&amp;loc=Local</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat jieLearn/migrations/20180829163647_jieTest.sql</span></span><br><span class="line"></span><br><span class="line">-- +goose Up</span><br><span class="line">-- SQL in section 'Up' is executed when this migration is applied</span><br><span class="line">CREATE TABLE `jie_test`.`test_table` (</span><br><span class="line">  `c1` INT NOT NULL,</span><br><span class="line">  `c2` VARCHAR(45) NULL,</span><br><span class="line">  `c3` VARCHAR(45) NULL,</span><br><span class="line">  PRIMARY KEY (`c1`));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- +goose Down</span><br><span class="line">-- SQL section 'Down' is executed when this migration is rolled back</span><br><span class="line">DROP TABLE `jie_test`.`test_table`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> cat jieLearn/migrations/20180829165529_addC4Col.sql</span></span><br><span class="line"></span><br><span class="line">-- +goose Up</span><br><span class="line">-- SQL in section 'Up' is executed when this migration is applied</span><br><span class="line">ALTER TABLE `jie_test`.`test_table`</span><br><span class="line">ADD COLUMN `c4` VARCHAR(45) NULL AFTER `c3`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- +goose Down</span><br><span class="line">-- SQL section 'Down' is executed when this migration is rolled back</span><br><span class="line">ALTER TABLE `jie_test`.`test_table`</span><br><span class="line">DROP COLUMN `c4`;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> goose -path <span class="string">"jieLearn"</span> up</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> goose -path <span class="string">"jieLearn"</span> down</span></span><br></pre></td></tr></table></figure>
+<h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><p>new table: goose_db_version, test_table</p>
+<p>goose_db_version: content<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1	0	1	2018-08-29 08:33:23</span><br><span class="line">2	20180829163647	1	2018-08-29 08:33:23</span><br><span class="line">3	20180829163647	0	2018-08-29 08:34:53</span><br><span class="line">4	20180829163647	1	2018-08-29 08:35:35</span><br><span class="line">5	20180829165529	1	2018-08-29 08:42:39</span><br><span class="line">6	20180829165529	0	2018-08-29 08:43:00</span><br></pre></td></tr></table></figure></p>
+<p>参考: <a href="https://bitbucket.org/liamstask/goose" target="_blank" rel="noopener">https://bitbucket.org/liamstask/goose</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/backend/go/goose/goose_start_learn/" data-id="cjzhtsclj004ey3s6t7w20giu" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/goose/">goose</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-build_own_x/data_base/build_simple_database/模块功能概述" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" class="article-date">
@@ -132,7 +539,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" data-id="cjy2hcgza005n8seosu3dajic" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/05/17/build_own_x/data_base/build_simple_database/模块功能概述/" data-id="cjzhtscm90060y3s6m765htbe" class="article-share-link">分享</a>
       
       
       
@@ -199,7 +606,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" data-id="cjy2hcgv0001v8seolhaktw4m" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/27/alg/sorting/Dual_pivot_Quicksort/" data-id="cjzhtsck20020y3s649siyelz" class="article-share-link">分享</a>
       
       
       
@@ -239,23 +646,23 @@
       <ul>
         
           <li>
-            <a href="/2019/08/10/self_doc/文件加密/">(no title)</a>
+            <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/09/basic/protobuf/">(no title)</a>
+            <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/frontend/优秀项目/">(no title)</a>
+            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/alg/一致性hash/">(no title)</a>
+            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/22/alg/finance/atr/">(no title)</a>
+            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>

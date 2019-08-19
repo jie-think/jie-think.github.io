@@ -69,6 +69,197 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-alg/knuth_shuffle" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/19/alg/knuth_shuffle/" class="article-date">
+  <time datetime="2019-07-19T02:17:53.425Z" itemprop="datePublished">2019-07-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Knuth-Shuffle-洗牌算法"><a href="#Knuth-Shuffle-洗牌算法" class="headerlink" title="Knuth-Shuffle 洗牌算法"></a>Knuth-Shuffle 洗牌算法</h1><p>参考:</p>
+<p><a href="https://en.wikipedia.org/wiki/Fisher–Yates_shuffle" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle</a></p>
+<p><a href="https://www.jianshu.com/p/7cb95ad7d5d5" target="_blank" rel="noopener">https://www.jianshu.com/p/7cb95ad7d5d5</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/19/alg/knuth_shuffle/" data-id="cjzhtsci00002y3s67t5fbslz" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/reservoir_sampling" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/17/alg/reservoir_sampling/" class="article-date">
+  <time datetime="2019-07-17T05:22:01.411Z" itemprop="datePublished">2019-07-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Reservoir-Sampling"><a href="#Reservoir-Sampling" class="headerlink" title="Reservoir Sampling"></a>Reservoir Sampling</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">從S中抽取首k項放入「水塘」中</span><br><span class="line">對於每一個S[j]項（j ≥ k）：</span><br><span class="line">   隨機產生一個範圍從0到j的整數r</span><br><span class="line">   若 r &lt; k 則把水塘中的第r項換成S[j]項</span><br></pre></td></tr></table></figure>
+<p>参考:</p>
+<p><a href="https://zh.wikipedia.org/wiki/水塘抽樣" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E6%B0%B4%E5%A1%98%E6%8A%BD%E6%A8%A3</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/17/alg/reservoir_sampling/" data-id="cjzhtsci30003y3s611vsarpu" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-basic/正则零宽断言" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/13/basic/正则零宽断言/" class="article-date">
+  <time datetime="2019-07-13T06:31:13.423Z" itemprop="datePublished">2019-07-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="正则零宽断言"><a href="#正则零宽断言" class="headerlink" title="正则零宽断言"></a>正则零宽断言</h1><p><strong>(?=exp):零宽度正预测先行断言，它断言自身出现的位置的后面能匹配表达式exp。</strong></p>
+<p>匹配后面为_path，结果为product</p>
+<p>‘product_path’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(product)(?=_path)/</span><br></pre></td></tr></table></figure>
+<p><strong><code>vscode</code> 和 <code>sublime</code> 支持</strong></p>
+<p><strong>(?&lt;=exp):零宽度正回顾后发断言，它断言自身出现的位置的前面能匹配表达式exp</strong></p>
+<p>匹配前面为name:，结果为wangfei</p>
+<p>‘name:wangfei’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(?&lt;=name:)(wangfei)/</span><br></pre></td></tr></table></figure>
+<p><strong><code>vscode</code> 和 <code>sublime</code> 支持</strong></p>
+<p><strong>(?!exp):零宽度负预测先行断言，断言此位置的后面不能匹配表达式exp。</strong></p>
+<p>匹配后面不是_path</p>
+<p>‘product_path’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(product)(?!_path)/</span><br></pre></td></tr></table></figure>
+<p>匹配后面不是_url</p>
+<p>‘product_path’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(product)(?!_url)/</span><br></pre></td></tr></table></figure>
+<p><strong><code>vscode</code> 和 <code>sublime</code> 支持</strong></p>
+<p><strong>(?&lt;!exp):零宽度负回顾后发断言来断言此位置的前面不能匹配表达式exp</strong></p>
+<p>匹配前面不是name:</p>
+<p>‘name:angelica’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(?&lt;!name:)(angelica)/</span><br></pre></td></tr></table></figure>
+<p>匹配前面不是nick_name:</p>
+<p>‘name:angelica’.scan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/(?&lt;!nick_name:)(angelica)/</span><br></pre></td></tr></table></figure>
+<p><strong><code>vscode</code> 和 <code>sublime</code> 支持</strong></p>
+<p><strong>参考:</strong></p>
+<p><a href="https://www.cnblogs.com/macq/p/6597366.html#bc3" target="_blank" rel="noopener">https://www.cnblogs.com/macq/p/6597366.html#bc3</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/13/basic/正则零宽断言/" data-id="cjzhtsci80007y3s6p8luwccd" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-ide/vscode/vscode-snippet" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/12/ide/vscode/vscode-snippet/" class="article-date">
+  <time datetime="2019-07-12T04:10:34.779Z" itemprop="datePublished">2019-07-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="vscode-snippet"><a href="#vscode-snippet" class="headerlink" title="vscode snippet"></a>vscode snippet</h1><p>golang snippet: <a href="https://github.com/microsoft/vscode-go/blob/master/snippets/go.json" target="_blank" rel="noopener">https://github.com/microsoft/vscode-go/blob/master/snippets/go.json</a></p>
+<h2 id="snippet-正则使用"><a href="#snippet-正则使用" class="headerlink" title="snippet 正则使用"></a>snippet 正则使用</h2><p><strong>参考:</strong></p>
+<p><a href="https://my.oschina.net/imsole/blog/1794999" target="_blank" rel="noopener">https://my.oschina.net/imsole/blog/1794999</a></p>
+<p><a href="https://code.visualstudio.com/docs/editor/userdefinedsnippets" target="_blank" rel="noopener">https://code.visualstudio.com/docs/editor/userdefinedsnippets</a></p>
+<h2 id="go-json"><a href="#go-json" class="headerlink" title="go.json"></a>go.json</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">// go</span><br><span class="line">&#123;</span><br><span class="line">  // Place your snippets for go here. Each snippet is defined under a snippet name and has a prefix, body and </span><br><span class="line">	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:</span><br><span class="line">	// $1, $2 for tab stops, $0 for the final cursor position, and $&#123;1:label&#125;, $&#123;2:another&#125; for placeholders. Placeholders with the </span><br><span class="line">	// same ids are connected.</span><br><span class="line">	// Example:</span><br><span class="line">	// "Print to console": &#123;</span><br><span class="line">	// 	"prefix": "log",</span><br><span class="line">	// 	"body": [</span><br><span class="line">	// 		"console.log('$1');",</span><br><span class="line">	// 		"$2"</span><br><span class="line">	// 	],</span><br><span class="line">	// 	"description": "Log output to console"</span><br><span class="line">  // &#125;</span><br><span class="line">  "log_info": &#123;</span><br><span class="line">        "prefix": "log_info",</span><br><span class="line">        "body": "$&#123;1:log&#125;.Infof(ctx, \"[@%s] $3\", $&#123;2:fn&#125;)",</span><br><span class="line">        "description": "log.Infof()"</span><br><span class="line">    &#125;,</span><br><span class="line">    "log_err": &#123;</span><br><span class="line">        "prefix": "log_err",</span><br><span class="line">        "body": "$&#123;1:log&#125;.Errorf(ctx, \"[@%s] $3$&#123;4:err&#125;=%v\", $&#123;2:fn&#125;, $4)",</span><br><span class="line">        "description": "log Errorf"</span><br><span class="line">    &#125;,</span><br><span class="line">    "log_warn": &#123;</span><br><span class="line">        "prefix": "log_warn",</span><br><span class="line">        "body": "$&#123;1:log&#125;.Warningf(ctx, \"[@%s] $3\", $&#123;2:fn&#125;)",</span><br><span class="line">        "description": "log Warningf"</span><br><span class="line">    &#125;,</span><br><span class="line">    "iferr_log": &#123;</span><br><span class="line">        "prefix": "iferr_log",</span><br><span class="line">        "body": [</span><br><span class="line">            "if $&#123;1:err&#125; != nil &#123;",</span><br><span class="line">            "    $&#123;2:log&#125;.Errorf(ctx, \"[@%s] $4$1=%v\", $&#123;3:fn&#125;, $1)",</span><br><span class="line">            <span class="string">"&#125;"</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/12/ide/vscode/vscode-snippet/" data-id="cjzhtscko0037y3s6xql5xwyc" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/styleguide/python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/09/backend/styleguide/python/" class="article-date">
+  <time datetime="2019-07-09T02:38:05.087Z" itemprop="datePublished">2019-07-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Google-Python-Style-Guide"><a href="#Google-Python-Style-Guide" class="headerlink" title="Google Python Style Guide"></a>Google Python Style Guide</h1><p>参考: <a href="https://google.github.io/styleguide/pyguide.html" target="_blank" rel="noopener">https://google.github.io/styleguide/pyguide.html</a></p>
+<p>中文翻译: <a href="https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/background/" target="_blank" rel="noopener">https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/background/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/09/backend/styleguide/python/" data-id="cjzhtsckc002oy3s6ssio9had" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-backend/python/python 项目目录结构" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/07/03/backend/python/python 项目目录结构/" class="article-date">
@@ -98,7 +289,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/03/backend/python/python 项目目录结构/" data-id="cjy2hcgvh00278seoa1gpxp4r" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/03/backend/python/python 项目目录结构/" data-id="cjzhtsck7002ey3s65aqzw085" class="article-share-link">分享</a>
       
       
       
@@ -131,7 +322,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/02/alg/finance/rsi/" data-id="cjy2hcgu8001g8seow8gg23fe" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/02/alg/finance/rsi/" data-id="cjzhtsck30024y3s63w7gen86" class="article-share-link">分享</a>
       
       
       
@@ -215,7 +406,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/29/alg/finance/bias/" data-id="cjy2hcgtz00178seo3nz45mld" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/06/29/alg/finance/bias/" data-id="cjzhtscju001jy3s6wc33y4qs" class="article-share-link">分享</a>
       
       
       
@@ -300,7 +491,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/27/alg/finance/macd/" data-id="cjy2hcgub001h8seoh2sn6kub" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/06/27/alg/finance/macd/" data-id="cjzhtsck0001xy3s6iucn7f2t" class="article-share-link">分享</a>
       
       
       
@@ -351,238 +542,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/27/alg/finance/kdj/" data-id="cjy2hcgu3001b8seo7ol737cm" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/finance/cci" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/26/alg/finance/cci/" class="article-date">
-  <time datetime="2019-06-26T15:03:32.836Z" itemprop="datePublished">2019-06-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="CCI-算法"><a href="#CCI-算法" class="headerlink" title="CCI 算法"></a>CCI 算法</h1><p>CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。</p>
-<h2 id="计算公式"><a href="#计算公式" class="headerlink" title="计算公式"></a>计算公式</h2><p>系统默认n为14</p>
-<p>$TP = \frac{最高价 + 最低价 + 收盘价}{3}$</p>
-<p>$MA = \frac{\sum\limits_{k=1}^{n} TP(i)}{n}$</p>
-<p>MD = 最近n日 (MA - TP)的绝对值的累计和 ÷ n</p>
-<p>可能不太准确…</p>
-<p>$MD = \frac{MA - TP}{n}​$</p>
-<p>$CCI(n) = \frac{TP - MA}{MD} * 0.015$</p>
-<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p><strong>1,观察CCI范围</strong></p>
-<p>当CCI从0~+100的正常范围内，由下往上突破+100时，<a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87" target="_blank" rel="noopener">股指</a>或<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>有可能出现强势上涨，是买入的时机；当CCI从+100之上，由上往下跌破+100，股指或股价<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a>有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E8%B0%83/9837525" target="_blank" rel="noopener">回调</a>，是卖出的时机。当CCI从0~-100的正常范围内，由上往下跌破-100时，股指或股价有可能出现弱势下跌，是抛出的时机。当CCI从-100的下方，由下往上突破-100时，有可能出现反弹，可逢低买入。</p>
-<p><strong>2, CCI运用也可以用<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>来判断<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E5%A4%B4%E9%83%A8" target="_blank" rel="noopener">短线头部</a>的出现，用<a href="https://baike.baidu.com/item/%E5%BA%95%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">底背离</a>来判断短线底部的到来</strong></p>
-<p>当股指或股价创出新高，而CCI没有同步创出新高时，<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>出现，<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a><a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87/3342555" target="_blank" rel="noopener">股指</a>或股价有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E6%8C%A1" target="_blank" rel="noopener">回挡</a>，可逢高卖出；当股指或股价创出新低，而CCI没有同步创出新低时，底背离出现，短线股指或股价有可能出现反弹，可逢低买入。</p>
-<h2 id="应用技巧"><a href="#应用技巧" class="headerlink" title="应用技巧"></a>应用技巧</h2><p>1、如果CCI指标一直上行突破了100的话,表示此时的股市进入了异常波动的阶段,可能伴随着较大的<a href="https://baike.baidu.com/item/%E6%88%90%E4%BA%A4%E9%87%8F" target="_blank" rel="noopener">成交量</a>,可以进行中短线的投资者,此时的<a href="https://baike.baidu.com/item/%E4%B9%B0%E5%85%A5" target="_blank" rel="noopener">买入</a>信号比较明显.</p>
-<p>2、反之如果CCI指标向下突破了-100,则代表此时的股市进入了新一轮的下跌趋势,此时可以选择不要操作,保持观望的态度面对市场.</p>
-<p>3、如果CCI指标从上行突破100又回到100之内的正常范围,则代表股价这一阶段的上涨行情已经疲软,投资者可以在此时选择卖出.反之CCI突破-100又回到正常范围,则代表<a href="https://baike.baidu.com/item/%E4%B8%8B%E8%B7%8C%E8%B6%8B%E5%8A%BF" target="_blank" rel="noopener">下跌趋势</a>已经结束,观察一段时间可能有转折的信号出现,可以先少量买入.</p>
-<p>注意<a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>主要用来判断100到-100范围之外的行情趋势,在这之间的趋势分析应用 <a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>没有作用和意义,可以选择<a href="https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">KDJ指标</a>来分析.另外CCI指标是进行<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E6%93%8D%E4%BD%9C" target="_blank" rel="noopener">短线操作</a>的投资者比较实用的武器,可以很快帮助交易者找到准确的<a href="https://baike.baidu.com/item/%E4%BA%A4%E6%98%93%E4%BF%A1%E5%8F%B7" target="_blank" rel="noopener">交易信号</a>. [2] </p>
-<p><strong>参考：</strong></p>
-<p>[CCI百度百科(<a href="https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196" target="_blank" rel="noopener">https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196</a>)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/26/alg/finance/cci/" data-id="cjy2hcgtx00168seoxlghivhe" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/finance/alg_list" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/26/alg/finance/alg_list/" class="article-date">
-  <time datetime="2019-06-26T15:02:55.603Z" itemprop="datePublished">2019-06-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>涉及的算法：</p>
-<ul>
-<li style="list-style: none"><input type="checkbox" checked> 1. MACD</li>
-<li style="list-style: none"><input type="checkbox" checked> 2. KDJ</li>
-<li style="list-style: none"><input type="checkbox"> 3. RSI</li>
-<li style="list-style: none"><input type="checkbox"> 4. BOLL</li>
-<li style="list-style: none"><input type="checkbox"> 5. WR</li>
-<li style="list-style: none"><input type="checkbox"> 6. DMI</li>
-<li style="list-style: none"><input type="checkbox"> 7. BBIBOLL</li>
-<li style="list-style: none"><input type="checkbox"> 8. ROC</li>
-<li style="list-style: none"><input type="checkbox"> 9. PSY</li>
-<li style="list-style: none"><input type="checkbox"> 10. OBV</li>
-<li style="list-style: none"><input type="checkbox"> 11. WVAD</li>
-<li style="list-style: none"><input type="checkbox" checked> 12. CCI</li>
-<li style="list-style: none"><input type="checkbox"> 13. TRIX</li>
-<li style="list-style: none"><input type="checkbox"> 14. DMA</li>
-<li style="list-style: none"><input type="checkbox"> 15. EXPMA</li>
-<li style="list-style: none"><input type="checkbox" checked> 16. BIAS</li>
-<li style="list-style: none"><input type="checkbox"> 17. ASI</li>
-<li style="list-style: none"><input type="checkbox"> 18. VR</li>
-<li style="list-style: none"><input type="checkbox"> 19. EMV</li>
-<li style="list-style: none"><input type="checkbox"> 20. BRAR</li>
-<li style="list-style: none"><input type="checkbox"> 21. ATR</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/26/alg/finance/alg_list/" data-id="cjy2hcgu5001c8seonepjlic8" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/fsm/fsm理解" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/04/backend/go/fsm/fsm理解/" class="article-date">
-  <time datetime="2019-06-04T06:52:00.000Z" itemprop="datePublished">2019-06-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/04/backend/go/fsm/fsm理解/">fsm 笔记</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>参考: <a href="https://www.cnblogs.com/21207-iHome/p/6085334.html" target="_blank" rel="noopener">https://www.cnblogs.com/21207-iHome/p/6085334.html</a></p>
-<p>参考代码: <a href="https://godoc.org/github.com/docker/infrakit/pkg/fsm" target="_blank" rel="noopener">https://godoc.org/github.com/docker/infrakit/pkg/fsm</a></p>
-<p><img src="./状态机架构图 2.jpg" alt="状态机架构图 2"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/04/backend/go/fsm/fsm理解/" data-id="cjy2hcgxp00418seo15vyj1jh" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fsm/">fsm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/gin/gin实现原理" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/04/backend/go/gin/gin实现原理/" class="article-date">
-  <time datetime="2019-06-04T06:52:00.000Z" itemprop="datePublished">2019-06-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/04/backend/go/gin/gin实现原理/">gin 实现原理</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="待写TODO-jx"><a href="#待写TODO-jx" class="headerlink" title="待写TODO(jx)"></a>待写TODO(jx)</h1>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/04/backend/go/gin/gin实现原理/" data-id="cjy2hcgxd003v8seofz9i4wbc" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gin/">gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/echo/echo_learn" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/04/27/backend/go/echo/echo_learn/" class="article-date">
-  <time datetime="2019-04-27T13:55:41.966Z" itemprop="datePublished">2019-04-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="Learn-Echo"><a href="#Learn-Echo" class="headerlink" title="Learn Echo"></a>Learn Echo</h1><h2 id="Echo-目的"><a href="#Echo-目的" class="headerlink" title="Echo 目的"></a><strong>Echo 目的</strong></h2><blockquote>
-<p>High performance, extensible, minimalist Go web framework</p>
-<h3 id="Feature-Overview"><a href="#Feature-Overview" class="headerlink" title="Feature Overview"></a>Feature Overview</h3><p>Optimized HTTP router which smartly prioritize routes<br>Build robust and scalable RESTful APIs<br>Group APIs<br>Extensible middleware framework<br>Define middleware at root, group or route level<br>Data binding for JSON, XML and form payload<br>Handy functions to send variety of HTTP responses<br>Centralized HTTP error handling<br>Template rendering with any template engine<br>Define your format for the logger<br>Highly customizable<br>Automatic TLS via Let’s Encrypt<br>HTTP/2 support</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/04/27/backend/go/echo/echo_learn/" data-id="cjy2hcgxg003w8seozcwun6al" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/06/27/alg/finance/kdj/" data-id="cjzhtscjx001ry3s6jxfg7wbw" class="article-share-link">分享</a>
       
       
       
@@ -620,23 +580,23 @@
       <ul>
         
           <li>
-            <a href="/2019/08/10/self_doc/文件加密/">(no title)</a>
+            <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/09/basic/protobuf/">(no title)</a>
+            <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/frontend/优秀项目/">(no title)</a>
+            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/alg/一致性hash/">(no title)</a>
+            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/22/alg/finance/atr/">(no title)</a>
+            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>

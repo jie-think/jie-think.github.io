@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-10T14:05:20.520Z</updated>
+  <updated>2019-08-18T01:16:00.458Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,111 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/"/>
+    <id>http://yoursite.com/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/</id>
+    <published>2019-08-18T01:14:00.206Z</published>
+    <updated>2019-08-18T01:16:00.458Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="elisp-learn"><a href="#elisp-learn" class="headerlink" title="elisp learn"></a>elisp learn</h1><p>参考: <a href="https://learnxinyminutes.com/docs/elisp/" target="_blank" rel="noopener">learn elisp in y minutes</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;elisp-learn&quot;&gt;&lt;a href=&quot;#elisp-learn&quot; class=&quot;headerlink&quot; title=&quot;elisp learn&quot;&gt;&lt;/a&gt;elisp learn&lt;/h1&gt;&lt;p&gt;参考: &lt;a href=&quot;https://learnxinyminu
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/16/ide/emacs/hack_emacs/tutorial/"/>
+    <id>http://yoursite.com/2019/08/16/ide/emacs/hack_emacs/tutorial/</id>
+    <published>2019-08-16T14:56:38.153Z</published>
+    <updated>2019-08-18T01:02:29.652Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="emacs-入门教程"><a href="#emacs-入门教程" class="headerlink" title="emacs 入门教程"></a>emacs 入门教程</h1><p>中文: <a href="https://blog.csdn.net/swazer_z/article/details/10146557" target="_blank" rel="noopener">emacs 中文教程</a></p><p><img src="assets/emacs 教程.png" alt="emacs 教程"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;emacs-入门教程&quot;&gt;&lt;a href=&quot;#emacs-入门教程&quot; class=&quot;headerlink&quot; title=&quot;emacs 入门教程&quot;&gt;&lt;/a&gt;emacs 入门教程&lt;/h1&gt;&lt;p&gt;中文: &lt;a href=&quot;https://blog.csdn.net/swa
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/15/backend/rust/%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84/"/>
+    <id>http://yoursite.com/2019/08/15/backend/rust/项目结构/</id>
+    <published>2019-08-15T11:44:14.257Z</published>
+    <updated>2019-08-15T11:45:46.600Z</updated>
+    
+    <content type="html"><![CDATA[<p>参考: <a href="https://doc.rust-lang.org/stable/cargo/guide/project-layout.html" target="_blank" rel="noopener">https://doc.rust-lang.org/stable/cargo/guide/project-layout.html</a></p><p>版本: <code>rustc 1.36.0 (a53f9df32 2019-07-03)</code></p><p>推荐目录结构</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── Cargo.lock</span><br><span class="line">├── Cargo.toml</span><br><span class="line">├── benches</span><br><span class="line">│   └── large-input.rs</span><br><span class="line">├── examples</span><br><span class="line">│   └── simple.rs</span><br><span class="line">├── src</span><br><span class="line">│   ├── bin</span><br><span class="line">│   │   └── another_executable.rs</span><br><span class="line">│   ├── lib.rs</span><br><span class="line">│   └── main.rs</span><br><span class="line">└── tests</span><br><span class="line">    └── some-integration-tests.rs</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;参考: &lt;a href=&quot;https://doc.rust-lang.org/stable/cargo/guide/project-layout.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://doc.rust-lang.org/s
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/15/ide/emacs/hack_emacs/hack_emacs/"/>
+    <id>http://yoursite.com/2019/08/15/ide/emacs/hack_emacs/hack_emacs/</id>
+    <published>2019-08-15T07:46:34.040Z</published>
+    <updated>2019-08-15T07:48:11.139Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Hack-Emacs"><a href="#Hack-Emacs" class="headerlink" title="Hack Emacs"></a>Hack Emacs</h1><p>learn: <a href="http://book.emacs-china.org/#orgheadline2" target="_blank" rel="noopener">zilongshanren hack 教程</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Hack-Emacs&quot;&gt;&lt;a href=&quot;#Hack-Emacs&quot; class=&quot;headerlink&quot; title=&quot;Hack Emacs&quot;&gt;&lt;/a&gt;Hack Emacs&lt;/h1&gt;&lt;p&gt;learn: &lt;a href=&quot;http://book.emacs-chin
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/15/alg/sorting/go_sort/"/>
+    <id>http://yoursite.com/2019/08/15/alg/sorting/go_sort/</id>
+    <published>2019-08-15T01:50:23.296Z</published>
+    <updated>2019-08-15T01:56:55.733Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="golang-sort-包"><a href="#golang-sort-包" class="headerlink" title="golang sort 包"></a>golang sort 包</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A type, typically a collection, that satisfies sort.Interface can be</span></span><br><span class="line"><span class="comment">// sorted by the routines in this package. The methods require that the</span></span><br><span class="line"><span class="comment">// elements of the collection be enumerated by an integer index.</span></span><br><span class="line"><span class="keyword">type</span> Interface <span class="keyword">interface</span> &#123;</span><br><span class="line"><span class="comment">// Len is the number of elements in the collection.</span></span><br><span class="line">Len() <span class="keyword">int</span></span><br><span class="line"><span class="comment">// Less reports whether the element with</span></span><br><span class="line"><span class="comment">// index i should sort before the element with index j.</span></span><br><span class="line">Less(i, j <span class="keyword">int</span>) <span class="keyword">bool</span></span><br><span class="line"><span class="comment">// Swap swaps the elements with indexes i and j.</span></span><br><span class="line">Swap(i, j <span class="keyword">int</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;golang-sort-包&quot;&gt;&lt;a href=&quot;#golang-sort-包&quot; class=&quot;headerlink&quot; title=&quot;golang sort 包&quot;&gt;&lt;/a&gt;golang sort 包&lt;/h1&gt;&lt;figure class=&quot;highlight go&quot;&gt;
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title></title>
@@ -328,126 +433,6 @@
       
       
         &lt;h1 id=&quot;KDJ-指标&quot;&gt;&lt;a href=&quot;#KDJ-指标&quot; class=&quot;headerlink&quot; title=&quot;KDJ 指标&quot;&gt;&lt;/a&gt;KDJ 指标&lt;/h1&gt;&lt;p&gt;KDJ指标又叫&lt;a href=&quot;https://baike.baidu.com/item/%E9%9A%8F
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/06/26/alg/finance/cci/"/>
-    <id>http://yoursite.com/2019/06/26/alg/finance/cci/</id>
-    <published>2019-06-26T15:03:32.836Z</published>
-    <updated>2019-06-27T01:24:45.557Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="CCI-算法"><a href="#CCI-算法" class="headerlink" title="CCI 算法"></a>CCI 算法</h1><p>CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。由唐纳德·R.兰伯特（DonaldLambert）所创，属于超买超卖类指标中较特殊的一种，波动于正无限大和负无限小之间。</p><h2 id="计算公式"><a href="#计算公式" class="headerlink" title="计算公式"></a>计算公式</h2><p>系统默认n为14</p><p>$TP = \frac{最高价 + 最低价 + 收盘价}{3}$</p><p>$MA = \frac{\sum\limits_{k=1}^{n} TP(i)}{n}$</p><p>MD = 最近n日 (MA - TP)的绝对值的累计和 ÷ n</p><p>可能不太准确…</p><p>$MD = \frac{MA - TP}{n}​$</p><p>$CCI(n) = \frac{TP - MA}{MD} * 0.015$</p><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p><strong>1,观察CCI范围</strong></p><p>当CCI从0~+100的正常范围内，由下往上突破+100时，<a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87" target="_blank" rel="noopener">股指</a>或<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>有可能出现强势上涨，是买入的时机；当CCI从+100之上，由上往下跌破+100，股指或股价<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a>有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E8%B0%83/9837525" target="_blank" rel="noopener">回调</a>，是卖出的时机。当CCI从0~-100的正常范围内，由上往下跌破-100时，股指或股价有可能出现弱势下跌，是抛出的时机。当CCI从-100的下方，由下往上突破-100时，有可能出现反弹，可逢低买入。</p><p><strong>2, CCI运用也可以用<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>来判断<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E5%A4%B4%E9%83%A8" target="_blank" rel="noopener">短线头部</a>的出现，用<a href="https://baike.baidu.com/item/%E5%BA%95%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">底背离</a>来判断短线底部的到来</strong></p><p>当股指或股价创出新高，而CCI没有同步创出新高时，<a href="https://baike.baidu.com/item/%E9%A1%B6%E8%83%8C%E7%A6%BB" target="_blank" rel="noopener">顶背离</a>出现，<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF" target="_blank" rel="noopener">短线</a><a href="https://baike.baidu.com/item/%E8%82%A1%E6%8C%87/3342555" target="_blank" rel="noopener">股指</a>或股价有可能出现<a href="https://baike.baidu.com/item/%E5%9B%9E%E6%8C%A1" target="_blank" rel="noopener">回挡</a>，可逢高卖出；当股指或股价创出新低，而CCI没有同步创出新低时，底背离出现，短线股指或股价有可能出现反弹，可逢低买入。</p><h2 id="应用技巧"><a href="#应用技巧" class="headerlink" title="应用技巧"></a>应用技巧</h2><p>1、如果CCI指标一直上行突破了100的话,表示此时的股市进入了异常波动的阶段,可能伴随着较大的<a href="https://baike.baidu.com/item/%E6%88%90%E4%BA%A4%E9%87%8F" target="_blank" rel="noopener">成交量</a>,可以进行中短线的投资者,此时的<a href="https://baike.baidu.com/item/%E4%B9%B0%E5%85%A5" target="_blank" rel="noopener">买入</a>信号比较明显.</p><p>2、反之如果CCI指标向下突破了-100,则代表此时的股市进入了新一轮的下跌趋势,此时可以选择不要操作,保持观望的态度面对市场.</p><p>3、如果CCI指标从上行突破100又回到100之内的正常范围,则代表股价这一阶段的上涨行情已经疲软,投资者可以在此时选择卖出.反之CCI突破-100又回到正常范围,则代表<a href="https://baike.baidu.com/item/%E4%B8%8B%E8%B7%8C%E8%B6%8B%E5%8A%BF" target="_blank" rel="noopener">下跌趋势</a>已经结束,观察一段时间可能有转折的信号出现,可以先少量买入.</p><p>注意<a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>主要用来判断100到-100范围之外的行情趋势,在这之间的趋势分析应用 <a href="https://baike.baidu.com/item/CCI%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">CCI指标</a>没有作用和意义,可以选择<a href="https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">KDJ指标</a>来分析.另外CCI指标是进行<a href="https://baike.baidu.com/item/%E7%9F%AD%E7%BA%BF%E6%93%8D%E4%BD%9C" target="_blank" rel="noopener">短线操作</a>的投资者比较实用的武器,可以很快帮助交易者找到准确的<a href="https://baike.baidu.com/item/%E4%BA%A4%E6%98%93%E4%BF%A1%E5%8F%B7" target="_blank" rel="noopener">交易信号</a>. [2] </p><p><strong>参考：</strong></p><p>[CCI百度百科(<a href="https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196" target="_blank" rel="noopener">https://baike.baidu.com/item/CCI%E9%A1%BA%E5%8A%BF%E6%8C%87%E6%A0%87/6982196</a>)</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;CCI-算法&quot;&gt;&lt;a href=&quot;#CCI-算法&quot; class=&quot;headerlink&quot; title=&quot;CCI 算法&quot;&gt;&lt;/a&gt;CCI 算法&lt;/h1&gt;&lt;p&gt;CCI（Commodity Channel lndex）顺势指标是测量股价是否已超出常态分布范围的一个指数。
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/06/26/alg/finance/alg_list/"/>
-    <id>http://yoursite.com/2019/06/26/alg/finance/alg_list/</id>
-    <published>2019-06-26T15:02:55.603Z</published>
-    <updated>2019-07-22T15:46:36.856Z</updated>
-    
-    <content type="html"><![CDATA[<p>涉及的算法：</p><ul><li style="list-style: none"><input type="checkbox" checked> 1. MACD</li><li style="list-style: none"><input type="checkbox" checked> 2. KDJ</li><li style="list-style: none"><input type="checkbox"> 3. RSI</li><li style="list-style: none"><input type="checkbox"> 4. BOLL</li><li style="list-style: none"><input type="checkbox"> 5. WR</li><li style="list-style: none"><input type="checkbox"> 6. DMI</li><li style="list-style: none"><input type="checkbox"> 7. BBIBOLL</li><li style="list-style: none"><input type="checkbox"> 8. ROC</li><li style="list-style: none"><input type="checkbox"> 9. PSY</li><li style="list-style: none"><input type="checkbox"> 10. OBV</li><li style="list-style: none"><input type="checkbox"> 11. WVAD</li><li style="list-style: none"><input type="checkbox" checked> 12. CCI</li><li style="list-style: none"><input type="checkbox"> 13. TRIX</li><li style="list-style: none"><input type="checkbox"> 14. DMA</li><li style="list-style: none"><input type="checkbox"> 15. EXPMA</li><li style="list-style: none"><input type="checkbox" checked> 16. BIAS</li><li style="list-style: none"><input type="checkbox"> 17. ASI</li><li style="list-style: none"><input type="checkbox"> 18. VR</li><li style="list-style: none"><input type="checkbox"> 19. EMV</li><li style="list-style: none"><input type="checkbox"> 20. BRAR</li><li style="list-style: none"><input type="checkbox"> 21. ATR</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;涉及的算法：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li style=&quot;list-style: none&quot;&gt;&lt;input type=&quot;checkbox&quot; checked&gt; 1. MACD&lt;/li&gt;
-&lt;li style=&quot;list-style: none&quot;&gt;&lt;input type=&quot;check
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>fsm 笔记</title>
-    <link href="http://yoursite.com/2019/06/04/backend/go/fsm/fsm%E7%90%86%E8%A7%A3/"/>
-    <id>http://yoursite.com/2019/06/04/backend/go/fsm/fsm理解/</id>
-    <published>2019-06-04T06:52:00.000Z</published>
-    <updated>2019-06-04T07:21:28.280Z</updated>
-    
-    <content type="html"><![CDATA[<p>参考: <a href="https://www.cnblogs.com/21207-iHome/p/6085334.html" target="_blank" rel="noopener">https://www.cnblogs.com/21207-iHome/p/6085334.html</a></p><p>参考代码: <a href="https://godoc.org/github.com/docker/infrakit/pkg/fsm" target="_blank" rel="noopener">https://godoc.org/github.com/docker/infrakit/pkg/fsm</a></p><p><img src="./状态机架构图 2.jpg" alt="状态机架构图 2"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;参考: &lt;a href=&quot;https://www.cnblogs.com/21207-iHome/p/6085334.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://www.cnblogs.com/21207-iHome/p/608
-      
-    
-    </summary>
-    
-      <category term="backend" scheme="http://yoursite.com/categories/backend/"/>
-    
-    
-      <category term="go" scheme="http://yoursite.com/tags/go/"/>
-    
-      <category term="fsm" scheme="http://yoursite.com/tags/fsm/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>gin 实现原理</title>
-    <link href="http://yoursite.com/2019/06/04/backend/go/gin/gin%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"/>
-    <id>http://yoursite.com/2019/06/04/backend/go/gin/gin实现原理/</id>
-    <published>2019-06-04T06:52:00.000Z</published>
-    <updated>2019-06-04T06:53:37.235Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="待写TODO-jx"><a href="#待写TODO-jx" class="headerlink" title="待写TODO(jx)"></a>待写TODO(jx)</h1>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;待写TODO-jx&quot;&gt;&lt;a href=&quot;#待写TODO-jx&quot; class=&quot;headerlink&quot; title=&quot;待写TODO(jx)&quot;&gt;&lt;/a&gt;待写TODO(jx)&lt;/h1&gt;
-      
-    
-    </summary>
-    
-      <category term="backend" scheme="http://yoursite.com/categories/backend/"/>
-    
-    
-      <category term="go" scheme="http://yoursite.com/tags/go/"/>
-    
-      <category term="gin" scheme="http://yoursite.com/tags/gin/"/>
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/04/27/backend/go/echo/echo_learn/"/>
-    <id>http://yoursite.com/2019/04/27/backend/go/echo/echo_learn/</id>
-    <published>2019-04-27T13:55:41.966Z</published>
-    <updated>2019-04-27T13:59:37.357Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Learn-Echo"><a href="#Learn-Echo" class="headerlink" title="Learn Echo"></a>Learn Echo</h1><h2 id="Echo-目的"><a href="#Echo-目的" class="headerlink" title="Echo 目的"></a><strong>Echo 目的</strong></h2><blockquote><p>High performance, extensible, minimalist Go web framework</p><h3 id="Feature-Overview"><a href="#Feature-Overview" class="headerlink" title="Feature Overview"></a>Feature Overview</h3><p>Optimized HTTP router which smartly prioritize routes<br>Build robust and scalable RESTful APIs<br>Group APIs<br>Extensible middleware framework<br>Define middleware at root, group or route level<br>Data binding for JSON, XML and form payload<br>Handy functions to send variety of HTTP responses<br>Centralized HTTP error handling<br>Template rendering with any template engine<br>Define your format for the logger<br>Highly customizable<br>Automatic TLS via Let’s Encrypt<br>HTTP/2 support</p></blockquote>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;Learn-Echo&quot;&gt;&lt;a href=&quot;#Learn-Echo&quot; class=&quot;headerlink&quot; title=&quot;Learn Echo&quot;&gt;&lt;/a&gt;Learn Echo&lt;/h1&gt;&lt;h2 id=&quot;Echo-目的&quot;&gt;&lt;a href=&quot;#Echo-目的&quot; class
       
     
     </summary>

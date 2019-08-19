@@ -69,6 +69,282 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-alg/raft/ReadRaft" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/09/alg/raft/ReadRaft/" class="article-date">
+  <time datetime="2018-12-09T14:31:08.000Z" itemprop="datePublished">2018-12-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://github.com/shishujuan/mit6.824-2017-raft.git" target="_blank" rel="noopener">https://github.com/shishujuan/mit6.824-2017-raft.git</a></p>
+<p><code>raft.go @Make</code></p>
+<ol>
+<li>初始化 rf</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">state=Follower <span class="comment">// 初始化成 Folloer</span></span><br><span class="line"></span><br><span class="line">rf.heartbeatInterval = time.Duration(HeartbeatInterval) * time.Millisecond <span class="comment">// 50 ms</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>启动 bot</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">electionTimeout := getRandomElectionTimeout() <span class="comment">// 范围 &#123;300 + [0,100)&#125;ms</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> state &#123;</span><br><span class="line">    <span class="keyword">case</span> Follower:</span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.appendEntryCh: <span class="comment">// 不用去处理接收的日志吗?</span></span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.grantVoteCh:   <span class="comment">// ??</span></span><br><span class="line">        <span class="keyword">case</span> &lt;-time.After(electionTimeout): <span class="comment">// 选举超时, Follower -&gt; Candidate</span></span><br><span class="line">            rf.mu.Lock()</span><br><span class="line">            rf.convertToCandidate()</span><br><span class="line">            rf.mu.Unlock()</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">case</span> Candidate:</span><br><span class="line">        <span class="keyword">go</span> rf.leaderElection() <span class="comment">// 1. 发起选举</span></span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.appendEntryCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.grantVoteCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-rf.leaderCh:</span><br><span class="line">        <span class="keyword">case</span> &lt;-time.After(electionTimeout):</span><br><span class="line">            rf.mu.Lock()</span><br><span class="line">            rf.convertToCandidate() <span class="comment">// 选举超时, 重新开始选举</span></span><br><span class="line">            rf.mu.Unlock()</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">case</span> Leader:</span><br><span class="line">        rf.startAppendEntries() <span class="comment">// 开始去追加日志</span></span><br><span class="line">        time.Sleep(rf.heartbeatInterval) <span class="comment">// 心跳间隙</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjzhtscjy001ty3s633g4jeci" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/raft-learn/">raft learn</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-devops/shadowsocks_server" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/07/devops/shadowsocks_server/" class="article-date">
+  <time datetime="2018-12-07T07:28:31.000Z" itemprop="datePublished">2018-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/devops/">devops</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/07/devops/shadowsocks_server/">搭建 shadowsocks 服务器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install python-pip</span><br><span class="line">pip install shadowsocks</span><br></pre></td></tr></table></figure>
+<h2 id="start-service"><a href="#start-service" class="headerlink" title="start service"></a>start service</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -p 443 -k password -m rc4-md5</span><br></pre></td></tr></table></figure>
+<p>如果要后台运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ssserver -p 443 -k password -m rc4-md5 --user nobody -d start</span><br></pre></td></tr></table></figure>
+<p>如果要停止：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ssserver -d stop</span><br></pre></td></tr></table></figure>
+<p>如果要检查日志：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo less /var/<span class="built_in">log</span>/shadowsocks.log</span><br></pre></td></tr></table></figure>
+<h3 id="启动示例"><a href="#启动示例" class="headerlink" title="启动示例"></a>启动示例</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -p 8837 -k passwd --user nobody -d start</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjzhtscih000cy3s6odjku2cr" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shadowsocks-服务器/">shadowsocks 服务器</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-frontend/flutter/flutter_learn_plan" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/06/frontend/flutter/flutter_learn_plan/" class="article-date">
+  <time datetime="2018-12-06T11:41:59.000Z" itemprop="datePublished">2018-12-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/flutter/">flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/06/frontend/flutter/flutter_learn_plan/">Learn flutter</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="基础-Widget"><a href="#基础-Widget" class="headerlink" title="基础 Widget"></a>基础 Widget</h2><ul>
+<li style="list-style: none"><input type="checkbox"> widget概述-布局模型</li>
+</ul>
+<h2 id="Material-组件"><a href="#Material-组件" class="headerlink" title="Material 组件"></a>Material 组件</h2><h3 id="Widget-与-Material关系"><a href="#Widget-与-Material关系" class="headerlink" title="Widget 与 Material关系"></a>Widget 与 Material关系</h3><h2 id="处理手势"><a href="#处理手势" class="headerlink" title="处理手势"></a>处理手势</h2><h2 id="根据用户输入改变widget"><a href="#根据用户输入改变widget" class="headerlink" title="根据用户输入改变widget"></a>根据用户输入改变widget</h2><h2 id="响应widget生命周期事件"><a href="#响应widget生命周期事件" class="headerlink" title="响应widget生命周期事件"></a>响应widget生命周期事件</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjzhtsckk002zy3s6jp3o241r" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/flutter/">flutter</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/learn-task/">learn task</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-devops/build_vpn_server" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/03/devops/build_vpn_server/" class="article-date">
+  <time datetime="2018-12-03T14:33:29.000Z" itemprop="datePublished">2018-12-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/devops/">devops</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/03/devops/build_vpn_server/">搭建 vpn 服务器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="Setp1-install-OpenVPN"><a href="#Setp1-install-OpenVPN" class="headerlink" title="Setp1. install OpenVPN"></a>Setp1. install OpenVPN</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get install openvpn easy-rsa</span><br></pre></td></tr></table></figure>
+<h2 id="Setp2-构建-CA-certificate-authority-目录"><a href="#Setp2-构建-CA-certificate-authority-目录" class="headerlink" title="Setp2. 构建 CA(certificate authority) 目录"></a>Setp2. 构建 CA(certificate authority) 目录</h2><p>使用<code>make-cadir</code>拷贝<code>easy-rsa</code> 的模板.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make-cadir ~/openvpn-ca</span><br></pre></td></tr></table></figure>
+<h2 id="Setp3-配置-CA-变量"><a href="#Setp3-配置-CA-变量" class="headerlink" title="Setp3.  配置 CA 变量"></a>Setp3.  配置 CA 变量</h2><p><code>~/openvpn-ca/vars</code> 自己喜欢填啥就填啥吧, 不可以空着就是了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">. . .</span><br><span class="line"><span class="built_in">export</span> KEY_NAME=<span class="string">"server"</span> <span class="comment"># 服务器的名字</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> KEY_COUNTRY=<span class="string">"US"</span></span><br><span class="line"><span class="built_in">export</span> KEY_PROVINCE=<span class="string">"CA"</span></span><br><span class="line"><span class="built_in">export</span> KEY_CITY=<span class="string">"SanFrancisco"</span></span><br><span class="line"><span class="built_in">export</span> KEY_ORG=<span class="string">"Fort-Funston"</span></span><br><span class="line"><span class="built_in">export</span> KEY_EMAIL=<span class="string">"me@myhost.mydomain"</span></span><br><span class="line"><span class="built_in">export</span> KEY_OU=<span class="string">"MyOrganizationalUnit"</span></span><br><span class="line"></span><br><span class="line">. . .</span><br></pre></td></tr></table></figure>
+<h2 id="Setp4-Build-the-Certificate-Authority"><a href="#Setp4-Build-the-Certificate-Authority" class="headerlink" title="Setp4. Build the Certificate Authority"></a>Setp4. Build the Certificate Authority</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/openvpn-ca</span><br><span class="line">$ <span class="built_in">source</span> vars</span><br><span class="line">$ ./clean-all	<span class="comment"># 确保干净的环境中操作</span></span><br><span class="line">$ ./build-ca	<span class="comment"># 构建CA</span></span><br></pre></td></tr></table></figure>
+<h2 id="Setp5-创建服务器证书-key和加密文件"><a href="#Setp5-创建服务器证书-key和加密文件" class="headerlink" title="Setp5.  创建服务器证书,key和加密文件"></a>Setp5.  创建服务器证书,key和加密文件</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ./build-key-server server</span><br><span class="line">$ ./build-dh</span><br><span class="line">$ openvpn --genkey --secret keys/ta.key</span><br></pre></td></tr></table></figure>
+<h2 id="Setp6-创建客户端的证书和key-pair"><a href="#Setp6-创建客户端的证书和key-pair" class="headerlink" title="Setp6. 创建客户端的证书和key pair"></a>Setp6. 创建客户端的证书和key pair</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./build-key client1 <span class="comment"># 不需要密码版</span></span><br><span class="line">$ ./build-key-pass client1 <span class="comment"># 需要密码版</span></span><br></pre></td></tr></table></figure>
+<h2 id="Setp7-配置-OpenVPN-服务"><a href="#Setp7-配置-OpenVPN-服务" class="headerlink" title="Setp7. 配置 OpenVPN 服务"></a>Setp7. 配置 OpenVPN 服务</h2><h3 id="Copy-the-Files-to-the-OpenVPN-Directory"><a href="#Copy-the-Files-to-the-OpenVPN-Directory" class="headerlink" title="Copy the Files to the OpenVPN Directory"></a>Copy the Files to the OpenVPN Directory</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/openvpn-ca/keys</span><br><span class="line">sudo cp ca.crt server.crt server.key ta.key dh2048.pem /etc/openvpn</span><br><span class="line"><span class="comment"># 拷贝 vpn 服务器</span></span><br><span class="line">gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz | sudo tee /etc/openvpn/server.conf</span><br></pre></td></tr></table></figure>
+<h3 id="调整-OpenVPN-的配置"><a href="#调整-OpenVPN-的配置" class="headerlink" title="调整 OpenVPN 的配置"></a>调整 OpenVPN 的配置</h3><p><strong>Basic Configuration</strong></p>
+<p><code>vi /etc/openvpn/server.conf</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">tls-auth ta.key 0 <span class="comment"># This file is secret</span></span><br><span class="line">key-direction 0</span><br><span class="line"></span><br><span class="line">cipher AES-128-CBC</span><br><span class="line"></span><br><span class="line">auth SHA256</span><br><span class="line"></span><br><span class="line">user nobody</span><br><span class="line">group nogroup</span><br><span class="line"></span><br><span class="line">push <span class="string">"redirect-gateway def1 bypass-dhcp"</span></span><br><span class="line"></span><br><span class="line">push <span class="string">"dhcp-option DNS 208.67.222.222"</span></span><br><span class="line">push <span class="string">"dhcp-option DNS 208.67.220.220"</span></span><br><span class="line"></span><br><span class="line">port 443</span><br><span class="line">proto tcp</span><br><span class="line"></span><br><span class="line">cert server.crt</span><br><span class="line">key server.key</span><br></pre></td></tr></table></figure>
+<h2 id="Setp8-调整网络的服务配置"><a href="#Setp8-调整网络的服务配置" class="headerlink" title="Setp8. 调整网络的服务配置"></a>Setp8. 调整网络的服务配置</h2><p><code>vi /etc/sysctl.conf</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure>
+<h3 id="Adjust-the-UFW-Rules-to-Masquerade-Client-Connections"><a href="#Adjust-the-UFW-Rules-to-Masquerade-Client-Connections" class="headerlink" title="Adjust the UFW Rules to Masquerade Client Connections"></a>Adjust the UFW Rules to Masquerade Client Connections</h3><p>防火墙先不考虑</p>
+<h2 id="Setp9-开始-OpenVPN-服务器"><a href="#Setp9-开始-OpenVPN-服务器" class="headerlink" title="Setp9. 开始 OpenVPN 服务器"></a>Setp9. 开始 OpenVPN 服务器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start openvpn@server</span><br><span class="line">systemctl status openvpn@server</span><br></pre></td></tr></table></figure>
+<h2 id="Setp10-创建客户端的配置和基础设施"><a href="#Setp10-创建客户端的配置和基础设施" class="headerlink" title="Setp10. 创建客户端的配置和基础设施"></a>Setp10. 创建客户端的配置和基础设施</h2><h3 id="Creating-the-Client-Config-Directory-Structure"><a href="#Creating-the-Client-Config-Directory-Structure" class="headerlink" title="Creating the Client Config Directory Structure"></a>Creating the Client Config Directory Structure</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/client-configs/files</span><br><span class="line">chmod 700 ~/client-configs/files</span><br></pre></td></tr></table></figure>
+<h3 id="Creating-a-Base-Configuration"><a href="#Creating-a-Base-Configuration" class="headerlink" title="Creating a Base Configuration"></a>Creating a Base Configuration</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf</span><br></pre></td></tr></table></figure>
+<p>编辑<code>~/client-configs/base.conf</code>文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">remote &#123;server_IP_address&#125; &#123;1194&#125;</span><br><span class="line"></span><br><span class="line">proto udp</span><br><span class="line"></span><br><span class="line">user nobody</span><br><span class="line">group nogroup</span><br><span class="line"></span><br><span class="line">ca ca.crt</span><br><span class="line">cert client.crt</span><br><span class="line">key client.key</span><br><span class="line"></span><br><span class="line">cipher AES-128-CBC</span><br><span class="line">auth SHA256</span><br><span class="line"></span><br><span class="line">key-direction 1</span><br><span class="line"></span><br><span class="line"># script-security 2</span><br><span class="line"># up /etc/openvpn/update-resolv-conf</span><br><span class="line"># down /etc/openvpn/update-resolv-conf</span><br></pre></td></tr></table></figure>
+<h3 id="Creating-a-Configuration-Generation-Script"><a href="#Creating-a-Configuration-Generation-Script" class="headerlink" title="Creating a Configuration Generation Script"></a>Creating a Configuration Generation Script</h3><p><code>vi ~/client-configs/make_config.sh</code></p>
+<p>内容如下:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># First argument: Client identifier</span></span><br><span class="line"></span><br><span class="line">KEY_DIR=~/openvpn-ca/keys</span><br><span class="line">OUTPUT_DIR=~/client-configs/files</span><br><span class="line">BASE_CONFIG=~/client-configs/base.conf</span><br><span class="line"></span><br><span class="line">cat <span class="variable">$&#123;BASE_CONFIG&#125;</span> \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;ca&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/ca.crt \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/ca&gt;\n&lt;cert&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.crt \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/cert&gt;\n&lt;key&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.key \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/key&gt;\n&lt;tls-auth&gt;'</span>) \</span><br><span class="line">    <span class="variable">$&#123;KEY_DIR&#125;</span>/ta.key \</span><br><span class="line">    &lt;(<span class="built_in">echo</span> -e <span class="string">'&lt;/tls-auth&gt;'</span>) \</span><br><span class="line">    &gt; <span class="variable">$&#123;OUTPUT_DIR&#125;</span>/<span class="variable">$&#123;1&#125;</span>.ovpn</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 700 ~/client-configs/make_config.sh</span><br></pre></td></tr></table></figure>
+<h2 id="Step-11-Generate-Client-Configurations"><a href="#Step-11-Generate-Client-Configurations" class="headerlink" title="Step 11: Generate Client Configurations"></a>Step 11: Generate Client Configurations</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/client-configs</span><br><span class="line">./make_config.sh client1</span><br><span class="line">ls ~/client-configs/files</span><br></pre></td></tr></table></figure>
+<p><strong>将文件拷贝到目标系统中</strong></p>
+<p>参考: <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04" target="_blank" rel="noopener">https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjzhtscib0009y3s69x4gelve" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vpn-服务器/">vpn 服务器</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-mac/防火墙问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/30/mac/防火墙问题/" class="article-date">
+  <time datetime="2018-11-30T07:03:26.000Z" itemprop="datePublished">2018-11-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mac/">Mac</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/30/mac/防火墙问题/">Mac 上防火墙的倒腾</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="80端口转8080端口"><a href="#80端口转8080端口" class="headerlink" title="80端口转8080端口"></a>80端口转8080端口</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">首先在 /etc/pf.anchors/ 新建一个 http 文件内容如下:</span><br><span class="line">rdr pass on lo0 inet proto tcp from any to any port 80 -&gt; 127.0.0.1 port 8080</span><br><span class="line"></span><br><span class="line">然后使用 pfctl 命令检测配置文件</span><br><span class="line">sudo pfctl -vnf /etc/pf.anchors/http</span><br><span class="line">如果没有报错(正确的打印了配置信息, 没有明显的出错信息), 即修改pf的主配置文件/etc/pf.conf, 来引入这个转发规则:</span><br><span class="line"></span><br><span class="line">在</span><br><span class="line">rdr-anchor &quot;com.apple/*&quot;</span><br><span class="line">下, 添加如下 anchor 声明:</span><br><span class="line">rdr-anchor &quot;http-forwarding&quot;</span><br><span class="line"></span><br><span class="line">pf.conf对指令的顺序有严格要求, 否则会报出 Rules must be in order: options, normalization, queueing, translation, filtering 的错误, 所以相同的指令需要放在一起.</span><br><span class="line"></span><br><span class="line">再在</span><br><span class="line">load anchor &quot;com.apple&quot; from &quot;/etc/pf.anchors/com.apple&quot;</span><br><span class="line">下, 添加 anchor 引入:</span><br><span class="line">load anchor &quot;http-forwarding&quot; from &quot;/etc/pf.anchors/http&quot;</span><br><span class="line"></span><br><span class="line">最后, 导入并允许运行 pf</span><br><span class="line"></span><br><span class="line">sudo pfctl -ef /etc/pf.conf</span><br><span class="line"></span><br><span class="line">如果需要开机启动, 则需要为 /System/Library/LaunchDaemons/com.apple.pfctl.plist 针对 pfctl 的启动项, 新增一个 -e (允许) 参数, 这样, pf 规则开机机器可以生效了.</span><br></pre></td></tr></table></figure>
+<h3 id="pf-的一些用法"><a href="#pf-的一些用法" class="headerlink" title="pf 的一些用法"></a>pf 的一些用法</h3><p>在网上发现的一些例子:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/pf.conf</span><br><span class="line"><span class="comment">#对外的网络卡</span></span><br><span class="line">ext_if = <span class="string">"sis0"</span></span><br><span class="line"><span class="comment">#对内的网络卡</span></span><br><span class="line">int_if = <span class="string">"rl0"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#频宽控管</span></span><br><span class="line"><span class="comment">#定义 std_out 总频宽 512Kb</span></span><br><span class="line"><span class="comment">#altq on $ext_if cbq bandwidth 512Kb queue &#123; std_out &#125;</span></span><br><span class="line"><span class="comment">#定义 std_out 队列频宽 256Kb，使用预设队列</span></span><br><span class="line"><span class="comment">#queue std_out bandwith 256Kb cbq (default)</span></span><br><span class="line"><span class="comment">#定义 std_in 总频宽 2Mb</span></span><br><span class="line"><span class="comment">#altq on $int_if cbq bandwidth 2Mb queue &#123; std_in &#125;</span></span><br><span class="line"><span class="comment">#假设频宽足够的话，可以从父队列借用额外的频宽</span></span><br><span class="line"><span class="comment">#queue std_in bandwidth 768Kb cbq (brrrow)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#对外开放的服务 </span></span><br><span class="line">open_services = <span class="string">"&#123;80, 443&#125;"</span></span><br><span class="line"><span class="comment">#内部私有的 IP</span></span><br><span class="line">priv_nets = <span class="string">"&#123; 127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 &#125;"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># options</span></span><br><span class="line"><span class="comment">#设定拒绝联机封包的处理 方式</span></span><br><span class="line"><span class="built_in">set</span> block-policy <span class="built_in">return</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="built_in">set</span> optimization aggressive</span><br><span class="line"></span><br><span class="line"><span class="comment">#纪录 $ext_if</span></span><br><span class="line"><span class="built_in">set</span> loginterface <span class="variable">$ext_if</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># scrub</span></span><br><span class="line"><span class="comment">#整理封包</span></span><br><span class="line">scrub <span class="keyword">in</span> all</span><br><span class="line"></span><br><span class="line"><span class="comment">#nat</span></span><br><span class="line"><span class="comment">#NAT 地址转译处理</span></span><br><span class="line">nat on <span class="variable">$ext_if</span> from <span class="variable">$int_if</span>:network to any -&gt; <span class="variable">$ext_if</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#ftp-proxy</span></span><br><span class="line"><span class="comment">#ftp-proxy 重新 导向</span></span><br><span class="line">rdr on <span class="variable">$int_if</span> proto tcp from any to any port 21 -&gt; 127.0.0.1 port 8021</span><br><span class="line"><span class="comment">#rdr on $ext_if proto tcp from any to 140.111.152.13 port 21 -&gt; 192.168.13.253 port 21</span></span><br><span class="line"><span class="comment">#Transparent Proxy Server</span></span><br><span class="line">rdr on rl0 proto tcp from 192.168.13.0/24 to any 80 -&gt; 127.0.0.1 port 3128</span><br><span class="line"></span><br><span class="line"><span class="comment">#阻挡可疑封包在 $ext_if 网卡进出</span></span><br><span class="line">antispoof <span class="built_in">log</span> quick <span class="keyword">for</span> <span class="variable">$ext_if</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#阻挡所有进出的封包</span></span><br><span class="line">block all</span><br><span class="line"></span><br><span class="line"><span class="comment">#开放 loopback</span></span><br><span class="line">pass quick on lo0 all</span><br><span class="line"></span><br><span class="line"><span class="comment">#拒绝内部私有 IP 对 $ext_if 网络卡联机</span></span><br><span class="line">block drop <span class="keyword">in</span> quick on <span class="variable">$ext_if</span> from <span class="variable">$priv_nets</span> to any</span><br><span class="line">block drop out quick on <span class="variable">$ext_if</span> from any to <span class="variable">$priv_nets</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#开放对外的 80, 443 埠</span></span><br><span class="line">pass <span class="keyword">in</span> on <span class="variable">$ext_if</span> inet proto tcp from any to <span class="variable">$ext_if</span> port <span class="variable">$open_services</span> flags S/SA keep state</span><br><span class="line"><span class="comment">#只容许 140.111.152.0/24 网段对本机做 22 埠联机</span></span><br><span class="line">pass <span class="keyword">in</span> on <span class="variable">$ext_if</span> inet proto tcp from 140.111.152.0/24 to <span class="variable">$ext_if</span> port 22 flags S/SA keep state</span><br><span class="line"></span><br><span class="line"><span class="comment">#开放内部网络对外联机</span></span><br><span class="line"><span class="comment">#pass in on $inf_if proto rcp from any to any queue std_in</span></span><br><span class="line">pass <span class="keyword">in</span> on <span class="variable">$int_if</span> from <span class="variable">$int_if</span>:network to any keep state</span><br><span class="line">pass out on <span class="variable">$int_if</span> from any to <span class="variable">$int_if</span>:network keep state</span><br><span class="line"></span><br><span class="line"><span class="comment">#开放对外网络的联机</span></span><br><span class="line"><span class="comment">#pass out $ext_if proto tcp from any to any queue std_out</span></span><br><span class="line">pass out on <span class="variable">$ext_if</span> proto tcp all modulate state flags S/SA</span><br><span class="line">pass out on <span class="variable">$ext_if</span> proto &#123; udp, icmp &#125; all keep state</span><br><span class="line"></span><br><span class="line">启动 PF，并读取 pf 规则</span><br><span class="line">pfctl -e;pfctl -f /etc/pf.conf</span><br></pre></td></tr></table></figure>
+<p>参考:</p>
+<p><a href="http://www.voidcn.com/article/p-bioqbvvf-cx.html" target="_blank" rel="noopener">http://www.voidcn.com/article/p-bioqbvvf-cx.html</a></p>
+<p><a href="https://my.oschina.net/china008/blog/343049" target="_blank" rel="noopener">https://my.oschina.net/china008/blog/343049</a></p>
+<p>PF 防火墙详解: <a href="http://blog.chinaunix.net/uid-20674714-id-90862.html" target="_blank" rel="noopener">http://blog.chinaunix.net/uid-20674714-id-90862.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjzhtscii000dy3s6pkqoa73p" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mac/">Mac</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/日常杂记/">日常杂记</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-backend/go/goStandardLib/log" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/11/29/backend/go/goStandardLib/log/" class="article-date">
@@ -89,7 +365,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjy2hcgxr00438seofd6svrci" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjzhtsclh004ay3s6qvek5pr1" class="article-share-link">分享</a>
       
       
       
@@ -125,7 +401,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjy2hcgxu00458seo9yde8f99" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjzhtscli004dy3s6vtb6e6h5" class="article-share-link">分享</a>
       
       
       
@@ -185,7 +461,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/cron/cron_source_code_read/" data-id="cjy2hcgxb003u8seoq14e4x9b" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/cron/cron_source_code_read/" data-id="cjzhtscla0042y3s68xld8m2o" class="article-share-link">分享</a>
       
       
       
@@ -215,7 +491,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/10/backend/go/goStandardLib/REDEME/" data-id="cjy2hcgxk003z8seopfapwy3o" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/10/backend/go/goStandardLib/REDEME/" data-id="cjzhtsclf0047y3s6gdu6v337" class="article-share-link">分享</a>
       
       
       
@@ -259,341 +535,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/3_raft领导选取/" data-id="cjy2hcgug001k8seom7rr6jre" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/10/25/alg/raft/3_raft领导选取/" data-id="cjzhtscjw001py3s6bgmq351v" class="article-share-link">分享</a>
       
       
       
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/1_raft基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/25/alg/raft/1_raft基础/" class="article-date">
-  <time datetime="2018-10-25T10:33:24.559Z" itemprop="datePublished">2018-10-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="raft-基础理论"><a href="#raft-基础理论" class="headerlink" title="raft 基础理论"></a>raft 基础理论</h1><p>参考: <a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
-<p>问题分解为：领导选取、日志复制、安全和成员变化</p>
-<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="复制状态机"><a href="#复制状态机" class="headerlink" title="复制状态机"></a>复制状态机</h3><p><img src="https://upload-images.jianshu.io/upload_images/3412164-922866cdd2dd47c6.png" alt="复制状态机"></p>
-<ul>
-<li>复制状态机通过复制日志来实现：<ul>
-<li>日志：每台机器保存一份日志，日志来自于客户端的请求，包含一系列的命令</li>
-<li>状态机：状态机会按顺序执行这些命令</li>
-<li>一致性模型：分布式环境下，保证多机的日志是一致的，这样回放到状态机中的状态是一致的</li>
-</ul>
-</li>
-</ul>
-<h3 id="服务器状态"><a href="#服务器状态" class="headerlink" title="服务器状态"></a>服务器状态</h3><p>每台服务器均有可能存在下面三种情况:</p>
-<ol>
-<li>领导者</li>
-<li>候选人</li>
-<li>追随者</li>
-</ol>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-07ae960bce59aab5.png" alt="服务器转态转换图"></p>
-<p>追随者只响应其他服务器的请求。如果追随者没有收到任何消息，它会成为一个候选人并且开始一次选举。收到大多数服务器投票的候选人会成为新的领导人。领导人在它们宕机之前会一直保持领导人的状态。</p>
-<h3 id="任期"><a href="#任期" class="headerlink" title="任期"></a>任期</h3><p>Raft 算法将时间划分成为任意不同长度的任期（term）。任期用连续的数字进行表示。每一个任期的开始都是一次选举（election），一个或多个候选人会试图成为领导人。如果一个候选人赢得了选举，它就会在该任期的剩余时间担任领导人。在某些情况下，选票会被瓜分，有可能没有选出领导人，那么，将会开始另一个任期，并且立刻开始下一次选举。Raft 算法保证在给定的一个任期最多只有一个领导人。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-d67cbaab1479a864.png" alt="任期示意图"></p>
-<h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><p>Raft 算法中服务器节点之间通信使用远程过程调用（RPCs），并且基本的一致性算法只需要两种类型的 RPCs。请求投票（<code>RequestVote</code>） RPCs 由候选人在选举期间发起，然后附加条目（<code>AppendEntries</code>）RPCs 由领导人发起，用来复制日志和提供一种心跳机制。为了在服务器之间传输快照增加了第三种 RPC。当服务器没有及时的收到 RPC 的响应时，会进行重试， 并且他们能够并行的发起 RPCs 来获得最佳的性能。</p>
-<p>RPC有三种：</p>
-<ol>
-<li>RequestVote RPC：候选人在选举期间发起</li>
-<li>AppendEntries RPC：领导人发起的一种心跳机制，复制日志也在该命令中完成</li>
-<li>InstallSnapshot RPC: 领导者使用该RPC来发送快照给太落后的追随者。</li>
-</ol>
-<p>超时设置：</p>
-<ol>
-<li>BroadcastTime :  领导者的心跳超时时间</li>
-<li>Election Timeout: 追随者设置的候选超时时间</li>
-<li>MTBT :指的是单个服务器发生故障的间隔时间的平均数</li>
-</ol>
-<p>BroadcastTime &lt;&lt; ElectionTimeout &lt;&lt; MTBF<br> 两个原则：</p>
-<ol>
-<li>BroadcastTime应该比ElectionTimeout小一个数量级，为的是使领导人能够持续发送心跳信息（heartbeat）来阻止追随者们开始选举；</li>
-<li>ElectionTimeout也要比MTBF小几个数量级，为的是使得系统稳定运行。</li>
-</ol>
-<p>一般BroadcastTime大约为0.5毫秒到20毫秒，ElectionTimeout一般在10ms到500ms之间。大多数服务器的MTBF都在几个月甚至更长。</p>
-<h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
-<ol>
-<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
-<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
-</ol>
-<p><strong>候选操作过程：</strong></p>
-<blockquote>
-<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
-</blockquote>
-<ol>
-<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
-<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
-<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
-</ol>
-<ul>
-<li>注意事项：</li>
-</ul>
-<ol>
-<li>服务器在一个任期内，最多能给一个候选人投票，采用先到先服务原则；</li>
-<li>候选者等待投票时，可能会接收到来自其它声明为领导人的的AppendEntries RPC。如果该领导人的任期（RPC中有）比当前候选人的当前任期要大，则候选人认为该领导人合法，并转换成追随者；如果RPC中的任期小于候选人的当前任期，则候选人拒绝此次RPC，继续保持候选人状态；</li>
-<li>候选人既没有赢得选举也没有输掉选举：如果许多追随者在同一时刻都成为了候选人，选票会被分散，可能没有候选人能获得大多数的选票。当这种情形发生时，每一个候选人都会超时，并且通过自增任期号和发起另一轮 RequestVote RPC 来开始新的选举。然而，如果没有其它手段来分配选票的话，这种情形可能会无限的重复下去。所以Raft使用的随机的选举超时时间（150~300ms之间），来避免这种情况发生。</li>
-</ol>
-<ul>
-<li>问题探讨：为什么这里没有谈收到其他候选者的RequestVote RPC请求？<br> 可能的解释：</li>
-</ul>
-<ol>
-<li>候选者已经给自己投票了，一个候选者在一个任期只会给一个人投票，不会给其他人再投票了；</li>
-<li>也有可能算法本身设定候选者就拒绝所有的其他服务器的请求。</li>
-</ol>
-<h2 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h2><p><img src="https://upload-images.jianshu.io/upload_images/3412164-7bfb13d382599f65.png" alt="日志复制问题"></p>
-<p>接受命令的过程：</p>
-<ol>
-<li>领导者接受客户端请求；</li>
-<li>领导者把指令追加到日志；</li>
-<li>发送AppendEntries RPC到追随者；</li>
-<li>领导者收到大多数追随者的确认后，领导者Commit该日志，把日志在状态机中回放，并返回结果给客户端；</li>
-</ol>
-<p>提交过程：</p>
-<ol>
-<li>在下一个心跳阶段，领导者再次发送AppendEntries RPC给追随者，日志已经commited；</li>
-<li>追随者收到Commited日志后，将日志在状态机中回放。</li>
-</ol>
-<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>到目前为止描述的机制并不能充分的保证每一个状态机会按照相同的顺序执行相同的指令，例如：一个跟随者可能会进入不可用状态同时领导人已经提交了若干的日志条目，然后这个跟随者可能会被选举为领导人并且覆盖这些日志条目；因此，不同的状态机可能会执行不同的指令序列。</p>
-<h3 id="1-领导者追加日志（Append-Only"><a href="#1-领导者追加日志（Append-Only" class="headerlink" title="1. 领导者追加日志（Append-Only)"></a>1. 领导者追加日志（Append-Only)</h3><p>领导者永远不会覆盖已经存在的日志条目；<br>日志永远只有一个流向：从领导者到追随者；</p>
-<h3 id="2-选举限制：投票阻止没有全部日志条目的服务器赢得选举"><a href="#2-选举限制：投票阻止没有全部日志条目的服务器赢得选举" class="headerlink" title="2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举"></a>2. 选举限制：投票阻止没有全部日志条目的服务器赢得选举</h3><p>如果投票者的日志比候选人的新，拒绝投票请求；<br>这意味着要赢得选举，候选者的日志至少和大多数服务器的日志一样新，那么它一定包含全部的已经提交的日志条目。</p>
-<h3 id="3-永远不提交任期之前的日志条目（只提交任期内的日志条目）"><a href="#3-永远不提交任期之前的日志条目（只提交任期内的日志条目）" class="headerlink" title="3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）"></a>3. 永远不提交任期之前的日志条目（只提交任期内的日志条目）</h3><p>在Raft算法中，当一个日志被安全的复制到绝大多数的机器上面，即AppendEntries RPC在绝大多数服务器正确返回了，那么这个日志就是被提交了，然后领导者会更新commit index。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/3412164-45a235af7798e8f2.png" alt=""></p>
-<p>如果允许提交任期之前的日志条目，那么在步骤c中，我们就会把之前任期为2的日志提交到其他服务器中去，并造成了大多数机器存在了日志为2的情况。所以造成了d中S5中任期为3的日志条目会覆盖掉已经提交的日志的情况。</p>
-<p>Raft 从来不会通过计算复制的数目来提交之前人气的日志条目。只有领导人当前任期的日志条目才能通过计算数目来进行提交。一旦当前任期的日志条目以这种方式被提交，那么由于日志匹配原则（Log Matching Property），之前的日志条目也都会被间接的提交。</p>
-<p>论文中的这段话比较难理解，更加直观的说：由于Raft不会提交任期之前的日志条目，那么就不会从b过渡到c的情况，只能从b发生S5down机的情况下直接过渡到e，这样就产生的更新的任期，这样S5就没有机会被选为领导者了。</p>
-<h3 id="4-候选者和追随者崩溃"><a href="#4-候选者和追随者崩溃" class="headerlink" title="4. 候选者和追随者崩溃"></a>4. 候选者和追随者崩溃</h3><p>候选者和追随者崩溃的情况处理要简单的多。如果这类角色崩溃了，那么后续发送给他们的 RequestVote和AppendEntries的所有RCP都会失败，Raft算法中处理这类失败就是简单的无限重试的方式。<br> 　　如果这些服务器重新可用，那么这些RPC就会成功返回。如果一个服务器完成了一个RPC，但是在响应Leader前崩溃了，那么当他再次可用的时候还会收到相同的RPC请求，此时接收服务器负责检查，比如如果收到了已经包含该条日志的RPC请求，可以直接忽略这个请求，确保对系统是无害的。</p>
-<h2 id="成员变化问题"><a href="#成员变化问题" class="headerlink" title="成员变化问题"></a>成员变化问题</h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/1_raft基础/" data-id="cjy2hcgup001p8seodsagn8k3" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/goraft_read" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/24/alg/raft/goraft_read/" class="article-date">
-  <time datetime="2018-10-24T13:25:59.811Z" itemprop="datePublished">2018-10-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="GoRaft-Read"><a href="#GoRaft-Read" class="headerlink" title="GoRaft Read"></a>GoRaft Read</h1><p>建议粗略的看一下原理：<a href="https://www.jianshu.com/p/096ae57d1fe0" target="_blank" rel="noopener">https://www.jianshu.com/p/096ae57d1fe0</a></p>
-<h3 id="整体文件目录结构"><a href="#整体文件目录结构" class="headerlink" title="整体文件目录结构"></a>整体文件目录结构</h3><p>raft<br>    ├── LICENSE<br>    ├── Makefile<br>    ├── README.md<br>    ├── append_entries.go<br>    ├── append_entries_test.go<br>    ├── command.go<br>    ├── commands.go<br>    ├── config.go<br>    ├── context.go<br>    ├── debug.go<br>    ├── event.go<br>    ├── event_dispatcher.go<br>    ├── event_dispatcher_test.go<br>    ├── http_transporter.go<br>    ├── http_transporter_test.go<br>    ├── log.go<br>    ├── log_entry.go<br>    ├── log_test.go<br>    ├── peer.go<br>    ├── protobuf<br>    │   ├── append_entries_request.pb.go<br>    │   ….<br>    ├── request_vote.go<br>    ├── server.go<br>    ├── server_test.go<br>    ├── snapshot.go<br>    ├── snapshot_test.go<br>    ├── statemachine.go<br>    ├── statemachine_test.go<br>    ├── test.go<br>    ├── transporter.go<br>    ├── util.go<br>    └── z_test.go</p>
-<h3 id="文件作用详解"><a href="#文件作用详解" class="headerlink" title="文件作用详解"></a>文件作用详解</h3><p><strong>append_entries.go </strong></p>
-<p>entries：项，日志中的一条指令？</p>
-<p>存在两个结构体：</p>
-<p>AppendEntriesRequest</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to append entries to the log.</span></span><br><span class="line"><span class="comment">// 这个请求是发送给服务端的增加一项到日志中</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term         <span class="keyword">uint64</span></span><br><span class="line">	PrevLogIndex <span class="keyword">uint64</span></span><br><span class="line">	PrevLogTerm  <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex  <span class="keyword">uint64</span></span><br><span class="line">	LeaderName   <span class="keyword">string</span></span><br><span class="line">	Entries      []*protobuf.LogEntry</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>AppendEntriesResponse</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="comment">// 从服务端返回的应答</span></span><br><span class="line"><span class="keyword">type</span> AppendEntriesResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb     *protobuf.AppendEntriesResponse</span><br><span class="line">	peer   <span class="keyword">string</span></span><br><span class="line">	<span class="built_in">append</span> <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>command.go</strong></p>
-<p>一些和命令相关的接口定义:</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> commandTypes <span class="keyword">map</span>[<span class="keyword">string</span>]Command</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	commandTypes = <span class="keyword">map</span>[<span class="keyword">string</span>]Command&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Command represents an action to be taken on the replicated state machine.</span></span><br><span class="line"><span class="keyword">type</span> Command <span class="keyword">interface</span> &#123;</span><br><span class="line">	CommandName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CommandApply represents the interface to apply a command to the server.</span></span><br><span class="line"><span class="keyword">type</span> CommandApply <span class="keyword">interface</span> &#123;</span><br><span class="line">	Apply(Context) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>commands.go</strong></p>
-<p>定义了一些指令的接口和结构体</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Join command interface</span></span><br><span class="line"><span class="keyword">type</span> JoinCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Join command</span></span><br><span class="line"><span class="keyword">type</span> DefaultJoinCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name             <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command interface</span></span><br><span class="line"><span class="keyword">type</span> LeaveCommand <span class="keyword">interface</span> &#123;</span><br><span class="line">	Command</span><br><span class="line">	NodeName() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Leave command</span></span><br><span class="line"><span class="keyword">type</span> DefaultLeaveCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// NOP command</span></span><br><span class="line"><span class="keyword">type</span> NOPCommand <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>context.go</strong></p>
-<p>context</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Context represents the current state of the server. It is passed into</span></span><br><span class="line"><span class="comment">// a command when the command is being applied since the server methods</span></span><br><span class="line"><span class="comment">// are locked.</span></span><br><span class="line"><span class="comment">// Context表示服务器的当前状态。 由于服务器方法被锁定，因此在应用命令时将其传递给命令</span></span><br><span class="line"><span class="keyword">type</span> Context <span class="keyword">interface</span> &#123;</span><br><span class="line">	Server() Server</span><br><span class="line">	CurrentTerm() <span class="keyword">uint64</span></span><br><span class="line">	CurrentIndex() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// context is the concrete implementation of Context.</span></span><br><span class="line"><span class="comment">// context是Context的具体实现</span></span><br><span class="line"><span class="keyword">type</span> context <span class="keyword">struct</span> &#123;</span><br><span class="line">	server       Server</span><br><span class="line">	currentIndex <span class="keyword">uint64</span></span><br><span class="line">	currentTerm  <span class="keyword">uint64</span></span><br><span class="line">	commitIndex  <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>event_dispatcher.go</strong></p>
-<p>事件调度者</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// eventDispatcher is responsible for managing listeners for named events</span></span><br><span class="line"><span class="comment">// and dispatching event notifications to those listeners.</span></span><br><span class="line"><span class="comment">// eventDispatcher负责管理命名事件的侦听器并将事件通知分派给这些侦听器</span></span><br><span class="line"><span class="keyword">type</span> eventDispatcher <span class="keyword">struct</span> &#123;</span><br><span class="line">	sync.RWMutex</span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	listeners <span class="keyword">map</span>[<span class="keyword">string</span>]eventListeners</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// EventListener is a function that can receive event notifications.</span></span><br><span class="line"><span class="comment">// EventListener 是一个函数,能够接受事件通知</span></span><br><span class="line"><span class="keyword">type</span> EventListener <span class="function"><span class="keyword">func</span><span class="params">(Event)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> <span class="title">represents</span> <span class="title">a</span> <span class="title">collection</span> <span class="title">of</span> <span class="title">individual</span> <span class="title">listeners</span>.</span></span><br><span class="line"><span class="function">// <span class="title">EventListeners</span> 一个监听器的收集器</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">eventListeners</span> []<span class="title">EventListener</span></span></span><br></pre></td></tr></table></figure>
-<p><strong>event.go</strong></p>
-<p>定义了事件</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Event represents an action that occurred within the Raft library.</span></span><br><span class="line"><span class="comment">// Listeners can subscribe to event types by using the Server.AddEventListener() function.</span></span><br><span class="line"><span class="comment">// Event 表示在Raft库中发生的操作。 监听器可以使用Server.AddEventListener（）函数订阅事件类型。</span></span><br><span class="line"><span class="keyword">type</span> Event <span class="keyword">interface</span> &#123;</span><br><span class="line">	Type() <span class="keyword">string</span></span><br><span class="line">	Source() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	Value() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	PrevValue() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// event is the concrete implementation of the Event interface.</span></span><br><span class="line"><span class="comment">// event 是 Event 接口的一个实现</span></span><br><span class="line"><span class="keyword">type</span> event <span class="keyword">struct</span> &#123;</span><br><span class="line">	typ       <span class="keyword">string</span></span><br><span class="line">	source    <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	value     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	prevValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>http_transporter.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An HTTPTransporter is a default transport layer used to communicate between</span></span><br><span class="line"><span class="comment">// multiple servers.</span></span><br><span class="line"><span class="comment">// HTTPTransporter 是用于在多个服务器之间进行通信的默认传输层</span></span><br><span class="line"><span class="keyword">type</span> HTTPTransporter <span class="keyword">struct</span> &#123;</span><br><span class="line">	DisableKeepAlives    <span class="keyword">bool</span></span><br><span class="line">	prefix               <span class="keyword">string</span></span><br><span class="line">	appendEntriesPath    <span class="keyword">string</span></span><br><span class="line">	requestVotePath      <span class="keyword">string</span></span><br><span class="line">	snapshotPath         <span class="keyword">string</span></span><br><span class="line">	snapshotRecoveryPath <span class="keyword">string</span></span><br><span class="line">	httpClient           http.Client</span><br><span class="line">	Transport            *http.Transport</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> HTTPMuxer <span class="keyword">interface</span> &#123;</span><br><span class="line">	HandleFunc(<span class="keyword">string</span>, <span class="function"><span class="keyword">func</span><span class="params">(http.ResponseWriter, *http.Request)</span>)</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p><strong>log_entry.go</strong></p>
-<p>日志中的一项</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log entry stores a single item in the log.</span></span><br><span class="line"><span class="comment">// 日志中的单独一项</span></span><br><span class="line"><span class="keyword">type</span> LogEntry <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb       *protobuf.LogEntry</span><br><span class="line">	Position <span class="keyword">int64</span> <span class="comment">// position in the log file</span></span><br><span class="line">	log      *Log</span><br><span class="line">	event    *ev</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>log.go</strong></p>
-<p>日志</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A log is a collection of log entries that are persisted to durable storage.</span></span><br><span class="line"><span class="comment">// Log 是 log entries 的一个收集器, 可以持久存储到持久存储器</span></span><br><span class="line"><span class="keyword">type</span> Log <span class="keyword">struct</span> &#123;</span><br><span class="line">	ApplyFunc   <span class="function"><span class="keyword">func</span><span class="params">(*LogEntry, Command)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span></span><br><span class="line"><span class="function">	<span class="title">file</span>        *<span class="title">os</span>.<span class="title">File</span></span></span><br><span class="line"><span class="function">	<span class="title">path</span>        <span class="title">string</span></span></span><br><span class="line"><span class="function">	<span class="title">entries</span>     []*<span class="title">LogEntry</span></span></span><br><span class="line"><span class="function">	<span class="title">commitIndex</span> <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">mutex</span>       <span class="title">sync</span>.<span class="title">RWMutex</span></span></span><br><span class="line"><span class="function">	<span class="title">startIndex</span>  <span class="title">uint64</span> // <span class="title">the</span> <span class="title">index</span> <span class="title">before</span> <span class="title">the</span> <span class="title">first</span> <span class="title">entry</span> <span class="title">in</span> <span class="title">the</span> <span class="title">Log</span> <span class="title">entries</span></span></span><br><span class="line"><span class="function">	<span class="title">startTerm</span>   <span class="title">uint64</span></span></span><br><span class="line"><span class="function">	<span class="title">initialized</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">// <span class="title">The</span> <span class="title">results</span> <span class="title">of</span> <span class="title">the</span> <span class="title">applying</span> <span class="title">a</span> <span class="title">log</span> <span class="title">entry</span>.</span></span><br><span class="line"><span class="function"><span class="title">type</span> <span class="title">logResult</span> <span class="title">struct</span></span> &#123;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	err         error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>peer.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A peer is a reference to another server involved in the consensus protocol.</span></span><br><span class="line"><span class="comment">// Peer 是对共识协议中涉及的另一个服务器的引用</span></span><br><span class="line"><span class="keyword">type</span> Peer <span class="keyword">struct</span> &#123;</span><br><span class="line">	server            *server</span><br><span class="line">	Name              <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	ConnectionString  <span class="keyword">string</span> <span class="string">`json:"connectionString"`</span></span><br><span class="line">	prevLogIndex      <span class="keyword">uint64</span></span><br><span class="line">	stopChan          <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line">	lastActivity      time.Time</span><br><span class="line">	sync.RWMutex</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>request_vote.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The request sent to a server to vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer          *Peer</span><br><span class="line">	Term          <span class="keyword">uint64</span></span><br><span class="line">	LastLogIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastLogTerm   <span class="keyword">uint64</span></span><br><span class="line">	CandidateName <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server after a vote for a candidate to become a leader.</span></span><br><span class="line"><span class="keyword">type</span> RequestVoteResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	peer        *Peer</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	VoteGranted <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>server.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A server is involved in the consensus protocol and can act as a follower,</span></span><br><span class="line"><span class="comment">// candidate or a leader.</span></span><br><span class="line"><span class="keyword">type</span> Server <span class="keyword">interface</span> &#123;</span><br><span class="line">	Name() <span class="keyword">string</span></span><br><span class="line">	Context() <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	StateMachine() StateMachine</span><br><span class="line">	Leader() <span class="keyword">string</span></span><br><span class="line">	State() <span class="keyword">string</span></span><br><span class="line">	Path() <span class="keyword">string</span></span><br><span class="line">	LogPath() <span class="keyword">string</span></span><br><span class="line">	SnapshotPath(lastIndex <span class="keyword">uint64</span>, lastTerm <span class="keyword">uint64</span>) <span class="keyword">string</span></span><br><span class="line">	Term() <span class="keyword">uint64</span></span><br><span class="line">	CommitIndex() <span class="keyword">uint64</span></span><br><span class="line">	VotedFor() <span class="keyword">string</span></span><br><span class="line">	MemberCount() <span class="keyword">int</span></span><br><span class="line">	QuorumSize() <span class="keyword">int</span></span><br><span class="line">	IsLogEmpty() <span class="keyword">bool</span></span><br><span class="line">	LogEntries() []*LogEntry</span><br><span class="line">	LastCommandName() <span class="keyword">string</span></span><br><span class="line">	GetState() <span class="keyword">string</span></span><br><span class="line">	ElectionTimeout() time.Duration</span><br><span class="line">	SetElectionTimeout(duration time.Duration)</span><br><span class="line">	HeartbeatInterval() time.Duration</span><br><span class="line">	SetHeartbeatInterval(duration time.Duration)</span><br><span class="line">	Transporter() Transporter</span><br><span class="line">	SetTransporter(t Transporter)</span><br><span class="line">	AppendEntries(req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	RequestVote(req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	RequestSnapshot(req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SnapshotRecoveryRequest(req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">	AddPeer(name <span class="keyword">string</span>, connectiongString <span class="keyword">string</span>) error</span><br><span class="line">	RemovePeer(name <span class="keyword">string</span>) error</span><br><span class="line">	Peers() <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	Init() error</span><br><span class="line">	Start() error</span><br><span class="line">	Stop()</span><br><span class="line">	Running() <span class="keyword">bool</span></span><br><span class="line">	Do(command Command) (<span class="keyword">interface</span>&#123;&#125;, error)</span><br><span class="line">	TakeSnapshot() error</span><br><span class="line">	LoadSnapshot() error</span><br><span class="line">	AddEventListener(<span class="keyword">string</span>, EventListener)</span><br><span class="line">	FlushCommitIndex()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span> &#123;</span><br><span class="line">	*eventDispatcher</span><br><span class="line"></span><br><span class="line">	name        <span class="keyword">string</span></span><br><span class="line">	path        <span class="keyword">string</span></span><br><span class="line">	state       <span class="keyword">string</span></span><br><span class="line">	transporter Transporter</span><br><span class="line">	context     <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	currentTerm <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	votedFor   <span class="keyword">string</span></span><br><span class="line">	log        *Log</span><br><span class="line">	leader     <span class="keyword">string</span></span><br><span class="line">	peers      <span class="keyword">map</span>[<span class="keyword">string</span>]*Peer</span><br><span class="line">	mutex      sync.RWMutex</span><br><span class="line">	syncedPeer <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">	stopped           <span class="keyword">chan</span> <span class="keyword">bool</span></span><br><span class="line">	c                 <span class="keyword">chan</span> *ev</span><br><span class="line">	electionTimeout   time.Duration</span><br><span class="line">	heartbeatInterval time.Duration</span><br><span class="line"></span><br><span class="line">	snapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	<span class="comment">// PendingSnapshot is an unfinished snapshot.</span></span><br><span class="line">	<span class="comment">// After the pendingSnapshot is saved to disk,</span></span><br><span class="line">	<span class="comment">// it will be set to snapshot and also will be</span></span><br><span class="line">	<span class="comment">// set to nil.</span></span><br><span class="line">	pendingSnapshot *Snapshot</span><br><span class="line"></span><br><span class="line">	stateMachine            StateMachine</span><br><span class="line">	maxLogEntriesPerRequest <span class="keyword">uint64</span></span><br><span class="line"></span><br><span class="line">	connectionString <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">	routineGroup sync.WaitGroup</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// An internal event to be processed by the server's event loop.</span></span><br><span class="line"><span class="keyword">type</span> ev <span class="keyword">struct</span> &#123;</span><br><span class="line">	target      <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	returnValue <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	c           <span class="keyword">chan</span> error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>snapshot.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Snapshot represents an in-memory representation of the current state of the system.</span></span><br><span class="line"><span class="keyword">type</span> Snapshot <span class="keyword">struct</span> &#123;</span><br><span class="line">	LastIndex <span class="keyword">uint64</span> <span class="string">`json:"lastIndex"`</span></span><br><span class="line">	LastTerm  <span class="keyword">uint64</span> <span class="string">`json:"lastTerm"`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Cluster configuration.</span></span><br><span class="line">	Peers []*Peer <span class="string">`json:"peers"`</span></span><br><span class="line">	State []<span class="keyword">byte</span>  <span class="string">`json:"state"`</span></span><br><span class="line">	Path  <span class="keyword">string</span>  <span class="string">`json:"path"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">	Peers      []*Peer</span><br><span class="line">	State      []<span class="keyword">byte</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned from a server appending entries to the log.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRecoveryResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Term        <span class="keyword">uint64</span></span><br><span class="line">	Success     <span class="keyword">bool</span></span><br><span class="line">	CommitIndex <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The request sent to a server to start from the snapshot.</span></span><br><span class="line"><span class="keyword">type</span> SnapshotRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	LeaderName <span class="keyword">string</span></span><br><span class="line">	LastIndex  <span class="keyword">uint64</span></span><br><span class="line">	LastTerm   <span class="keyword">uint64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The response returned if the follower entered snapshot state</span></span><br><span class="line"><span class="keyword">type</span> SnapshotResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Success <span class="keyword">bool</span> <span class="string">`json:"success"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>statemachine.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// StateMachine is the interface for allowing the host application to save and</span></span><br><span class="line"><span class="comment">// recovery the state machine. This makes it possible to make snapshots</span></span><br><span class="line"><span class="comment">// and compact the log.</span></span><br><span class="line"><span class="keyword">type</span> StateMachine <span class="keyword">interface</span> &#123;</span><br><span class="line">	Save() ([]<span class="keyword">byte</span>, error)</span><br><span class="line">	Recovery([]<span class="keyword">byte</span>) error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>transporter.go</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Transporter is the interface for allowing the host application to transport</span></span><br><span class="line"><span class="comment">// requests to other nodes.</span></span><br><span class="line"><span class="keyword">type</span> Transporter <span class="keyword">interface</span> &#123;</span><br><span class="line">	SendVoteRequest(server Server, peer *Peer, req *RequestVoteRequest) *RequestVoteResponse</span><br><span class="line">	SendAppendEntriesRequest(server Server, peer *Peer, req *AppendEntriesRequest) *AppendEntriesResponse</span><br><span class="line">	SendSnapshotRequest(server Server, peer *Peer, req *SnapshotRequest) *SnapshotResponse</span><br><span class="line">	SendSnapshotRecoveryRequest(server Server, peer *Peer, req *SnapshotRecoveryRequest) *SnapshotRecoveryResponse</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/24/alg/raft/goraft_read/" data-id="cjy2hcguw001s8seocyo1740t" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-build_own_x/os/How to create an OS from scratch" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/23/build_own_x/os/How to create an OS from scratch/" class="article-date">
-  <time datetime="2018-09-23T05:21:19.206Z" itemprop="datePublished">2018-09-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="How-to-create-an-OS-from-scratch"><a href="#How-to-create-an-OS-from-scratch" class="headerlink" title="How to create an OS from scratch!"></a>How to create an OS from scratch!</h2><p>参考: <a href="https://github.com/cfenollosa/os-tutorial" target="_blank" rel="noopener">https://github.com/cfenollosa/os-tutorial</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/23/build_own_x/os/How to create an OS from scratch/" data-id="cjy2hcgvs002j8seol3629fri" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/grpc/服务的注册_发现" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/14/backend/go/grpc/服务的注册_发现/" class="article-date">
-  <time datetime="2018-09-14T12:42:22.000Z" itemprop="datePublished">2018-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/14/backend/go/grpc/服务的注册_发现/">服务的注册,发现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>参考: <a href="https://juejin.im/post/5ad9b9596fb9a07acf55b550" target="_blank" rel="noopener">https://juejin.im/post/5ad9b9596fb9a07acf55b550</a></p>
-<h2 id="微服务之服务的注册和发现"><a href="#微服务之服务的注册和发现" class="headerlink" title="微服务之服务的注册和发现"></a>微服务之服务的注册和发现</h2><p>服务的注册发现功能, 能够很好的解耦服务器之间的调用功能.</p>
-<h2 id="服务注册"><a href="#服务注册" class="headerlink" title="服务注册"></a>服务注册</h2><p>策略: </p>
-<ol>
-<li>将服务注册到 kv 服务器中, 设置一个过期时间(50s ? ).</li>
-<li>心跳续期 </li>
-</ol>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Register</span><span class="params">(ctx context.Context, target <span class="keyword">string</span>, update naming.Update, opts ...wrapper.RegistryOptions)</span> <span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> upBytes []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">if</span> upBytes, err = json.Marshal(update); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	er.cancal = cancel</span><br><span class="line">	rgOpt := wrapper.RegistryOption&#123;TTL: wrapper.DefaultRegInfTTL&#125;</span><br><span class="line">	<span class="keyword">for</span> _, opt := <span class="keyword">range</span> opts &#123;</span><br><span class="line">		opt(&amp;rgOpt)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">switch</span> update.Op &#123;</span><br><span class="line">	<span class="keyword">case</span> naming.Add:</span><br><span class="line">		lsRsp, err := er.lsCli.Grant(ctx, <span class="keyword">int64</span>(rgOpt.TTL/time.Second))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//Put服务信息到etcd,并设置key的值TTL,通过后面的KeepAlive接口</span></span><br><span class="line">        <span class="comment">//对TTL进行续期,超过TTL的时间未收到续期请求,则说明服务可能挂了,从而清除服务信息</span></span><br><span class="line">		etcdOpts := []etcd.OpOption&#123;etcd.WithLease(lsRsp.ID)&#125;</span><br><span class="line">		key := target + <span class="string">"/"</span> + update.Addr</span><br><span class="line">		_, err = er.cli.KV.Put(ctx, key, <span class="keyword">string</span>(upBytes), etcdOpts...)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//保持心跳</span></span><br><span class="line">		lsRspChan, err := er.lsCli.KeepAlive(context.TODO(), lsRsp.ID)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				_, ok := &lt;-lsRspChan</span><br><span class="line">				<span class="keyword">if</span> !ok &#123;</span><br><span class="line">					grpclog.Fatalf(<span class="string">"%v keepalive channel is closing"</span>, key)</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	<span class="keyword">case</span> naming.Delete:</span><br><span class="line">		_, err = er.cli.Delete(ctx, target+<span class="string">"/"</span>+update.Addr)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> status.Error(codes.InvalidArgument, <span class="string">"unsupported op"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p><strong>Resolve()接口</strong><br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用于生成Watcher,监听注册中心中的服务信息变化</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(er *etcdRegistry)</span> <span class="title">Resolve</span><span class="params">(target <span class="keyword">string</span>)</span> <span class="params">(naming.Watcher, error)</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), resolverTimeOut)</span><br><span class="line">	w := &amp;etcdWatcher&#123;</span><br><span class="line">		cli:    er.cli,</span><br><span class="line">		target: target + <span class="string">"/"</span>,</span><br><span class="line">		ctx:    ctx,</span><br><span class="line">		cancel: cancel,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> w, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><strong>Next() 接口</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Next接口主要用于获取注册的服务信息,通过channel以及watch,当服务信息发生</span></span><br><span class="line"><span class="comment">//变化时,Next接口会将变化返回给grpc框架从而实现服务信息变更.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(ew *etcdWatcher)</span> <span class="title">Next</span><span class="params">()</span> <span class="params">([]*naming.Update, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> updates []*naming.Update</span><br><span class="line">    <span class="comment">//初次获取时,创建监听channel,并返回获取到的服务信息</span></span><br><span class="line">	<span class="keyword">if</span> ew.watchChan == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">//create new chan</span></span><br><span class="line">		resp, err := ew.cli.Get(ew.ctx, ew.target, etcd.WithPrefix(), etcd.WithSerializable())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> _, kv := <span class="keyword">range</span> resp.Kvs &#123;</span><br><span class="line">			<span class="keyword">var</span> upt naming.Update</span><br><span class="line">			<span class="keyword">if</span> err := json.Unmarshal(kv.Value, &amp;upt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//创建etcd的watcher监听target(服务名)的信息.</span></span><br><span class="line">		opts := []etcd.OpOption&#123;etcd.WithRev(resp.Header.Revision + <span class="number">1</span>), etcd.WithPrefix(), etcd.WithPrevKV()&#125;</span><br><span class="line">		ew.watchChan = ew.cli.Watch(context.TODO(), ew.target, opts...)</span><br><span class="line">		<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//阻塞监听,服务发生变化时才返回给上层</span></span><br><span class="line">	wrsp, ok := &lt;-ew.watchChan</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		err := status.Error(codes.Unavailable, <span class="string">"etcd watch closed"</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> wrsp.Err() != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, wrsp.Err()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> _, e := <span class="keyword">range</span> wrsp.Events &#123;</span><br><span class="line">		<span class="keyword">var</span> upt naming.Update</span><br><span class="line">		<span class="keyword">var</span> err error</span><br><span class="line">		<span class="keyword">switch</span> e.Type &#123;</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypePut:</span><br><span class="line">			err = json.Unmarshal(e.Kv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Add</span><br><span class="line">		<span class="keyword">case</span> etcd.EventTypeDelete:</span><br><span class="line">			err = json.Unmarshal(e.PrevKv.Value, &amp;upt)</span><br><span class="line">			upt.Op = naming.Delete</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		updates = <span class="built_in">append</span>(updates, &amp;upt)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> updates, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="使用默认的grpc"><a href="#使用默认的grpc" class="headerlink" title="使用默认的grpc"></a>使用默认的grpc</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cli, _ := clientv3.NewFromURL(<span class="string">"http://127.0.0.1:2379"</span>)</span><br><span class="line">rs := &amp;etcdnaming.GRPCResolver&#123;Client: cli&#125;</span><br><span class="line"></span><br><span class="line">b := grpc.RoundRobin(rs)</span><br><span class="line">dialOpts := []grpc.DialOption&#123;grpc.WithBalancer(b), grpc.WithInsecure()&#125;</span><br><span class="line">conn, err := grpc.Dial(<span class="string">"jie-test"</span>, dialOpts...)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">"did not connect: %v"</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">client := pb.NewGreeterClient(conn)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjy2hcgy2004d8seo98062g6g" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/etcd/">etcd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/grpc/">grpc</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-frontend/learn_admin_manage/admin_manage_jie_learn" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" class="article-date">
-  <time datetime="2018-09-08T14:27:30.000Z" itemprop="datePublished">2018-09-08</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/frontend/">frontend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/">admin_manage_jie</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="admin-manage-jie"><a href="#admin-manage-jie" class="headerlink" title="admin_manage_jie"></a>admin_manage_jie</h2><p>copy from Material Dashboard React</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" data-id="cjy2hcgvz002s8seo430jitbq" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/admin-manage/">admin manage</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
-
     </footer>
   </div>
   
@@ -628,23 +573,23 @@
       <ul>
         
           <li>
-            <a href="/2019/08/10/self_doc/文件加密/">(no title)</a>
+            <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/09/basic/protobuf/">(no title)</a>
+            <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/frontend/优秀项目/">(no title)</a>
+            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/08/08/alg/一致性hash/">(no title)</a>
+            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
           </li>
         
           <li>
-            <a href="/2019/07/22/alg/finance/atr/">(no title)</a>
+            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>
