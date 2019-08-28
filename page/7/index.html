@@ -69,6 +69,248 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-backend/tools/markfile_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/01/backend/tools/markfile_start_learn/" class="article-date">
+  <time datetime="2018-09-01T07:37:28.000Z" itemprop="datePublished">2018-09-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/01/backend/tools/markfile_start_learn/">markfile start learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="https://www.cnblogs.com/wang_yb/p/3990952.html" target="_blank" rel="noopener">https://www.cnblogs.com/wang_yb/p/3990952.html</a></p>
+<h2 id="Makefile-简介"><a href="#Makefile-简介" class="headerlink" title="Makefile 简介"></a>Makefile 简介</h2><p>Makefile 是和 make 命令一起配合使用的.</p>
+<p>很多大型项目的编译都是通过 Makefile 来组织的, 如果没有 Makefile, 那很多项目中各种库和代码之间的依赖关系不知会多复杂.</p>
+<p>Makefile的组织流程的能力如此之强, 不仅可以用来编译项目, 还可以用来组织我们平时的一些日常操作. 这个需要大家发挥自己的想象力.</p>
+<h3 id="Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释"><a href="#Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释" class="headerlink" title="Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)"></a>Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)</h3><p>Makefile基本格式如下:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">target ... : prerequisites ...</span><br><span class="line">    command</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>其中,</p>
+<ul>
+<li>target        - 目标文件, 可以是 Object File, 也可以是可执行文件</li>
+<li>prerequisites - 生成 target 所需要的文件或者目标</li>
+<li>command       - make需要执行的命令 (任意的shell命令), Makefile中的命令必须以 <code>[tab] 开头</code></li>
+</ul>
+<ol>
+<li>显示规则 :: 说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)</li>
+<li>隐晦规则 :: make的自动推导功能所执行的规则</li>
+<li>变量定义 :: Makefile中定义的变量</li>
+<li>文件指示 :: Makefile中引用其他Makefile; 指定Makefile中有效部分; 定义一个多行命令</li>
+<li>注释     :: Makefile只有行注释 “#”, 如果要使用或者输出”#”字符, 需要进行转义, “#“</li>
+</ol>
+<h3 id="1-2-GNU-make-的工作方式"><a href="#1-2-GNU-make-的工作方式" class="headerlink" title="1.2 GNU make 的工作方式"></a>1.2 GNU make 的工作方式</h3><ol>
+<li>读入主Makefile (主Makefile中可以引用其他Makefile)</li>
+<li>读入被include的其他Makefile</li>
+<li>初始化文件中的变量</li>
+<li>推导隐晦规则, 并分析所有规则</li>
+<li>为所有的目标文件创建依赖关系链</li>
+<li>根据依赖关系, 决定哪些目标要重新生成</li>
+<li>执行生成命令</li>
+</ol>
+<h2 id="实例解析"><a href="#实例解析" class="headerlink" title="实例解析"></a>实例解析</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/01/backend/tools/markfile_start_learn/" data-id="cjzv7orc5002i3gs6ekweegqr" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/build-tools/">build tools</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/">markdown</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/tools/apidoc_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/backend/tools/apidoc_start_learn/" class="article-date">
+  <time datetime="2018-08-31T08:02:53.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/backend/">backend</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/backend/tools/apidoc_start_learn/">apidoc start learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>参考: <a href="http://apidocjs.com/" target="_blank" rel="noopener">http://apidocjs.com/</a></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p><code>Javadoc-Style</code> (can be used in C#, Go, Dart, Java, JavaScript, PHP, TypeScript and all other Javadoc capable languages):</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install apidoc -g</span><br></pre></td></tr></table></figure>
+<h2 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apidoc -i myapp/ -o apidoc/ -t mytemplate/</span><br></pre></td></tr></table></figure>
+<h2 id="Configuration-apidoc-json"><a href="#Configuration-apidoc-json" class="headerlink" title="Configuration (apidoc.json)"></a>Configuration (apidoc.json)</h2><p>ex:<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"apiDoc basic example"</span>,</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"Custom apiDoc browser title"</span>,</span><br><span class="line">  <span class="attr">"url"</span> : <span class="string">"https://api.github.com/v1"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Header-Footer"><a href="#Header-Footer" class="headerlink" title="Header / Footer"></a>Header / Footer</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"header"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own header title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"header.md"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"footer"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own footer title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"footer.md"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h2><p><code>apidoc.json</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"A basic apiDoc example"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>example.js</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDefine UserNotFoundError</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;put&#125; /user/ Modify User information</span></span><br><span class="line"><span class="comment"> * @apiName PutUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id          Users unique ID.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname] Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [lastname]  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h3 id="Versioning"><a href="#Versioning" class="headerlink" title="Versioning"></a>Versioning</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.1.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information and Date of Registration.</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.2.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname  Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname   Lastname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;Date&#125;   registered Date of Registration.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<p>该版本可用于每个块，也可用于继承块。您不必更改继承块上的版本，解析器会自动检查最近的前任.</p>
+<h2 id="apiDoc-Params"><a href="#apiDoc-Params" class="headerlink" title="apiDoc-Params"></a>apiDoc-Params</h2><p>列几个常用的标签:</p>
+<h3 id="api"><a href="#api" class="headerlink" title="@api"></a>@api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@api &#123;method&#125; path [title]</span><br></pre></td></tr></table></figure>
+<p>Required!<br>Without that indicator, apiDoc parser ignore the documentation block. (apidoc 工具的标识开始)</p>
+<h2 id="apiName"><a href="#apiName" class="headerlink" title="@apiName"></a>@apiName</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiName name</span><br></pre></td></tr></table></figure>
+<h2 id="apiGroup"><a href="#apiGroup" class="headerlink" title="@apiGroup"></a>@apiGroup</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiGroup name</span><br></pre></td></tr></table></figure>
+<h2 id="apiDefine"><a href="#apiDefine" class="headerlink" title="@apiDefine"></a>@apiDefine</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiDefine name [title]</span><br><span class="line">    [description]</span><br></pre></td></tr></table></figure>
+<h2 id="apiUse"><a href="#apiUse" class="headerlink" title="@apiUse"></a>@apiUse</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiUse name</span><br></pre></td></tr></table></figure>
+<h2 id="apiDeprecated"><a href="#apiDeprecated" class="headerlink" title="@apiDeprecated"></a>@apiDeprecated</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDeprecated [text]</span><br></pre></td></tr></table></figure>
+<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated use now (#Group:Name).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Example: to set a link to the GetDetails method of your group User</span></span><br><span class="line"><span class="comment"> * write (#User:GetDetails)</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="apiDescription"><a href="#apiDescription" class="headerlink" title="@apiDescription"></a>@apiDescription</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDescription text</span><br></pre></td></tr></table></figure>
+<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDescription This is the Description.</span></span><br><span class="line"><span class="comment"> * It is multiline capable.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Last line of Description.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="apiParam"><a href="#apiParam" class="headerlink" title="@apiParam"></a>@apiParam</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiParam [(group)] [&#123;type&#125;] [field=defaultValue] [description]</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;post&#125; /user/</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname]  Optional Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; lastname     Mandatory Lastname.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; country="DE" Mandatory with default value "DE".</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; [age=18]     Optional Age with default 18.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam (Login) &#123;String&#125; pass Only logged in users can post this.</span></span><br><span class="line"><span class="comment"> *                                 In generated documentation a separate</span></span><br><span class="line"><span class="comment"> *                                 "Login" Block will be generated.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(group)</td>
+<td>All parameters will be grouped by this name. <br>Without a group, the default <code>Parameter</code> is set.<br>You can set a title and description with @apiDefine.</td>
+</tr>
+<tr>
+<td>{type}</td>
+<td>Parameter type, e.g. <code>{Boolean}</code>, <code>{Number}</code>, <code>{String}</code>, <code>{Object}</code>, <code>{String[]}</code> (array of strings), …</td>
+</tr>
+<tr>
+<td>{type{size}}</td>
+<td>Information about the size of the variable.<br><code>{string{..5}}</code> a string that has max 5 chars.<br><code>{string{2..5}}</code> a string that has min. 2 chars and max 5 chars.<br><code>{number{100-999}}</code> a number between 100 and 999.</td>
+</tr>
+<tr>
+<td>{type=allowedValues}</td>
+<td>Information about allowed values of the variable.<br><code>{string=&quot;small&quot;}</code> a string that can only contain the word “small” (a constant).<br><code>{string=&quot;small&quot;,&quot;huge&quot;}</code> a string that can contain the words “small” or “huge”.<br><code>{number=1,2,3,99}</code> a number with allowed values of 1, 2, 3 and 99.<br><br>Can be combined with size:<br><code>{string {..5}=&quot;small&quot;,&quot;huge&quot;}</code> a string that has max 5 chars and only contain the words “small” or “huge”.</td>
+</tr>
+<tr>
+<td>field</td>
+<td>Variablename</td>
+</tr>
+<tr>
+<td>[field]</td>
+<td>Fieldname with brackets define the Variable as optional.</td>
+</tr>
+<tr>
+<td>=defaultValue</td>
+<td>The parameters default value.</td>
+</tr>
+<tr>
+<td>description</td>
+<td>Description of the field.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="apiParamExample"><a href="#apiParamExample" class="headerlink" title="@apiParamExample"></a>@apiParamExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiParamExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParamExample &#123;json&#125; Request-Example:</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "id": 4711</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiSuccess"><a href="#apiSuccess" class="headerlink" title="@apiSuccess"></a>@apiSuccess</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccess [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
+<h2 id="apiSuccessExample"><a href="#apiSuccessExample" class="headerlink" title="@apiSuccessExample"></a>@apiSuccessExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccessExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample &#123;json&#125; Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiError"><a href="#apiError" class="headerlink" title="@apiError"></a>@apiError</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiError [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The &lt;code&gt;id&lt;/code&gt; of the User was not found.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="apiErrorExample"><a href="#apiErrorExample" class="headerlink" title="@apiErrorExample"></a>@apiErrorExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiErrorExample [&#123;type&#125;] [title]</span><br><span class="line">                 example</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiErrorExample &#123;json&#125; Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/31/backend/tools/apidoc_start_learn/" data-id="cjzv7orc4002f3gs6unc06zmi" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/apidoc/">apidoc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/learn/">learn</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-self_doc/个人软件安装记录" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/self_doc/个人软件安装记录/" class="article-date">
+  <time datetime="2018-08-31T07:54:58.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/self_doc/个人软件安装记录/">个人软件安装记录(mac osx)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># tree install</span></span></span><br><span class="line">brew install tree</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># apidoc install</span></span></span><br><span class="line">npm install apidoc -g</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh</span></span></span><br><span class="line">sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh config</span></span></span><br><span class="line">plugins=(</span><br><span class="line">  git</span><br><span class="line">  z</span><br><span class="line">  wd</span><br><span class="line">  zsh-autosuggestions</span><br><span class="line">  docker</span><br><span class="line">  docker-compose</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh install zsh-autosuggestions</span></span></span><br><span class="line">git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 持续增加中...</span></span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/31/self_doc/个人软件安装记录/" data-id="cjzv7orap000v3gs6oqk9m5ni" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tools安装/">tools安装</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-backend/docker/docker_构建最小_go_app" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/30/backend/docker/docker_构建最小_go_app/" class="article-date">
@@ -121,7 +363,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/30/backend/docker/docker_构建最小_go_app/" data-id="cjzhtsck6002ay3s6up5v60pi" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/30/backend/docker/docker_构建最小_go_app/" data-id="cjzv7orbz00223gs6kknl215p" class="article-share-link">分享</a>
       
       
       
@@ -168,11 +410,115 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/frontend/css/basic_1_0_css_position/" data-id="cjzhtsckl0031y3s6ameyp5rm" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/frontend/css/basic_1_0_css_position/" data-id="cjzv7orcc002y3gs6esfc38yb" class="article-share-link">分享</a>
       
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css grid</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/DynamicProgramming/动态规划总结" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/alg/DynamicProgramming/动态规划总结/" class="article-date">
+  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/动态规划总结/">动态规划</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>动态规划求解的一般思路： <br><br>　　判断问题的子结构（也可看作状态），当具有最优子结构时，动态规划可能适用。<br><br>　　求解重叠子问题。一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。分治法则不同，每次递归都产生新的问题。<br><br>　　重新构造一个最优解。<br></p>
+<p><strong>最优子结构?</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/动态规划总结/" data-id="cjzv7orbk001b3gs6mdf148qe" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/DynamicProgramming/1_1_Fibonacci numbers" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" class="article-date">
+  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/">Program for Fibonacci numbers</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>来源：<a href="https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/</a></p>
+<p>The Fibonacci numbers are the numbers in the following integer sequence.</p>
+<p>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ……..</p>
+<p>In mathematical terms, the sequence Fn of Fibonacci numbers is defined by the recurrence relation</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fn = Fn-1 + Fn-2</span><br></pre></td></tr></table></figure>
+<p>with seed values</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">F0 = 0 and F1 = 1.</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.geeksforgeeks.org/wp-content/uploads/fibonacci-sequence.png" alt="fibonacci-sequence"></p>
+<p>Given a number n, print n-th Fibonacci Number.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input  : n = 2</span><br><span class="line">Output : 1</span><br><span class="line"></span><br><span class="line">Input  : n = 9</span><br><span class="line">Output : 34</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" data-id="cjzv7orbj001a3gs6o0c7752f" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li></ul>
 
     </footer>
   </div>
@@ -992,115 +1338,11 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/题集/" data-id="cjzhtscjq001dy3s6g7y8c3qq" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/题集/" data-id="cjzv7orbn001f3gs62vj494ef" class="article-share-link">分享</a>
       
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/题集/">题集</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/DynamicProgramming/动态规划总结" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/alg/DynamicProgramming/动态规划总结/" class="article-date">
-  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/alg/">alg</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/动态规划总结/">动态规划</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>动态规划求解的一般思路： <br><br>　　判断问题的子结构（也可看作状态），当具有最优子结构时，动态规划可能适用。<br><br>　　求解重叠子问题。一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。分治法则不同，每次递归都产生新的问题。<br><br>　　重新构造一个最优解。<br></p>
-<p><strong>最优子结构?</strong></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/动态规划总结/" data-id="cjzhtscjm0018y3s6gk161woe" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/DynamicProgramming/1_1_Fibonacci numbers" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" class="article-date">
-  <time datetime="2018-08-29T13:18:44.000Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/alg/">alg</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/">Program for Fibonacci numbers</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>来源：<a href="https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/" target="_blank" rel="noopener">https://www.cdn.geeksforgeeks.org/program-for-nth-fibonacci-number/</a></p>
-<p>The Fibonacci numbers are the numbers in the following integer sequence.</p>
-<p>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ……..</p>
-<p>In mathematical terms, the sequence Fn of Fibonacci numbers is defined by the recurrence relation</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Fn = Fn-1 + Fn-2</span><br></pre></td></tr></table></figure>
-<p>with seed values</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">F0 = 0 and F1 = 1.</span><br></pre></td></tr></table></figure>
-<p><img src="https://www.geeksforgeeks.org/wp-content/uploads/fibonacci-sequence.png" alt="fibonacci-sequence"></p>
-<p>Given a number n, print n-th Fibonacci Number.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input  : n = 2</span><br><span class="line">Output : 1</span><br><span class="line"></span><br><span class="line">Input  : n = 9</span><br><span class="line">Output : 34</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/alg/DynamicProgramming/1_1_Fibonacci numbers/" data-id="cjzhtscjo0019y3s6535u40ww" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/动态规划/">动态规划</a></li></ul>
 
     </footer>
   </div>
@@ -1161,7 +1403,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/devops/supervisor_learn/" data-id="cjzhtscim000iy3s6i7v9ijrb" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/devops/supervisor_learn/" data-id="cjzv7orai000i3gs60knyvhj0" class="article-share-link">分享</a>
       
       
       
@@ -1230,224 +1472,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/java/spring_aop/" data-id="cjzhtsck8002gy3s6844vax9b" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/08/29/backend/java/spring_aop/" data-id="cjzv7orc200293gs6c10as7hq" class="article-share-link">分享</a>
       
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-aop/">spring aop</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/java/Lombok原理分析与功能实现" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/backend/java/Lombok原理分析与功能实现/" class="article-date">
-  <time datetime="2018-08-29T13:14:48.231Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/backend/java/Lombok原理分析与功能实现/">Lombok原理分析与功能实现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>参考：<a href="https://blog.mythsman.com/2017/12/19/1/" target="_blank" rel="noopener">https://blog.mythsman.com/2017/12/19/1/</a></p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
-<li>定义编译期的注解</li>
-<li>利用JSR269 api(Pluggable Annotation Processing API )创建编译期的注解处理器</li>
-<li>利用tools.jar的javac api处理AST(抽象语法树)</li>
-<li>将功能注册进jar包</li>
-</ol>
-<h2 id="基础点"><a href="#基础点" class="headerlink" title="基础点"></a>基础点</h2><ol>
-<li>注解</li>
-<li>JSR269 api</li>
-<li>javac api处理AST</li>
-</ol>
-<h2 id="手撸Getter"><a href="#手撸Getter" class="headerlink" title="手撸Getter"></a>手撸Getter</h2><p>实验的目的是自定义一个针对类的Getter注解，它能够读取该类的成员方法并自动生成getter方法。</p>
-<h3 id="创建Getter注解"><a href="#创建Getter注解" class="headerlink" title="创建Getter注解"></a>创建Getter注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.lombokLearn;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.ElementType;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.RetentionPolicy;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Getter &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="创建Getter注解的处理器"><a href="#创建Getter注解的处理器" class="headerlink" title="创建Getter注解的处理器"></a>创建Getter注解的处理器</h3><h4 id="基本框架"><a href="#基本框架" class="headerlink" title="基本框架"></a>基本框架</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> laboratory.lombokLearn;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.processing.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.SourceVersion;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.element.TypeElement;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="meta">@SupportedAnnotationTypes</span>(<span class="string">"laboratory.lombokLearn.Getter"</span>)</span><br><span class="line"><span class="meta">@SupportedSourceVersion</span>(SourceVersion.RELEASE_8)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetterProcessor</span> <span class="keyword">extends</span> <span class="title">AbstractProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后需要着重实现两个方法，init跟process。init的主要用途是通过ProcessingEnvironment来获取编译阶段的一些环境信息;process主要是实现具体逻辑的地方，也就是对AST进行处理的地方。</p>
-<h4 id="init-方法"><a href="#init-方法" class="headerlink" title="init 方法"></a>init 方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Messager messager;</span><br><span class="line"><span class="keyword">private</span> JavacTrees trees;</span><br><span class="line"><span class="keyword">private</span> TreeMaker treeMaker;</span><br><span class="line"><span class="keyword">private</span> Names names;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">    <span class="keyword">this</span>.messager = processingEnv.getMessager();</span><br><span class="line">    <span class="keyword">this</span>.trees = JavacTrees.instance(processingEnv);</span><br><span class="line">    Context context = ((JavacProcessingEnvironment) processingEnv).getContext();</span><br><span class="line">    <span class="keyword">this</span>.treeMaker = TreeMaker.instance(context);</span><br><span class="line">    <span class="keyword">this</span>.names = Names.instance(context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>Messager主要是用来在编译期打log用的</li>
-<li>JavacTrees提供了待处理的抽象语法树</li>
-<li>TreeMaker封装了创建AST节点的一些方法</li>
-<li>Names提供了创建标识符的方法</li>
-</ol>
-<h4 id="PROCESS方法"><a href="#PROCESS方法" class="headerlink" title="PROCESS方法"></a>PROCESS方法</h4><p>步骤大概是下面这样：</p>
-<ol>
-<li>利用roundEnv的getElementsAnnotatedWith方法过滤出被Getter这个注解标记的类，并存入set</li>
-<li>遍历这个set里的每一个元素，并生成jCTree这个语法树</li>
-<li>创建一个TreeTranslator，并重写其中的visitClassDef方法，这个方法处理遍历语法树得到的类定义部分jcClassDecl<blockquote>
-<p>创建一个jcVariableDeclList保存类的成员变量<br>遍历jcTree的所有成员(包括成员变量和成员函数和构造函数)，过滤出其中的成员变量，并添加进jcVariableDeclList<br>将jcVariableDeclList的所有变量转换成需要添加的getter方法，并添加进jcClassDecl的成员中<br>调用默认的遍历方法遍历处理后的jcClassDecl</p>
-</blockquote>
-</li>
-<li>利用上面的TreeTranslator去处理jcTree</li>
-</ol>
-<h2 id="summary-answer-question"><a href="#summary-answer-question" class="headerlink" title="summary (answer question)"></a>summary (answer question)</h2><h3 id="1-注解的理解"><a href="#1-注解的理解" class="headerlink" title="1. 注解的理解"></a>1. 注解的理解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br></pre></td></tr></table></figure>
-<p>这个是编译时运行的注解，其实我更加想知道运行时的注解，如何运作的。</p>
-<h3 id="2-JSR269-api-是啥？"><a href="#2-JSR269-api-是啥？" class="headerlink" title="2. JSR269 api 是啥？"></a>2. JSR269 api 是啥？</h3><p>Pluggable Annotation Processing API（注解处理器）</p>
-<h3 id="3-AST-what？"><a href="#3-AST-what？" class="headerlink" title="3. AST what？"></a>3. AST what？</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> JavacTrees trees;</span><br></pre></td></tr></table></figure>
-<p>这个就是语法树</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcTree.accept(）</span><br></pre></td></tr></table></figure>
-<p>为类增加方法</p>
-<h3 id="运行时的注解"><a href="#运行时的注解" class="headerlink" title="运行时的注解"></a>运行时的注解</h3><p>我研究一下<code>@Cacheable</code>注解吧</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/backend/java/Lombok原理分析与功能实现/" data-id="cjzhtsck50027y3s6i3uwm9yn" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/lombok/">lombok</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/原理/">原理</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-block_chain/搭建自己的私有网络" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/block_chain/搭建自己的私有网络/" class="article-date">
-  <time datetime="2018-08-29T13:14:48.228Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/29/block_chain/搭建自己的私有网络/">搭建自己的私有网络</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ol>
-<li>创建私有的以太网</li>
-<li>在私有网部署一个简单的智能合约</li>
-<li>使用该公约发起交易</li>
-</ol>
-<p><strong>注意事项：</strong> 机子内存要2G及以上</p>
-<h2 id="setp1-安装环境"><a href="#setp1-安装环境" class="headerlink" title="setp1:  安装环境"></a>setp1:  安装环境</h2><p><strong>记录坑：</strong><br>通过 <code>apt-get install geth</code> 安装的环境只有 <code>geth</code> 命令，无 <code>bootnode</code>,  <code>evm</code>,  <code>disasm</code>,  <code>rlpdump</code>,  <code>ethtest</code>这些命令。</p>
-<p>Ubuntu安装方式：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install software-properties-common</span><br><span class="line">sudo add-apt-repository -y ppa:ethereum/ethereum</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install ethereum</span><br></pre></td></tr></table></figure></p>
-<p>可以选择源码安装：(前提是需要 golang &gt; 1.7)<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ethereum/go-ethereum</span><br><span class="line"><span class="built_in">cd</span> go-ethereum</span><br><span class="line">make geth</span><br></pre></td></tr></table></figure></p>
-<h2 id="step2-创建创世块"><a href="#step2-创建创世块" class="headerlink" title="step2: 创建创世块"></a>step2: 创建创世块</h2><p>创世块是区块链的第一个块并且参数被指定在<em>genesis.json</em>文件中，内容如下：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"config"</span>: &#123;</span><br><span class="line"> <span class="attr">"chainId"</span>: <span class="number">15</span>,</span><br><span class="line"> <span class="attr">"homesteadBlock"</span>: <span class="number">0</span>,</span><br><span class="line"> <span class="attr">"eip155Block"</span>: <span class="number">0</span>,</span><br><span class="line"> <span class="attr">"eip158Block"</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line"> <span class="attr">"alloc"</span>  : &#123;</span><br><span class="line"> <span class="attr">"0x0000000000000000000000000000000000000001"</span>: &#123;<span class="attr">"balance"</span>: <span class="string">"111111111"</span>&#125;,</span><br><span class="line"> <span class="attr">"0x0000000000000000000000000000000000000002"</span>: &#123;<span class="attr">"balance"</span>: <span class="string">"222222222"</span>&#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line"> <span class="attr">"coinbase"</span>  : <span class="string">"0x0000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"difficulty"</span> : <span class="string">"0x00001"</span>,</span><br><span class="line"> <span class="attr">"extraData"</span>  : <span class="string">""</span>,</span><br><span class="line"> <span class="attr">"gasLimit"</span>  : <span class="string">"0x2fefd8"</span>,</span><br><span class="line"> <span class="attr">"nonce"</span>  : <span class="string">"0x0000000000000107"</span>,</span><br><span class="line"> <span class="attr">"mixhash"</span>  : <span class="string">"0x0000000000000000000000000000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"parentHash"</span> : <span class="string">"0x0000000000000000000000000000000000000000000000000000000000000000"</span>,</span><br><span class="line"> <span class="attr">"timestamp"</span>  : <span class="string">"0x00"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><strong>注意：</strong> <code>chainId=1</code> 指向的是以太坊的主链上。因此为您的网络创建唯一的<code>chainId</code>非常重要，这样您的客户端就不会混淆私有区块链和主网络.为了说明和测试，将采矿难度(<code>difficulty</code>)设置为较低值。还要确保你指定一个唯一的随机数来开始(<code>nonce</code>)。<code>alloc</code>字段允许您使用Ether预先填充帐户。<br>现在到您创建的<code>genesis.json</code>文件的目录并初始化<code>bootnode</code>节点，您的以太坊客户端可通过该节点加入您的专用网络并与连接到您的专用网络的其他节点进行交互。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/ucsfnet/data</span><br><span class="line">geth --datadir=learn init genesis.json </span><br><span class="line">bootnode --genkey=boot.key </span><br><span class="line">bootnode --nodekey=boot.key</span><br></pre></td></tr></table></figure>
-<p>没有bootnode的原因：see  step1</p>
-<h2 id="step3-连接到bootnode上"><a href="#step3-连接到bootnode上" class="headerlink" title="step3: 连接到bootnode上"></a>step3: 连接到bootnode上</h2><p>开一个新终端：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh root@101.102.103.104</span><br><span class="line">geth --datadir=/root/ucsfnet/data --bootnodes=enode://148f3....@101.102.103.104:3031</span><br></pre></td></tr></table></figure></p>
-<p>将<code>148f3....</code>替换为 <code>step2</code> 生成的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ bootnode --nodekey=boot.key</span><br><span class="line">INFO [03-14|16:30:33] UDP listener up                          self=enode://c591c837ff804c4bdb6a5a8d02e5343d5f96fbf6e198aaf05f91aeb0a9b781e3b6fb95124ac8e4ee1b99ca64df2c93052c54bc02ee1dada70d38bd4a956d4ac4@[::]:30301</span><br></pre></td></tr></table></figure></p>
-<h2 id="step4-创建一个新账号并查询余额"><a href="#step4-创建一个新账号并查询余额" class="headerlink" title="step4: 创建一个新账号并查询余额"></a>step4: 创建一个新账号并查询余额</h2><p>新开一个终端：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">geth attach /root/ucsfnet/data/geth.ipc</span><br></pre></td></tr></table></figure></p>
-<p>连接到网络中：<br>查看有哪些账户,   创建一个新账号密码为：<em>mypassword</em> ,  查询用户余额<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; eth.accounts</span><br><span class="line">[]</span><br><span class="line"></span><br><span class="line">&gt; personal.newAccount(<span class="string">"mypassword"</span>)</span><br><span class="line"><span class="string">"0x73c62b30d6dbe998313384f1c98528c1d372b075"</span></span><br><span class="line"></span><br><span class="line">&gt; web3.fromWei(eth.getBalance(eth.accounts\[0\]), <span class="string">"ether"</span>)</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
-<p>那个<code>0x</code>打头的就是账户地址：<em>0x73c62b30d6dbe998313384f1c98528c1d372b075</em></p>
-<h2 id="step5-在私链上挖矿"><a href="#step5-在私链上挖矿" class="headerlink" title="step5: 在私链上挖矿"></a>step5: 在私链上挖矿</h2><p>挖矿有2目的：</p>
-<blockquote>
-<ol>
-<li>需要为矿工的算力，提供gas</li>
-<li>采矿需要将你的交易写到区块链中</li>
-</ol>
-</blockquote>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">geth --datadir=/root/ucsfnet/data --mine --minerthreads=1 --etherbase=0x...</span><br></pre></td></tr></table></figure>
-<p><em>etherbase</em> 参数应该是<code>step4</code>中的钱包地址<br><em>开始挖矿后会有一段时间加载数据，耗CPU比较严重。</em></p>
-<h2 id="step6-开发一个简单的智能合约"><a href="#step6-开发一个简单的智能合约" class="headerlink" title="step6: 开发一个简单的智能合约"></a>step6: 开发一个简单的智能合约</h2><p>首先需要安装编译器：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:ethereum/ethereum</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install solc</span><br></pre></td></tr></table></figure></p>
-<p>其次，创建合约，并命名为 <code>greeter.sol</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">contract mortal &#123;</span><br><span class="line"></span><br><span class="line">/* Define variable owner of the type address*/</span><br><span class="line"> address owner;</span><br><span class="line"></span><br><span class="line">/* this function is executed at initialization and sets the owner of the contract */</span><br><span class="line"> function mortal() &#123; owner = msg.sender; &#125;</span><br><span class="line"></span><br><span class="line">/* Function to recover the funds on the contract */</span><br><span class="line"> function kill() &#123; if (msg.sender == owner) selfdestruct(owner); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract greeter is mortal &#123;</span><br><span class="line"> /* define variable greeting of the type string */</span><br><span class="line"> string greeting;</span><br><span class="line"></span><br><span class="line">/* this runs when the contract is executed */</span><br><span class="line"> function greeter(string _greeting) public &#123;</span><br><span class="line"> greeting = &quot;UCSFnet lives!&quot;;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">/* main function */</span><br><span class="line"> function greet() constant returns (string) &#123;</span><br><span class="line"> return greeting;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>编译合约：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">solc --bin --abi  -o /root/<span class="built_in">test</span> /root/<span class="built_in">test</span>/greeter.sol</span><br><span class="line"></span><br><span class="line"><span class="comment">## 输出文件</span></span><br><span class="line">$ ls</span><br><span class="line">greeter.abi  greeter.bin  greeter.sol  mortal.abi  mortal.bin</span><br></pre></td></tr></table></figure></p>
-<p>在编译命令行中， <code>--bin --abi</code> 是分别生成 EVM（Ethereum Virtual Machine：以太坊虚拟机）字节码 和 ABI（Application Binary Inferface：应用二进制接口）文件。 <code>-o</code> 指定生成后存放的路径</p>
-<p><strong>合约内容先不研究</strong></p>
-<h2 id="step7-部署GREETER合约到私网"><a href="#step7-部署GREETER合约到私网" class="headerlink" title="step7: 部署GREETER合约到私网"></a>step7: 部署GREETER合约到私网</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _greeting = <span class="string">'Jie lives!'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> browser_ballot_sol_greeterContract = web3.eth.contract([&#123;</span><br><span class="line">    <span class="string">"constant"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"inputs"</span>: [],</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"kill"</span>,</span><br><span class="line">    <span class="string">"outputs"</span>: [],</span><br><span class="line">    <span class="string">"payable"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"function"</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">    <span class="string">"constant"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="string">"inputs"</span>: [],</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"greet"</span>,</span><br><span class="line">    <span class="string">"outputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">""</span>, <span class="string">"type"</span>: <span class="string">"string"</span>&#125;],</span><br><span class="line">    <span class="string">"payable"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"function"</span></span><br><span class="line">&#125;, &#123;<span class="string">"inputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">"_greeting"</span>, <span class="string">"type"</span>: <span class="string">"string"</span>&#125;], <span class="string">"payable"</span>: <span class="literal">false</span>, <span class="string">"type"</span>: <span class="string">"constructor"</span>&#125;]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> browser_ballot_sol_greeter = browser_ballot_sol_greeterContract.new(</span><br><span class="line">    _greeting,</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">from</span>: web3.eth.accounts[<span class="number">0</span>],</span><br><span class="line"></span><br><span class="line">        data: <span class="string">'0x6060604052341561000f57600080fd5b6040516103dd3803806103dd833981016040528080518201919050505b5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505b6040805190810160405280600d81526020017f48656c6c6f2c20576f726c642100000000000000000000000000000000000000815250600190805190602001906100b99291906100c1565b505b50610166565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061010257805160ff1916838001178555610130565b82800160010185558215610130579182015b8281111561012f578251825591602001919060010190610114565b5b50905061013d9190610141565b5090565b61016391905b8082111561015f576000816000905550600101610147565b5090565b90565b610268806101756000396000f30060606040526000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806341c0e1b514610049578063cfae32171461005e575b600080fd5b341561005457600080fd5b61005c6100ed565b005b341561006957600080fd5b61007161017f565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100b25780820151818401525b602081019050610096565b50505050905090810190601f1680156100df5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561017c576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b5b565b610187610228565b60018054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561021d5780601f106101f25761010080835404028352916020019161021d565b820191906000526020600020905b81548152906001019060200180831161020057829003601f168201915b505050505090505b90565b6020604051908101604052806000815250905600a165627a7a7230582069d50e4318daa30d3f74bb817c3b0cb732c4ec6a493eb108266c548906c8b6d70029'</span>,</span><br><span class="line"></span><br><span class="line">        gas: <span class="string">'1000000'</span></span><br><span class="line"></span><br><span class="line">    &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">e, contract</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">console</span>.log(e, contract);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> contract.address !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'Contract mined! address: '</span> + contract.address + <span class="string">' transactionHash: '</span> + contract.transactionHash);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
-<p>数据看着填吧，启动一个终端，连接到私链上<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh root@101.102.103.104 </span><br><span class="line">geth attach /root/ucsfnet/data/geth.ipc </span><br><span class="line">&gt; web3.fromWei(eth.getBalance(eth.accounts[0]), <span class="string">"ether"</span>)</span><br><span class="line">&gt; personal.unlockAccount(eth.accounts[0], <span class="string">"mypassword"</span>)</span><br></pre></td></tr></table></figure></p>
-<p>部署合约需要account上有余额，且account处于unlock状态下。<br>使用下面的命令载入合约：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loadScript(<span class="string">'myContract.js'</span>)</span><br></pre></td></tr></table></figure></p>
-<p><strong>注意：</strong>需要有矿工挖矿保证交易被挖到<br>将会得到如下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Contract mined! address: 0xa76d017c3035dcf15e28b315477f3f19ae275433 transactionHash: 0x732e84efc03638767efc9a46738161c04d561a92cc2e631c63287e63ef38995b</span><br></pre></td></tr></table></figure></p>
-<p>这样合约就部署完成了</p>
-<h2 id="与合同的交换"><a href="#与合同的交换" class="headerlink" title="与合同的交换"></a>与合同的交换</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="keyword">var</span> abi = <span class="string">'[&#123;"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"type":"function"&#125;,&#123;"constant":true,"inputs":[],"name":"greet","outputs":[&#123;"name":"","type":"string"&#125;],"payable":false,"type":"function"&#125;,&#123;"inputs":[&#123;"name":"_greeting","type":"string"&#125;],"payable":false,"type":"constructor"&#125;]'</span></span><br><span class="line">&gt; <span class="keyword">var</span> abi = <span class="built_in">JSON</span>.parse(abi)</span><br><span class="line">&gt; <span class="keyword">var</span> contract = web3.eth.contract(abi)</span><br><span class="line">&gt; <span class="keyword">var</span> c = contract.at(<span class="string">"0xa76d017c3035dcf15e28b315477f3f19ae275433"</span>)</span><br><span class="line">&gt; c.greet()</span><br></pre></td></tr></table></figure>
-<p>会有一个输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UCSFnet lives!</span><br></pre></td></tr></table></figure></p>
-<p> 我这输出的是：”Hello, World!”  ….</p>
-<h2 id="博客推荐"><a href="#博客推荐" class="headerlink" title="博客推荐"></a>博客推荐</h2><p><a href="https://ocalog.com/post/10/" target="_blank" rel="noopener">Nice low-level description of networking in Ethereum (uses the Python-based client):</a></p>
-<p><a href="https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster" target="_blank" rel="noopener">Setting up private network or local cluster</a></p>
-<p><a href="https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts" target="_blank" rel="noopener">Managing your accounts</a></p>
-<p><a href="https://github.com/ethereum/go-ethereum/wiki/Connecting-to-the-network" target="_blank" rel="noopener">Connecting to the network</a></p>
-<p><a href="https://github.com/ethereum/go-ethereum" target="_blank" rel="noopener">The Go Ethereum client</a></p>
-<p><a href="https://ethereum.org/cli" target="_blank" rel="noopener">Official Ethereum command line tool documentation</a></p>
-<p>参考（算是翻译）：<br><a href="https://omarmetwally.blog/2017/07/25/how-to-create-a-private-ethereum-network/" target="_blank" rel="noopener">How to create a private Ethereum network</a></p>
-<h2 id="下一个目标"><a href="#下一个目标" class="headerlink" title="下一个目标"></a>下一个目标</h2><p><a href="https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/" target="_blank" rel="noopener">https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/block_chain/搭建自己的私有网络/" data-id="cjzhtsci90008y3s688p8cyfb" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blockchain/">blockchain</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/以太坊/">以太坊</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-block_chain/在私有网络上搭建3个以上节点" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/29/block_chain/在私有网络上搭建3个以上节点/" class="article-date">
-  <time datetime="2018-08-29T13:14:48.227Z" itemprop="datePublished">2018-08-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="在私有网络上搭建3个以上节点"><a href="#在私有网络上搭建3个以上节点" class="headerlink" title="在私有网络上搭建3个以上节点"></a>在私有网络上搭建3个以上节点</h1><h2 id="Step-1-创建创世块"><a href="#Step-1-创建创世块" class="headerlink" title="Step 1: 创建创世块"></a>Step 1: 创建创世块</h2><h2 id="Step-2-删除旧数据"><a href="#Step-2-删除旧数据" class="headerlink" title="Step 2: 删除旧数据"></a>Step 2: 删除旧数据</h2><h2 id="Step-3-重新初始化创世块"><a href="#Step-3-重新初始化创世块" class="headerlink" title="Step 3: 重新初始化创世块"></a>Step 3: 重新初始化创世块</h2><h2 id="Step-4-发现每个节点的enode地址"><a href="#Step-4-发现每个节点的enode地址" class="headerlink" title="Step 4: 发现每个节点的enode地址"></a>Step 4: 发现每个节点的enode地址</h2><h2 id="Step-5-在每个节点上创建static-nodes-json文件"><a href="#Step-5-在每个节点上创建static-nodes-json文件" class="headerlink" title="Step 5: 在每个节点上创建static-nodes.json文件"></a>Step 5: 在每个节点上创建static-nodes.json文件</h2><h2 id="Step-6-启动私人网络"><a href="#Step-6-启动私人网络" class="headerlink" title="Step 6: 启动私人网络"></a>Step 6: 启动私人网络</h2><h2 id="Step-7-在私网上挖掘"><a href="#Step-7-在私网上挖掘" class="headerlink" title="Step 7: 在私网上挖掘"></a>Step 7: 在私网上挖掘</h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/29/block_chain/在私有网络上搭建3个以上节点/" data-id="cjzhtsci70006y3s6oveo7dh2" class="article-share-link">分享</a>
-      
-      
-      
     </footer>
   </div>
   
@@ -1482,23 +1512,23 @@
       <ul>
         
           <li>
+            <a href="/2019/08/28/self_doc/blog-迁移计划/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/24/build_own_x/emacs/undo-tree/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/21/basic/diff_learn/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
             <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>

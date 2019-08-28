@@ -69,6 +69,117 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-frontend/优秀项目" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/08/frontend/优秀项目/" class="article-date">
+  <time datetime="2019-08-08T02:02:55.988Z" itemprop="datePublished">2019-08-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <ol>
+<li><a href="https://juejin.im/post/5d3e5522e51d454fd8057c76" target="_blank" rel="noopener">编写一个非常精美的Flutter Todo-List项目</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/08/08/frontend/优秀项目/" data-id="cjzv7oraf000e3gs6kvnahakh" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/一致性hash" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/08/alg/一致性hash/" class="article-date">
+  <time datetime="2019-08-08T01:38:52.596Z" itemprop="datePublished">2019-08-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="一致性-hash"><a href="#一致性-hash" class="headerlink" title="一致性 hash"></a>一致性 hash</h1><h3 id="一致性-hash-解决的问题"><a href="#一致性-hash-解决的问题" class="headerlink" title="一致性 hash 解决的问题"></a>一致性 hash 解决的问题</h3><p>在使用n台缓存服务器时，一种常用的负载均衡方式是，对资源o的请求使用 ${\displaystyle {\mbox{hash}}(o)=o\mod n}$ 来映射到某一台缓存服务器。当增加或减少一台缓存服务器时这种方式可能会改变所有资源对应的hash值，也就是所有的缓存都失效了，这会使得缓存服务器大量集中地向原始内容服务器更新缓存。因此需要一致哈希算法来避免这样的问题。 一致哈希尽可能使同一个资源映射到同一台缓存服务器。这种方式要求增加一台缓存服务器时，新的服务器尽量分担存储其他所有服务器的缓存资源。减少一台缓存服务器时，其他所有服务器也可以尽量分担存储它的缓存资源。 一致哈希算法的主要思想是将每个缓存服务器与一个或多个哈希值域区间关联起来，其中区间边界通过计算缓存服务器对应的哈希值来决定。（定义区间的哈希函数不一定和计算缓存服务器哈希值的函数相同，但是两个函数的返回值的范围需要匹配。）如果一个缓存服务器被移除，则它所对应的区间会被并入到邻近的区间，其他的缓存服务器不需要任何改变。</p>
+<p>总结:</p>
+<p>解决的是分布式缓存,节点失效导致数据不可用和数据倾斜的问题.</p>
+<p>原理:</p>
+<p><img src="assets/a0e32fde-3a5f-11e6-969d-085f64220e63.png" alt="a0e32fde-3a5f-11e6-969d-085f64220e63"></p>
+<p>图片出自: <a href="https://yikun.github.io/2016/06/09/一致性哈希算法的理解与实践/" target="_blank" rel="noopener">一致性哈希算法的理解与实践</a></p>
+<p>参考:</p>
+<p><a href="https://yikun.github.io/2016/06/09/一致性哈希算法的理解与实践/" target="_blank" rel="noopener">一致性哈希算法的理解与实践</a></p>
+<p><a href="https://zh.wikipedia.org/zh-hans/一致哈希" target="_blank" rel="noopener">wiki: 一致性 hash</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/08/08/alg/一致性hash/" data-id="cjzv7ora100043gs6i0l9k409" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/finance/atr" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/22/alg/finance/atr/" class="article-date">
+  <time datetime="2019-07-22T15:46:56.580Z" itemprop="datePublished">2019-07-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="ATR"><a href="#ATR" class="headerlink" title="ATR"></a>ATR</h1><p>ATR又称 Average true range平均真实波动范围，简称ATR指标，是由J.Welles Wilder 发明的，ATR指标主要是用来衡量市场波动的强烈度，即为了显示市场变化率的指标。</p>
+<p>首先提出的，这一指标主要用来衡量价格的波动。因此，这一技术指标并不能直接反映价格走向及其趋势稳定性，而只是表明价格波动的程度。</p>
+<h3 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h3><p><img src="https://alicdn.ricequant.com/upload/62/2fae2f750d188ad79b9c969e732ba562.jpeg" alt="img"></p>
+<p>$$TR = max[(high-low), abs(high - close_{prev}), abs(low-close_{prev})]$$</p>
+<p>$$ATR_t = \frac{ATR_{t-1} * (n - 1) + TR_t}{n}$$</p>
+<p>$$ATR = \frac{1}{n}\sum^{n}_{i=1}{TR_i}$$</p>
+<p>参考:</p>
+<p><a href="https://www.ricequant.com/community/topic/2397" target="_blank" rel="noopener">https://www.ricequant.com/community/topic/2397</a></p>
+<p><a href="https://wiki.mbalib.com/wiki/均幅指标" target="_blank" rel="noopener">https://wiki.mbalib.com/wiki/%E5%9D%87%E5%B9%85%E6%8C%87%E6%A0%87</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/07/22/alg/finance/atr/" data-id="cjzv7orbm001e3gs6sdrql9ce" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-alg/knuth_shuffle" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/07/19/alg/knuth_shuffle/" class="article-date">
@@ -90,7 +201,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/19/alg/knuth_shuffle/" data-id="cjzhtsci00002y3s67t5fbslz" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/19/alg/knuth_shuffle/" data-id="cjzv7or9v00023gs6lwnnp27e" class="article-share-link">分享</a>
       
       
       
@@ -123,7 +234,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/17/alg/reservoir_sampling/" data-id="cjzhtsci30003y3s611vsarpu" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/17/alg/reservoir_sampling/" data-id="cjzv7or9z00033gs6rk6tx77a" class="article-share-link">分享</a>
       
       
       
@@ -181,7 +292,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/13/basic/正则零宽断言/" data-id="cjzhtsci80007y3s6p8luwccd" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/13/basic/正则零宽断言/" data-id="cjzv7ora300063gs6a9hbv4g8" class="article-share-link">分享</a>
       
       
       
@@ -216,7 +327,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/12/ide/vscode/vscode-snippet/" data-id="cjzhtscko0037y3s6xql5xwyc" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/12/ide/vscode/vscode-snippet/" data-id="cjzv7orci00393gs6g3f0ox4f" class="article-share-link">分享</a>
       
       
       
@@ -248,7 +359,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/09/backend/styleguide/python/" data-id="cjzhtsckc002oy3s6ssio9had" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/09/backend/styleguide/python/" data-id="cjzv7orc7002m3gs68nnox7rv" class="article-share-link">分享</a>
       
       
       
@@ -289,7 +400,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/03/backend/python/python 项目目录结构/" data-id="cjzhtsck7002ey3s65aqzw085" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/03/backend/python/python 项目目录结构/" data-id="cjzv7orc8002p3gs6n3ldjwf8" class="article-share-link">分享</a>
       
       
       
@@ -322,227 +433,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/02/alg/finance/rsi/" data-id="cjzhtsck30024y3s63w7gen86" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/finance/bias" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/29/alg/finance/bias/" class="article-date">
-  <time datetime="2019-06-29T14:20:13.239Z" itemprop="datePublished">2019-06-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="BIAS"><a href="#BIAS" class="headerlink" title="BIAS"></a>BIAS</h1><p>BIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。</p>
-<p>乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。</p>
-<p>乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条以0值为横向中轴之波动伸延的曲线。</p>
-<h2 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h2><ol>
-<li>计算方法 一</li>
-</ol>
-<p>$$BIAS(乖离率) = \frac{当日收盘价-N日平均价}{N日平均价} * 100 \%$$</p>
-<p>其中N，一般5、6、10、12、24、30和72。在实际运用中，短线使用6日乖离率较为有效，中线则放大为10日或12日。</p>
-<ol start="2">
-<li>计算方法 二</li>
-</ol>
-<p>$BIAS=(EMA(收盘价, N) - \frac{MA(收盘价, M)}{MA(收盘价, M)}) * 100$</p>
-<p>其中，N取超短周期，例如4，7，9，12等；M为大周期，例如，38，57，137，254，526等；</p>
-<h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol>
-<li>当取N的值为6:</li>
-</ol>
-<p>1) 如果指数和平均线之间的乖离率达到6%以上,则表示该阶段处于超买区,投资者可以在此进行卖出的操作,如果指数与平均线之间的乖离率达到6%以下时为则显示为超卖区,投资者可在此进行买入操作.</p>
-<p>2) 如果指数和均线乖离率达8%以上时为超买区,投资者可以考虑卖出;指数和平均线间的乖离率达到-3%以下时为超卖区,是交易者进行买进的时机.</p>
-<ol start="2">
-<li>当N取值12时;</li>
-</ol>
-<p>1) 指数和12日平均线间的乖离率达5%以上时为超买区域,是投资者卖出的时机;指数和12日平均线乖离率达-5%以下时为超卖区,是交易买进的时机.</p>
-<p>2)指数与12日平均线乖离率达6%以上时为超买区,是交易卖出的时机;指数与12日平均线的乖离率达-4%以下时为超卖区,看做是交易买进的时机.</p>
-<ol start="3">
-<li><p>如果汇市处于不断上升的时候,可以选择在高价处的正乖离率点卖出操作;反之汇市不断下降,可以选择在最低价的负乖离率数卖出操作.</p>
-</li>
-<li><p>如果遇到汇率在不断下跌的同时,负乖离率增大,空头方向可以在此处进行平仓的操作,比较安全.另外在乖离率等于零以后出现反弹,则可以进行卖出的操作.</p>
-</li>
-</ol>
-<h2 id="组合应用"><a href="#组合应用" class="headerlink" title="组合应用"></a>组合应用</h2><p>在技术性<a href="https://baike.baidu.com/item/%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">反弹</a><a href="https://baike.baidu.com/item/%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">行情</a>中乖离率指标适合与随机指标组合运用，KD指标和BIAS指标可以使得反弹行情中的操作变得及时准确。在反弹行情中，BIAS指标的功用是确认<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>是否<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C" target="_blank" rel="noopener">超跌</a>，而KD指标的作用是显示<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>是否有拐头向上的动能，两者的结合有利于投资者准确判断出抢反弹的最佳时机。具体的应用原则：</p>
-<ol>
-<li><p>将BIAS指标的参数设置为24日，将KD指标的参数设置为9；3；3。</p>
-</li>
-<li><p><a href="https://baike.baidu.com/item/BIAS%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">BIAS指标</a>要小于-6，这只是确认该股超跌的初选条件。</p>
-</li>
-<li><p>KD指标产生黄金交叉，K线上穿D线。</p>
-</li>
-<li><p>KD交叉同时，KD指标中的D值要小于16。</p>
-</li>
-</ol>
-<p>第二种组合，乖离率指标与<a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">布林线指标</a>的结合运用适合在<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">超跌反弹</a>行情中的买入：对于这类反弹行情，投资者不宜采用追涨，而要结合技术分析方法，运用BIAS和布林线指标的组合分析，把握<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>进出时机。具体方法是：</p>
-<ol>
-<li><p>当BIAS的三条<a href="https://baike.baidu.com/item/%E7%9F%AD%E6%9C%9F%E5%9D%87%E7%BA%BF" target="_blank" rel="noopener">短期均线</a>全部小于0时；</p>
-</li>
-<li><p><a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>也已经触及BOLL的下轨线LB；</p>
-</li>
-<li><p><a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF" target="_blank" rel="noopener">布林线</a>正处于不断收敛状态中的；</p>
-</li>
-<li><p>BIAS的短期均线上穿长期均线，并且成交量逐渐放大的。</p>
-</li>
-</ol>
-<p>当符合上述条件时，<a href="https://baike.baidu.com/item/%E6%8A%95%E8%B5%84%E8%80%85" target="_blank" rel="noopener">投资者</a>可以积极择股买入。</p>
-<p><strong>参考</strong></p>
-<p><a href="https://baike.baidu.com/item/%E4%B9%96%E7%A6%BB%E7%8E%87/420286" target="_blank" rel="noopener">https://baike.baidu.com/item/乖离率/420286</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/29/alg/finance/bias/" data-id="cjzhtscju001jy3s6wc33y4qs" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/finance/macd" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/27/alg/finance/macd/" class="article-date">
-  <time datetime="2019-06-27T15:43:36.269Z" itemprop="datePublished">2019-06-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="MACD-指标"><a href="#MACD-指标" class="headerlink" title="MACD 指标"></a>MACD 指标</h1><p>MACD ( Moving Average Convergence / Divergence ) 称为异同移动平均线, 是从双指数移动平均线发展而来的，由快的指数移动平均线（EMA12）减去慢的指数移动平均线（EMA26）得到快线DIF，再用2×（快线DIF-DIF的9日加权移动均线DEA）得到MACD柱. </p>
-<h2 id="MACD的计算过程"><a href="#MACD的计算过程" class="headerlink" title="MACD的计算过程"></a>MACD的计算过程</h2><p><strong>1、计算移动平均值（EMA）</strong></p>
-<p>$S_n: 今日收盘价​$</p>
-<p>12日EMA的算式为</p>
-<p>$EMA_{12}(n) = EMA_{12}(n - 1) <em> \frac{11}{13} + S_n </em> \frac{2}{13}​$</p>
-<p>26日EMA的算式为</p>
-<p>$EMA_{26}(n) = EMA_{26}(n - 1) <em> \frac{25}{27} + S_n </em> \frac{2}{27}​$</p>
-<p><strong>2、计算离差值（DIF）</strong></p>
-<p>$DIF(n) = EMA_{12}(n) - EMA_{26}(n)​$</p>
-<p><strong>3、计算DIF的9日EMA</strong></p>
-<p>根据离差值计算其9日的EMA，即离差平均值，是所求的MACD值。为了不与指标原名相混淆，此值又名DEA或DEM.</p>
-<p>$DEA(n) = DEA(n-1) <em> \frac{8}{10} + DIF(n)</em>\frac{2}{10}​$</p>
-<p>计算出的DIF和DEA的数值均为正值或负值。</p>
-<p>$MACD柱状图 = (DIF - DEA) * 2​$</p>
-<h2 id="可参考方案"><a href="#可参考方案" class="headerlink" title="可参考方案"></a>可参考方案</h2><ol>
-<li><p>当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)并向上移动时，一般表示为行情处于<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">多头行情</a>中，可以买入<a href="https://baike.baidu.com/item/%E5%BC%80%E4%BB%93" target="_blank" rel="noopener">开仓</a>或<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E6%8C%81%E4%BB%93" target="_blank" rel="noopener">多头持仓</a>；</p>
-</li>
-<li><p>当DIF和DEA均小于0(即在图形上表示为它们处于零线以下)并向下移动时，一般表示为行情处于<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">空头行情</a>中，可以卖出开仓或观望。</p>
-</li>
-<li><p>当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)但都向下移动时，一般表示为行情处于下跌阶段，可以卖出开仓和观望；</p>
-</li>
-<li><p>当DIF和DEA均小于0时(即在图形上表示为它们处于零线以下)但向上移动时，一般表示为行情即将上涨，股票将上涨，可以买入开仓或多头持仓。</p>
-</li>
-</ol>
-<p>其买卖原则为：</p>
-<ol>
-<li><p>DIF、DEA均为正，DIF向上突破DEA，买入信号参考。</p>
-</li>
-<li><p>DIF、DEA均为负，DIF向下跌破DEA，卖出信号参考。</p>
-</li>
-<li><p>DIF线与K线发生背离，行情可能出现反转信号。</p>
-</li>
-<li><p>DIF、DEA的值从正数变成负数，或者从负数变成正数并不是交易信号，因为它们落后于市场。</p>
-</li>
-</ol>
-<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><ol>
-<li><p>MACD<a href="https://baike.baidu.com/item/%E9%87%91%E5%8F%89" target="_blank" rel="noopener">金叉</a>：DIFF 由下向上突破 DEA，为买入信号。</p>
-</li>
-<li><p>MACD<a href="https://baike.baidu.com/item/%E6%AD%BB%E5%8F%89" target="_blank" rel="noopener">死叉</a>：DIFF 由上向下突破 DEA，为卖出信号。</p>
-</li>
-<li><p>MACD 绿转红：MACD 值由负变正，市场由<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4/13825859" target="_blank" rel="noopener">空头</a>转为多头。</p>
-</li>
-<li><p>MACD 红转绿：MACD 值由正变负，市场由多头转为空头。</p>
-</li>
-<li><p>DIFF 与 DEA 均为正值,即都在零轴线以上时，大势属<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E5%B8%82%E5%9C%BA" target="_blank" rel="noopener">多头市场</a>，DIFF 向上突破 DEA，可作买入信号。</p>
-</li>
-<li><p>DIFF 与 DEA 均为负值,即都在零轴线以下时，大势属<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4%E5%B8%82%E5%9C%BA" target="_blank" rel="noopener">空头市场</a>，DIFF 向下跌破 DEA，可作卖出信号。</p>
-</li>
-<li><p>当 DEA 线与 K 线趋势发生<a href="https://baike.baidu.com/item/%E8%83%8C%E7%A6%BB/3696078" target="_blank" rel="noopener">背离</a>时为反转信号。</p>
-</li>
-<li><p>DEA 在盘整局面时失误率较高,但如果配合<a href="https://baike.baidu.com/item/RSI" target="_blank" rel="noopener">RSI</a> 及<a href="https://baike.baidu.com/item/KD" target="_blank" rel="noopener">KD</a>j指标可适当弥补缺点。</p>
-</li>
-</ol>
-<p><strong>参考:</strong></p>
-<p><a href="https://baike.baidu.com/item/MACD%E6%8C%87%E6%A0%87/6271283?fromtitle=MACD&amp;fromid=3334786" target="_blank" rel="noopener">MACD-百度百科</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/27/alg/finance/macd/" data-id="cjzhtsck0001xy3s6iucn7f2t" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/finance/kdj" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/27/alg/finance/kdj/" class="article-date">
-  <time datetime="2019-06-27T01:32:16.198Z" itemprop="datePublished">2019-06-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="KDJ-指标"><a href="#KDJ-指标" class="headerlink" title="KDJ 指标"></a>KDJ 指标</h1><p>KDJ指标又叫<a href="https://baike.baidu.com/item/%E9%9A%8F%E6%9C%BA%E6%8C%87%E6%A0%87/9401249" target="_blank" rel="noopener">随机指标</a>，是一种相当新颖、实用的技术分析指标，它起先用于期货市场的分析，后被广泛用于股市的中短期趋势分析，是期货和股票市场上最常用的技术分析工具。</p>
-<h2 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h2><p>$RSV(n) = \frac{Cn - Ln}{Hn - Ln} * 100​$</p>
-<p>公式中，<strong>Cn为第n日收盘价</strong>；<strong>Ln为n日内的最低价</strong>；<strong>Hn为n日内的最高价</strong></p>
-<p>其次，计算K值与D值：</p>
-<p>$K(n) = \frac{2}{3} <em> K(n - 1) + \frac{1}{3} </em> RSV(n)​$</p>
-<p>$D(n) = \frac{2}{3} <em> D(n-1) + \frac{1}{3} </em> K(n)​$</p>
-<p>若无前一日K 值与D值，则可分别用50来代替。</p>
-<p>$J(n) = 3<em>K(n) - 2</em>D(n)​$</p>
-<h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol>
-<li><p>K与D值永远介于0到100之间。D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。</p>
-</li>
-<li><p>上涨趋势中，K值大于D值，K线向上突破D线时，为买进信号。下跌趋势中，K值小于D值，K线向下跌破D线时，为卖出信号。</p>
-</li>
-<li><p>KD指标不仅能反映出市场的超买超卖程度，还能通过交叉突破发出买卖信号。</p>
-</li>
-<li>KD指标不适于发行量小、交易不活跃的股票，但是KD指标对大盘和热门大盘股有极高准确性。</li>
-<li>当随机指标与股价出现背离时，一般为转势的信号。??</li>
-<li>K值和D值上升或者下跌的速度减弱，倾斜度趋于平缓是短期转势的预警信号。</li>
-</ol>
-<p><strong>参考:</strong></p>
-<p><a href="https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">KDJ-百度百科</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/27/alg/finance/kdj/" data-id="cjzhtscjx001ry3s6jxfg7wbw" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/07/02/alg/finance/rsi/" data-id="cjzv7orbt001r3gs63m47xtvw" class="article-share-link">分享</a>
       
       
       
@@ -580,23 +471,23 @@
       <ul>
         
           <li>
+            <a href="/2019/08/28/self_doc/blog-迁移计划/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/24/build_own_x/emacs/undo-tree/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/21/basic/diff_learn/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
             <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-08-18T01:16:00.458Z</updated>
+  <updated>2019-08-28T12:03:40.190Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,69 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/28/self_doc/blog-%E8%BF%81%E7%A7%BB%E8%AE%A1%E5%88%92/"/>
+    <id>http://yoursite.com/2019/08/28/self_doc/blog-迁移计划/</id>
+    <published>2019-08-28T12:01:23.104Z</published>
+    <updated>2019-08-28T12:03:40.190Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="blog-迁移"><a href="#blog-迁移" class="headerlink" title="blog 迁移"></a>blog 迁移</h1><p>最近要使用 org 作为主要文档编辑, 打算将文章迁移到 org 模板, 然后使用全新的模板</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;blog-迁移&quot;&gt;&lt;a href=&quot;#blog-迁移&quot; class=&quot;headerlink&quot; title=&quot;blog 迁移&quot;&gt;&lt;/a&gt;blog 迁移&lt;/h1&gt;&lt;p&gt;最近要使用 org 作为主要文档编辑, 打算将文章迁移到 org 模板, 然后使用全新的模板&lt;/p&gt;
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/24/build_own_x/emacs/undo-tree/"/>
+    <id>http://yoursite.com/2019/08/24/build_own_x/emacs/undo-tree/</id>
+    <published>2019-08-24T03:41:11.709Z</published>
+    <updated>2019-08-24T03:42:16.689Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="undo-tree-Undo-System"><a href="#undo-tree-Undo-System" class="headerlink" title="undo-tree: Undo System"></a>undo-tree: Undo System</h1><p>参考: <a href="https://elpa.gnu.org/packages/undo-tree.html" target="_blank" rel="noopener">https://elpa.gnu.org/packages/undo-tree.html</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;undo-tree-Undo-System&quot;&gt;&lt;a href=&quot;#undo-tree-Undo-System&quot; class=&quot;headerlink&quot; title=&quot;undo-tree: Undo System&quot;&gt;&lt;/a&gt;undo-tree: Undo System
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="http://yoursite.com/2019/08/21/basic/diff_learn/"/>
+    <id>http://yoursite.com/2019/08/21/basic/diff_learn/</id>
+    <published>2019-08-21T03:13:48.736Z</published>
+    <updated>2019-08-21T03:16:24.462Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="diff-learn"><a href="#diff-learn" class="headerlink" title="diff learn"></a>diff learn</h1><p>参考: <a href="http://www.ruanyifeng.com/blog/2012/08/how_to_read_diff.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2012/08/how_to_read_diff.html</a></p><p>它用来比较两个文本文件的差异，是代码版本管理的基石之一.</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ diff &lt;变动前的文件&gt; &lt;变动后的文件&gt;</span><br></pre></td></tr></table></figure><h2 id="diff-的三种格式"><a href="#diff-的三种格式" class="headerlink" title="diff 的三种格式"></a>diff 的三种格式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">　　* 正常格式（normal diff）</span><br><span class="line"></span><br><span class="line">　　* 上下文格式（context diff）</span><br><span class="line"></span><br><span class="line">　　* 合并格式（unified diff）</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;diff-learn&quot;&gt;&lt;a href=&quot;#diff-learn&quot; class=&quot;headerlink&quot; title=&quot;diff learn&quot;&gt;&lt;/a&gt;diff learn&lt;/h1&gt;&lt;p&gt;参考: &lt;a href=&quot;http://www.ruanyifeng.com
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title></title>
@@ -370,69 +433,6 @@
       
       
         &lt;h1 id=&quot;RSI-指标&quot;&gt;&lt;a href=&quot;#RSI-指标&quot; class=&quot;headerlink&quot; title=&quot;RSI 指标&quot;&gt;&lt;/a&gt;RSI 指标&lt;/h1&gt;&lt;p&gt;RSI ( Relative Strength Index ) 相对强弱指数RSI是根据一定时期内上涨点数和
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/06/29/alg/finance/bias/"/>
-    <id>http://yoursite.com/2019/06/29/alg/finance/bias/</id>
-    <published>2019-06-29T14:20:13.239Z</published>
-    <updated>2019-07-06T06:03:36.254Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="BIAS"><a href="#BIAS" class="headerlink" title="BIAS"></a>BIAS</h1><p>BIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。</p><p>乖离率，是用百分比来表示价格与MA间的偏离程度(差距率)。</p><p>乖离率曲线(BIAS)，是将各BIAS值连成线，得到的一条以0值为横向中轴之波动伸延的曲线。</p><h2 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h2><ol><li>计算方法 一</li></ol><p>$$BIAS(乖离率) = \frac{当日收盘价-N日平均价}{N日平均价} * 100 \%$$</p><p>其中N，一般5、6、10、12、24、30和72。在实际运用中，短线使用6日乖离率较为有效，中线则放大为10日或12日。</p><ol start="2"><li>计算方法 二</li></ol><p>$BIAS=(EMA(收盘价, N) - \frac{MA(收盘价, M)}{MA(收盘价, M)}) * 100$</p><p>其中，N取超短周期，例如4，7，9，12等；M为大周期，例如，38，57，137，254，526等；</p><h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol><li>当取N的值为6:</li></ol><p>1) 如果指数和平均线之间的乖离率达到6%以上,则表示该阶段处于超买区,投资者可以在此进行卖出的操作,如果指数与平均线之间的乖离率达到6%以下时为则显示为超卖区,投资者可在此进行买入操作.</p><p>2) 如果指数和均线乖离率达8%以上时为超买区,投资者可以考虑卖出;指数和平均线间的乖离率达到-3%以下时为超卖区,是交易者进行买进的时机.</p><ol start="2"><li>当N取值12时;</li></ol><p>1) 指数和12日平均线间的乖离率达5%以上时为超买区域,是投资者卖出的时机;指数和12日平均线乖离率达-5%以下时为超卖区,是交易买进的时机.</p><p>2)指数与12日平均线乖离率达6%以上时为超买区,是交易卖出的时机;指数与12日平均线的乖离率达-4%以下时为超卖区,看做是交易买进的时机.</p><ol start="3"><li><p>如果汇市处于不断上升的时候,可以选择在高价处的正乖离率点卖出操作;反之汇市不断下降,可以选择在最低价的负乖离率数卖出操作.</p></li><li><p>如果遇到汇率在不断下跌的同时,负乖离率增大,空头方向可以在此处进行平仓的操作,比较安全.另外在乖离率等于零以后出现反弹,则可以进行卖出的操作.</p></li></ol><h2 id="组合应用"><a href="#组合应用" class="headerlink" title="组合应用"></a>组合应用</h2><p>在技术性<a href="https://baike.baidu.com/item/%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">反弹</a><a href="https://baike.baidu.com/item/%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">行情</a>中乖离率指标适合与随机指标组合运用，KD指标和BIAS指标可以使得反弹行情中的操作变得及时准确。在反弹行情中，BIAS指标的功用是确认<a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>是否<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C" target="_blank" rel="noopener">超跌</a>，而KD指标的作用是显示<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>是否有拐头向上的动能，两者的结合有利于投资者准确判断出抢反弹的最佳时机。具体的应用原则：</p><ol><li><p>将BIAS指标的参数设置为24日，将KD指标的参数设置为9；3；3。</p></li><li><p><a href="https://baike.baidu.com/item/BIAS%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">BIAS指标</a>要小于-6，这只是确认该股超跌的初选条件。</p></li><li><p>KD指标产生黄金交叉，K线上穿D线。</p></li><li><p>KD交叉同时，KD指标中的D值要小于16。</p></li></ol><p>第二种组合，乖离率指标与<a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">布林线指标</a>的结合运用适合在<a href="https://baike.baidu.com/item/%E8%B6%85%E8%B7%8C%E5%8F%8D%E5%BC%B9" target="_blank" rel="noopener">超跌反弹</a>行情中的买入：对于这类反弹行情，投资者不宜采用追涨，而要结合技术分析方法，运用BIAS和布林线指标的组合分析，把握<a href="https://baike.baidu.com/item/%E4%B8%AA%E8%82%A1" target="_blank" rel="noopener">个股</a>进出时机。具体方法是：</p><ol><li><p>当BIAS的三条<a href="https://baike.baidu.com/item/%E7%9F%AD%E6%9C%9F%E5%9D%87%E7%BA%BF" target="_blank" rel="noopener">短期均线</a>全部小于0时；</p></li><li><p><a href="https://baike.baidu.com/item/%E8%82%A1%E4%BB%B7" target="_blank" rel="noopener">股价</a>也已经触及BOLL的下轨线LB；</p></li><li><p><a href="https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF" target="_blank" rel="noopener">布林线</a>正处于不断收敛状态中的；</p></li><li><p>BIAS的短期均线上穿长期均线，并且成交量逐渐放大的。</p></li></ol><p>当符合上述条件时，<a href="https://baike.baidu.com/item/%E6%8A%95%E8%B5%84%E8%80%85" target="_blank" rel="noopener">投资者</a>可以积极择股买入。</p><p><strong>参考</strong></p><p><a href="https://baike.baidu.com/item/%E4%B9%96%E7%A6%BB%E7%8E%87/420286" target="_blank" rel="noopener">https://baike.baidu.com/item/乖离率/420286</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;BIAS&quot;&gt;&lt;a href=&quot;#BIAS&quot; class=&quot;headerlink&quot; title=&quot;BIAS&quot;&gt;&lt;/a&gt;BIAS&lt;/h1&gt;&lt;p&gt;BIAS(乖离率), 又称偏离率，简称Y值, 是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/06/27/alg/finance/macd/"/>
-    <id>http://yoursite.com/2019/06/27/alg/finance/macd/</id>
-    <published>2019-06-27T15:43:36.269Z</published>
-    <updated>2019-07-01T01:31:59.159Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="MACD-指标"><a href="#MACD-指标" class="headerlink" title="MACD 指标"></a>MACD 指标</h1><p>MACD ( Moving Average Convergence / Divergence ) 称为异同移动平均线, 是从双指数移动平均线发展而来的，由快的指数移动平均线（EMA12）减去慢的指数移动平均线（EMA26）得到快线DIF，再用2×（快线DIF-DIF的9日加权移动均线DEA）得到MACD柱. </p><h2 id="MACD的计算过程"><a href="#MACD的计算过程" class="headerlink" title="MACD的计算过程"></a>MACD的计算过程</h2><p><strong>1、计算移动平均值（EMA）</strong></p><p>$S_n: 今日收盘价​$</p><p>12日EMA的算式为</p><p>$EMA_{12}(n) = EMA_{12}(n - 1) <em> \frac{11}{13} + S_n </em> \frac{2}{13}​$</p><p>26日EMA的算式为</p><p>$EMA_{26}(n) = EMA_{26}(n - 1) <em> \frac{25}{27} + S_n </em> \frac{2}{27}​$</p><p><strong>2、计算离差值（DIF）</strong></p><p>$DIF(n) = EMA_{12}(n) - EMA_{26}(n)​$</p><p><strong>3、计算DIF的9日EMA</strong></p><p>根据离差值计算其9日的EMA，即离差平均值，是所求的MACD值。为了不与指标原名相混淆，此值又名DEA或DEM.</p><p>$DEA(n) = DEA(n-1) <em> \frac{8}{10} + DIF(n)</em>\frac{2}{10}​$</p><p>计算出的DIF和DEA的数值均为正值或负值。</p><p>$MACD柱状图 = (DIF - DEA) * 2​$</p><h2 id="可参考方案"><a href="#可参考方案" class="headerlink" title="可参考方案"></a>可参考方案</h2><ol><li><p>当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)并向上移动时，一般表示为行情处于<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">多头行情</a>中，可以买入<a href="https://baike.baidu.com/item/%E5%BC%80%E4%BB%93" target="_blank" rel="noopener">开仓</a>或<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E6%8C%81%E4%BB%93" target="_blank" rel="noopener">多头持仓</a>；</p></li><li><p>当DIF和DEA均小于0(即在图形上表示为它们处于零线以下)并向下移动时，一般表示为行情处于<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4%E8%A1%8C%E6%83%85" target="_blank" rel="noopener">空头行情</a>中，可以卖出开仓或观望。</p></li><li><p>当DIF和DEA均大于0(即在图形上表示为它们处于零线以上)但都向下移动时，一般表示为行情处于下跌阶段，可以卖出开仓和观望；</p></li><li><p>当DIF和DEA均小于0时(即在图形上表示为它们处于零线以下)但向上移动时，一般表示为行情即将上涨，股票将上涨，可以买入开仓或多头持仓。</p></li></ol><p>其买卖原则为：</p><ol><li><p>DIF、DEA均为正，DIF向上突破DEA，买入信号参考。</p></li><li><p>DIF、DEA均为负，DIF向下跌破DEA，卖出信号参考。</p></li><li><p>DIF线与K线发生背离，行情可能出现反转信号。</p></li><li><p>DIF、DEA的值从正数变成负数，或者从负数变成正数并不是交易信号，因为它们落后于市场。</p></li></ol><h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><ol><li><p>MACD<a href="https://baike.baidu.com/item/%E9%87%91%E5%8F%89" target="_blank" rel="noopener">金叉</a>：DIFF 由下向上突破 DEA，为买入信号。</p></li><li><p>MACD<a href="https://baike.baidu.com/item/%E6%AD%BB%E5%8F%89" target="_blank" rel="noopener">死叉</a>：DIFF 由上向下突破 DEA，为卖出信号。</p></li><li><p>MACD 绿转红：MACD 值由负变正，市场由<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4/13825859" target="_blank" rel="noopener">空头</a>转为多头。</p></li><li><p>MACD 红转绿：MACD 值由正变负，市场由多头转为空头。</p></li><li><p>DIFF 与 DEA 均为正值,即都在零轴线以上时，大势属<a href="https://baike.baidu.com/item/%E5%A4%9A%E5%A4%B4%E5%B8%82%E5%9C%BA" target="_blank" rel="noopener">多头市场</a>，DIFF 向上突破 DEA，可作买入信号。</p></li><li><p>DIFF 与 DEA 均为负值,即都在零轴线以下时，大势属<a href="https://baike.baidu.com/item/%E7%A9%BA%E5%A4%B4%E5%B8%82%E5%9C%BA" target="_blank" rel="noopener">空头市场</a>，DIFF 向下跌破 DEA，可作卖出信号。</p></li><li><p>当 DEA 线与 K 线趋势发生<a href="https://baike.baidu.com/item/%E8%83%8C%E7%A6%BB/3696078" target="_blank" rel="noopener">背离</a>时为反转信号。</p></li><li><p>DEA 在盘整局面时失误率较高,但如果配合<a href="https://baike.baidu.com/item/RSI" target="_blank" rel="noopener">RSI</a> 及<a href="https://baike.baidu.com/item/KD" target="_blank" rel="noopener">KD</a>j指标可适当弥补缺点。</p></li></ol><p><strong>参考:</strong></p><p><a href="https://baike.baidu.com/item/MACD%E6%8C%87%E6%A0%87/6271283?fromtitle=MACD&amp;fromid=3334786" target="_blank" rel="noopener">MACD-百度百科</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;MACD-指标&quot;&gt;&lt;a href=&quot;#MACD-指标&quot; class=&quot;headerlink&quot; title=&quot;MACD 指标&quot;&gt;&lt;/a&gt;MACD 指标&lt;/h1&gt;&lt;p&gt;MACD ( Moving Average Convergence / Divergence ) 称
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2019/06/27/alg/finance/kdj/"/>
-    <id>http://yoursite.com/2019/06/27/alg/finance/kdj/</id>
-    <published>2019-06-27T01:32:16.198Z</published>
-    <updated>2019-06-30T14:24:49.914Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="KDJ-指标"><a href="#KDJ-指标" class="headerlink" title="KDJ 指标"></a>KDJ 指标</h1><p>KDJ指标又叫<a href="https://baike.baidu.com/item/%E9%9A%8F%E6%9C%BA%E6%8C%87%E6%A0%87/9401249" target="_blank" rel="noopener">随机指标</a>，是一种相当新颖、实用的技术分析指标，它起先用于期货市场的分析，后被广泛用于股市的中短期趋势分析，是期货和股票市场上最常用的技术分析工具。</p><h2 id="计算方法"><a href="#计算方法" class="headerlink" title="计算方法"></a>计算方法</h2><p>$RSV(n) = \frac{Cn - Ln}{Hn - Ln} * 100​$</p><p>公式中，<strong>Cn为第n日收盘价</strong>；<strong>Ln为n日内的最低价</strong>；<strong>Hn为n日内的最高价</strong></p><p>其次，计算K值与D值：</p><p>$K(n) = \frac{2}{3} <em> K(n - 1) + \frac{1}{3} </em> RSV(n)​$</p><p>$D(n) = \frac{2}{3} <em> D(n-1) + \frac{1}{3} </em> K(n)​$</p><p>若无前一日K 值与D值，则可分别用50来代替。</p><p>$J(n) = 3<em>K(n) - 2</em>D(n)​$</p><h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol><li><p>K与D值永远介于0到100之间。D大于80时，行情呈现超买现象。D小于20时，行情呈现超卖现象。</p></li><li><p>上涨趋势中，K值大于D值，K线向上突破D线时，为买进信号。下跌趋势中，K值小于D值，K线向下跌破D线时，为卖出信号。</p></li><li><p>KD指标不仅能反映出市场的超买超卖程度，还能通过交叉突破发出买卖信号。</p></li><li>KD指标不适于发行量小、交易不活跃的股票，但是KD指标对大盘和热门大盘股有极高准确性。</li><li>当随机指标与股价出现背离时，一般为转势的信号。??</li><li>K值和D值上升或者下跌的速度减弱，倾斜度趋于平缓是短期转势的预警信号。</li></ol><p><strong>参考:</strong></p><p><a href="https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87" target="_blank" rel="noopener">KDJ-百度百科</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;KDJ-指标&quot;&gt;&lt;a href=&quot;#KDJ-指标&quot; class=&quot;headerlink&quot; title=&quot;KDJ 指标&quot;&gt;&lt;/a&gt;KDJ 指标&lt;/h1&gt;&lt;p&gt;KDJ指标又叫&lt;a href=&quot;https://baike.baidu.com/item/%E9%9A%8F
       
     
     </summary>

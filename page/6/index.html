@@ -69,6 +69,140 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-backend/go/cron/cron_source_code_read" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/29/backend/go/cron/cron_source_code_read/" class="article-date">
+  <time datetime="2018-11-29T02:48:10.074Z" itemprop="datePublished">2018-11-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="cron-source-code-read"><a href="#cron-source-code-read" class="headerlink" title="cron source code read"></a>cron source code read</h1><p>github: <a href="https://github.com/jakecoffman/cron" target="_blank" rel="noopener">https://github.com/jakecoffman/cron</a></p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>Cron</strong></p>
+<p>​    控制板, 保存了所有的任务,有停止,添加,移除,snapshot 等操作通道.</p>
+<p><strong>Entry</strong></p>
+<p>​    任务项: 包含了一个 schedule 和一个需要执行的 func</p>
+<p><strong>Schedule</strong></p>
+<p>​    日程表: 描述了工作周期</p>
+<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><p>步骤:</p>
+<blockquote>
+<ol>
+<li>new 控制板</li>
+<li>添加任务项</li>
+<li>启动任务</li>
+</ol>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new 控制板</span></span><br><span class="line">c := cron.New()</span><br><span class="line"><span class="comment">// 2. 添加任务项</span></span><br><span class="line">c.AddFunc(<span class="string">"0 5 * * * *"</span>,  <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every 5 minutes"</span>) &#125;, <span class="string">"Often"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@hourly"</span>,      <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour"</span>) &#125;, <span class="string">"Frequent"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@every 1h30m"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour thirty"</span>) &#125;, <span class="string">"Less Frequent"</span>)</span><br><span class="line"><span class="comment">// 3. 启动任务</span></span><br><span class="line">c.Start()</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Funcs are invoked in their own goroutine, asynchronously.</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">// Funcs may also be added to a running Cron</span></span><br><span class="line">c.AddFunc(<span class="string">"@daily"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every day"</span>) &#125;, <span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Inspect the cron job entries' next and previous run times.</span></span><br><span class="line">inspect(c.Entries())</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Remove an entry from the cron by name.</span></span><br><span class="line">c.RemoveJob(<span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line">c.Stop()  <span class="comment">// Stop the scheduler (does not stop any jobs already running).</span></span><br></pre></td></tr></table></figure>
+<h2 id="详细解析"><a href="#详细解析" class="headerlink" title="详细解析"></a>详细解析</h2><h3 id="newCron"><a href="#newCron" class="headerlink" title="newCron"></a>newCron</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">()</span> *<span class="title">Cron</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Cron&#123;</span><br><span class="line">		entries:  <span class="literal">nil</span>,</span><br><span class="line">		add:      <span class="built_in">make</span>(<span class="keyword">chan</span> *Entry),</span><br><span class="line">		remove:   <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>),</span><br><span class="line">		stop:     <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;),</span><br><span class="line">		snapshot: <span class="built_in">make</span>(<span class="keyword">chan</span> entries),</span><br><span class="line">		running:  <span class="literal">false</span>,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="AddFunc"><a href="#AddFunc" class="headerlink" title="AddFunc"></a>AddFunc</h3><p>AddFunc -&gt; AddJob</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">AddJob</span><span class="params">(spec <span class="keyword">string</span>, cmd Job, name <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	c.Schedule(Parse(spec), cmd, name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Parse</code> 功能: 解析 <code>spec</code> 生成 <code>schedule</code> ,<strong>生成的<code>schedule</code>很有意思哦!!</strong></p>
+<p><code>Schedule</code>主要职能:</p>
+<blockquote>
+<ol>
+<li>new Entry</li>
+<li>添加 entry 到 cron 的 entries 中</li>
+</ol>
+</blockquote>
+<h3 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h3><p>go 程启动</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	c.running = <span class="literal">true</span></span><br><span class="line">	<span class="keyword">go</span> c.run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// for 中 select 了解下</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">run</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Figure out the next activation times for each entry.</span></span><br><span class="line">	now := time.Now().Local()</span><br><span class="line">	<span class="keyword">for</span> _, entry := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">		entry.Next = entry.Schedule.Next(now)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// Determine the next entry to run.</span></span><br><span class="line">		sort.Sort(byTime(c.entries))</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> effective time.Time</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(c.entries) == <span class="number">0</span> || c.entries[<span class="number">0</span>].Next.IsZero() &#123;</span><br><span class="line">			<span class="comment">// If there are no entries yet, just sleep - it still handles new entries</span></span><br><span class="line">			<span class="comment">// and stop requests.</span></span><br><span class="line">			effective = now.AddDate(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			effective = c.entries[<span class="number">0</span>].Next</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> now = &lt;-time.After(effective.Sub(now)):</span><br><span class="line">			<span class="comment">// Run every entry whose next time was this effective time.</span></span><br><span class="line">			<span class="keyword">for</span> _, e := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">				<span class="keyword">if</span> e.Next != effective &#123;</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">go</span> e.Job.Run()</span><br><span class="line">				e.Prev = e.Next</span><br><span class="line">				e.Next = e.Schedule.Next(effective)</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> newEntry := &lt;-c.add:</span><br><span class="line">			i := c.entries.pos(newEntry.Name)</span><br><span class="line">			<span class="keyword">if</span> i != <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			c.entries = <span class="built_in">append</span>(c.entries, newEntry)</span><br><span class="line">			newEntry.Next = newEntry.Schedule.Next(time.Now().Local())</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> name := &lt;-c.remove:</span><br><span class="line">			i := c.entries.pos(name)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> i == <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			c.entries = c.entries[:i+<span class="built_in">copy</span>(c.entries[i:], c.entries[i+<span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.snapshot:</span><br><span class="line">			c.snapshot &lt;- c.entrySnapshot()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.stop:</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 'now' should be updated after newEntry and snapshot cases.</span></span><br><span class="line">		now = time.Now().Local()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h2><p>位比较来筛选出下一个执行的时间点, 了解下?</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/cron/cron_source_code_read/" data-id="cjzv7ord3004a3gs6jcq1opfh" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-backend/go/goStandardLib/REDEME" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/10/backend/go/goStandardLib/REDEME/" class="article-date">
+  <time datetime="2018-11-10T01:46:46.584Z" itemprop="datePublished">2018-11-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="golang-Standard-library"><a href="#golang-Standard-library" class="headerlink" title="golang Standard library"></a><a href="https://golang.org/pkg/#stdlib" target="_blank" rel="noopener">golang Standard library</a></h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/10/backend/go/goStandardLib/REDEME/" data-id="cjzv7ord4004b3gs666xmulr2" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/raft/3_raft领导选取" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/25/alg/raft/3_raft领导选取/" class="article-date">
+  <time datetime="2018-10-25T10:35:09.100Z" itemprop="datePublished">2018-10-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
+<ol>
+<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
+<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
+</ol>
+<p><strong>候选操作过程：</strong></p>
+<blockquote>
+<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
+</blockquote>
+<ol>
+<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
+<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
+<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/25/alg/raft/3_raft领导选取/" data-id="cjzv7orbw001x3gs63myevr3r" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-alg/raft/1_raft基础" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/10/25/alg/raft/1_raft基础/" class="article-date">
@@ -178,7 +312,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/1_raft基础/" data-id="cjzhtscjv001ny3s6vlmhmslp" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/10/25/alg/raft/1_raft基础/" data-id="cjzv7orbv001v3gs6o7bjg0na" class="article-share-link">分享</a>
       
       
       
@@ -252,7 +386,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/24/alg/raft/goraft_read/" data-id="cjzhtsck1001yy3s68de3yybx" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/10/24/alg/raft/goraft_read/" data-id="cjzv7orby001z3gs6rxhpx1be" class="article-share-link">分享</a>
       
       
       
@@ -283,7 +417,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/23/build_own_x/os/How to create an OS from scratch/" data-id="cjzhtscke002ty3s6a3qva8ls" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/23/build_own_x/os/How to create an OS from scratch/" data-id="cjzv7orcb002w3gs640j6vdg9" class="article-share-link">分享</a>
       
       
       
@@ -339,7 +473,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjzhtscln004my3s6zd8fvetr" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/14/backend/go/grpc/服务的注册_发现/" data-id="cjzv7ordc004r3gs6yhm24phb" class="article-share-link">分享</a>
       
       
       
@@ -386,7 +520,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" data-id="cjzhtsckm0035y3s6wuzg4c03" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/08/frontend/learn_admin_manage/admin_manage_jie_learn/" data-id="cjzv7orce00333gs6hhll8fmk" class="article-share-link">分享</a>
       
       
       
@@ -429,7 +563,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/" data-id="cjzhtscij000ey3s6gd17y8kx" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/04/self_doc/个人软件安装记录-linux/" data-id="cjzv7oran000t3gs6i8d4f4ee" class="article-share-link">分享</a>
       
       
       
@@ -513,253 +647,11 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/02/frontend/css/grid_learn/learn_css_grid/" data-id="cjzhtscm5005uy3s695638m2f" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/09/02/frontend/css/grid_learn/learn_css_grid/" data-id="cjzv7ore100623gs6u9r1cquc" class="article-share-link">分享</a>
       
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css grid</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/tools/markfile_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/01/backend/tools/markfile_start_learn/" class="article-date">
-  <time datetime="2018-09-01T07:37:28.000Z" itemprop="datePublished">2018-09-01</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/01/backend/tools/markfile_start_learn/">markfile start learn</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>参考: <a href="https://www.cnblogs.com/wang_yb/p/3990952.html" target="_blank" rel="noopener">https://www.cnblogs.com/wang_yb/p/3990952.html</a></p>
-<h2 id="Makefile-简介"><a href="#Makefile-简介" class="headerlink" title="Makefile 简介"></a>Makefile 简介</h2><p>Makefile 是和 make 命令一起配合使用的.</p>
-<p>很多大型项目的编译都是通过 Makefile 来组织的, 如果没有 Makefile, 那很多项目中各种库和代码之间的依赖关系不知会多复杂.</p>
-<p>Makefile的组织流程的能力如此之强, 不仅可以用来编译项目, 还可以用来组织我们平时的一些日常操作. 这个需要大家发挥自己的想象力.</p>
-<h3 id="Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释"><a href="#Makefile-主要的-5个部分-显示规则-隐晦规则-变量定义-文件指示-注释" class="headerlink" title="Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)"></a>Makefile 主要的 5个部分 (显示规则, 隐晦规则, 变量定义, 文件指示, 注释)</h3><p>Makefile基本格式如下:</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">target ... : prerequisites ...</span><br><span class="line">    command</span><br><span class="line">    ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
-<p>其中,</p>
-<ul>
-<li>target        - 目标文件, 可以是 Object File, 也可以是可执行文件</li>
-<li>prerequisites - 生成 target 所需要的文件或者目标</li>
-<li>command       - make需要执行的命令 (任意的shell命令), Makefile中的命令必须以 <code>[tab] 开头</code></li>
-</ul>
-<ol>
-<li>显示规则 :: 说明如何生成一个或多个目标文件(包括 生成的文件, 文件的依赖文件, 生成的命令)</li>
-<li>隐晦规则 :: make的自动推导功能所执行的规则</li>
-<li>变量定义 :: Makefile中定义的变量</li>
-<li>文件指示 :: Makefile中引用其他Makefile; 指定Makefile中有效部分; 定义一个多行命令</li>
-<li>注释     :: Makefile只有行注释 “#”, 如果要使用或者输出”#”字符, 需要进行转义, “#“</li>
-</ol>
-<h3 id="1-2-GNU-make-的工作方式"><a href="#1-2-GNU-make-的工作方式" class="headerlink" title="1.2 GNU make 的工作方式"></a>1.2 GNU make 的工作方式</h3><ol>
-<li>读入主Makefile (主Makefile中可以引用其他Makefile)</li>
-<li>读入被include的其他Makefile</li>
-<li>初始化文件中的变量</li>
-<li>推导隐晦规则, 并分析所有规则</li>
-<li>为所有的目标文件创建依赖关系链</li>
-<li>根据依赖关系, 决定哪些目标要重新生成</li>
-<li>执行生成命令</li>
-</ol>
-<h2 id="实例解析"><a href="#实例解析" class="headerlink" title="实例解析"></a>实例解析</h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/01/backend/tools/markfile_start_learn/" data-id="cjzhtscka002ky3s6swybv9ki" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/build-tools/">build tools</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/">markdown</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/tools/apidoc_start_learn" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/31/backend/tools/apidoc_start_learn/" class="article-date">
-  <time datetime="2018-08-31T08:02:53.000Z" itemprop="datePublished">2018-08-31</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/backend/">backend</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/31/backend/tools/apidoc_start_learn/">apidoc start learn</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>参考: <a href="http://apidocjs.com/" target="_blank" rel="noopener">http://apidocjs.com/</a></p>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p><code>Javadoc-Style</code> (can be used in C#, Go, Dart, Java, JavaScript, PHP, TypeScript and all other Javadoc capable languages):</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install apidoc -g</span><br></pre></td></tr></table></figure>
-<h2 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apidoc -i myapp/ -o apidoc/ -t mytemplate/</span><br></pre></td></tr></table></figure>
-<h2 id="Configuration-apidoc-json"><a href="#Configuration-apidoc-json" class="headerlink" title="Configuration (apidoc.json)"></a>Configuration (apidoc.json)</h2><p>ex:<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"apiDoc basic example"</span>,</span><br><span class="line">  <span class="attr">"title"</span>: <span class="string">"Custom apiDoc browser title"</span>,</span><br><span class="line">  <span class="attr">"url"</span> : <span class="string">"https://api.github.com/v1"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="Header-Footer"><a href="#Header-Footer" class="headerlink" title="Header / Footer"></a>Header / Footer</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"header"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own header title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"header.md"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"footer"</span>: &#123;</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"My own footer title"</span>,</span><br><span class="line">    <span class="attr">"filename"</span>: <span class="string">"footer.md"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h2><p><code>apidoc.json</code></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"example"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"0.1.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"A basic apiDoc example"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>example.js</code></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDefine UserNotFoundError</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Request User information</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;put&#125; /user/ Modify User information</span></span><br><span class="line"><span class="comment"> * @apiName PutUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id          Users unique ID.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname] Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [lastname]  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiUse UserNotFoundError</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h3 id="Versioning"><a href="#Versioning" class="headerlink" title="Versioning"></a>Versioning</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.1.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname  Lastname of the User.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id Get User information and Date of Registration.</span></span><br><span class="line"><span class="comment"> * @apiVersion 0.2.0</span></span><br><span class="line"><span class="comment"> * @apiName GetUser</span></span><br><span class="line"><span class="comment"> * @apiGroup User</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; firstname  Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;String&#125; lastname   Lastname of the User.</span></span><br><span class="line"><span class="comment"> * @apiSuccess &#123;Date&#125;   registered Date of Registration.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The id of the User was not found.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiErrorExample Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<p>该版本可用于每个块，也可用于继承块。您不必更改继承块上的版本，解析器会自动检查最近的前任.</p>
-<h2 id="apiDoc-Params"><a href="#apiDoc-Params" class="headerlink" title="apiDoc-Params"></a>apiDoc-Params</h2><p>列几个常用的标签:</p>
-<h3 id="api"><a href="#api" class="headerlink" title="@api"></a>@api</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@api &#123;method&#125; path [title]</span><br></pre></td></tr></table></figure>
-<p>Required!<br>Without that indicator, apiDoc parser ignore the documentation block. (apidoc 工具的标识开始)</p>
-<h2 id="apiName"><a href="#apiName" class="headerlink" title="@apiName"></a>@apiName</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiName name</span><br></pre></td></tr></table></figure>
-<h2 id="apiGroup"><a href="#apiGroup" class="headerlink" title="@apiGroup"></a>@apiGroup</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiGroup name</span><br></pre></td></tr></table></figure>
-<h2 id="apiDefine"><a href="#apiDefine" class="headerlink" title="@apiDefine"></a>@apiDefine</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiDefine name [title]</span><br><span class="line">    [description]</span><br></pre></td></tr></table></figure>
-<h2 id="apiUse"><a href="#apiUse" class="headerlink" title="@apiUse"></a>@apiUse</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiUse name</span><br></pre></td></tr></table></figure>
-<h2 id="apiDeprecated"><a href="#apiDeprecated" class="headerlink" title="@apiDeprecated"></a>@apiDeprecated</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDeprecated [text]</span><br></pre></td></tr></table></figure>
-<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDeprecated use now (#Group:Name).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Example: to set a link to the GetDetails method of your group User</span></span><br><span class="line"><span class="comment"> * write (#User:GetDetails)</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="apiDescription"><a href="#apiDescription" class="headerlink" title="@apiDescription"></a>@apiDescription</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiDescription text</span><br></pre></td></tr></table></figure>
-<p>Ex:<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @apiDescription This is the Description.</span></span><br><span class="line"><span class="comment"> * It is multiline capable.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Last line of Description.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="apiParam"><a href="#apiParam" class="headerlink" title="@apiParam"></a>@apiParam</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiParam [(group)] [&#123;type&#125;] [field=defaultValue] [description]</span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; id Users unique ID.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;post&#125; /user/</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; [firstname]  Optional Firstname of the User.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; lastname     Mandatory Lastname.</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;String&#125; country="DE" Mandatory with default value "DE".</span></span><br><span class="line"><span class="comment"> * @apiParam &#123;Number&#125; [age=18]     Optional Age with default 18.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @apiParam (Login) &#123;String&#125; pass Only logged in users can post this.</span></span><br><span class="line"><span class="comment"> *                                 In generated documentation a separate</span></span><br><span class="line"><span class="comment"> *                                 "Login" Block will be generated.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>(group)</td>
-<td>All parameters will be grouped by this name. <br>Without a group, the default <code>Parameter</code> is set.<br>You can set a title and description with @apiDefine.</td>
-</tr>
-<tr>
-<td>{type}</td>
-<td>Parameter type, e.g. <code>{Boolean}</code>, <code>{Number}</code>, <code>{String}</code>, <code>{Object}</code>, <code>{String[]}</code> (array of strings), …</td>
-</tr>
-<tr>
-<td>{type{size}}</td>
-<td>Information about the size of the variable.<br><code>{string{..5}}</code> a string that has max 5 chars.<br><code>{string{2..5}}</code> a string that has min. 2 chars and max 5 chars.<br><code>{number{100-999}}</code> a number between 100 and 999.</td>
-</tr>
-<tr>
-<td>{type=allowedValues}</td>
-<td>Information about allowed values of the variable.<br><code>{string=&quot;small&quot;}</code> a string that can only contain the word “small” (a constant).<br><code>{string=&quot;small&quot;,&quot;huge&quot;}</code> a string that can contain the words “small” or “huge”.<br><code>{number=1,2,3,99}</code> a number with allowed values of 1, 2, 3 and 99.<br><br>Can be combined with size:<br><code>{string {..5}=&quot;small&quot;,&quot;huge&quot;}</code> a string that has max 5 chars and only contain the words “small” or “huge”.</td>
-</tr>
-<tr>
-<td>field</td>
-<td>Variablename</td>
-</tr>
-<tr>
-<td>[field]</td>
-<td>Fieldname with brackets define the Variable as optional.</td>
-</tr>
-<tr>
-<td>=defaultValue</td>
-<td>The parameters default value.</td>
-</tr>
-<tr>
-<td>description</td>
-<td>Description of the field.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="apiParamExample"><a href="#apiParamExample" class="headerlink" title="@apiParamExample"></a>@apiParamExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiParamExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiParamExample &#123;json&#125; Request-Example:</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "id": 4711</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h2 id="apiSuccess"><a href="#apiSuccess" class="headerlink" title="@apiSuccess"></a>@apiSuccess</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccess [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
-<h2 id="apiSuccessExample"><a href="#apiSuccessExample" class="headerlink" title="@apiSuccessExample"></a>@apiSuccessExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiSuccessExample [&#123;type&#125;] [title]</span><br><span class="line">                   example</span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiSuccessExample &#123;json&#125; Success-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 200 OK</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "firstname": "John",</span></span><br><span class="line"><span class="comment"> *       "lastname": "Doe"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h2 id="apiError"><a href="#apiError" class="headerlink" title="@apiError"></a>@apiError</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@apiError [(group)] [&#123;type&#125;] field [description]</span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiError UserNotFound The &lt;code&gt;id&lt;/code&gt; of the User was not found.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<h2 id="apiErrorExample"><a href="#apiErrorExample" class="headerlink" title="@apiErrorExample"></a>@apiErrorExample</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@apiErrorExample [&#123;type&#125;] [title]</span><br><span class="line">                 example</span><br></pre></td></tr></table></figure>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @api &#123;get&#125; /user/:id</span></span><br><span class="line"><span class="comment"> * @apiErrorExample &#123;json&#125; Error-Response:</span></span><br><span class="line"><span class="comment"> *     HTTP/1.1 404 Not Found</span></span><br><span class="line"><span class="comment"> *     &#123;</span></span><br><span class="line"><span class="comment"> *       "error": "UserNotFound"</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/31/backend/tools/apidoc_start_learn/" data-id="cjzhtsckb002my3s6stp66e0k" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/apidoc/">apidoc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/learn/">learn</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-self_doc/个人软件安装记录" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/31/self_doc/个人软件安装记录/" class="article-date">
-  <time datetime="2018-08-31T07:54:58.000Z" itemprop="datePublished">2018-08-31</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/31/self_doc/个人软件安装记录/">个人软件安装记录(mac osx)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># tree install</span></span></span><br><span class="line">brew install tree</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># apidoc install</span></span></span><br><span class="line">npm install apidoc -g</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh</span></span></span><br><span class="line">sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh config</span></span></span><br><span class="line">plugins=(</span><br><span class="line">  git</span><br><span class="line">  z</span><br><span class="line">  wd</span><br><span class="line">  zsh-autosuggestions</span><br><span class="line">  docker</span><br><span class="line">  docker-compose</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># zsh install zsh-autosuggestions</span></span></span><br><span class="line">git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 持续增加中...</span></span></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/31/self_doc/个人软件安装记录/" data-id="cjzhtscio000my3s6t8xl1d26" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tools安装/">tools安装</a></li></ul>
 
     </footer>
   </div>
@@ -795,23 +687,23 @@
       <ul>
         
           <li>
+            <a href="/2019/08/28/self_doc/blog-迁移计划/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/24/build_own_x/emacs/undo-tree/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/21/basic/diff_learn/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
             <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>

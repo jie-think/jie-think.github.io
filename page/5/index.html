@@ -69,6 +69,214 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-build_own_x/data_base/build_simple_database/Readme_Index" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" class="article-date">
+  <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/build-own-x/">build-own-x</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/">Let&#39;s Build a Simple Database</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="Let’s-Build-a-Simple-Database"><a href="#Let’s-Build-a-Simple-Database" class="headerlink" title="Let’s Build a Simple Database"></a>Let’s Build a Simple Database</h1><p>原文: <a href="https://cstack.github.io/db_tutorial/" target="_blank" rel="noopener">https://cstack.github.io/db_tutorial/</a></p>
+<p>从 C 重新开始写 Sqlite</p>
+<h2 id="数据库是如何工作的"><a href="#数据库是如何工作的" class="headerlink" title="数据库是如何工作的?"></a>数据库是如何工作的?</h2><ul>
+<li>在内存和磁盘上, 数据保存的格式是啥?</li>
+<li>什么时候会从内存中移动到硬盘上?</li>
+<li>为什么每个表仅有一个主键呢?</li>
+<li>事务回滚是如何工作的呢?</li>
+<li>索引是如何格式化? FIXME(Jx)  (How are indexes formatted?)</li>
+<li>啥时候全表扫描会发生呢?</li>
+<li>保存前的预准备格式是啥样的呢? FIXME(Jx) (What format is a prepared statement saved in?)</li>
+</ul>
+<p>总而言之, 数据库是如何工作的呢?</p>
+<p>为了理解这个, 我将会用 C 重新构建一个 Sqlite , 并且会记录其过程.</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li>Part 1 - 介绍和设置 REPL</li>
+<li>Part 2 - 世上最简单的 SQL 编译器和虚拟机</li>
+<li>Part 3 - 一个在内存, 仅追加的 单表数据库</li>
+<li>Part 4 - 第一个单元测试类(和一些Bugs)</li>
+<li>Part 5 - 持久化到硬盘</li>
+<li>Part 6 - 游标的抽象化</li>
+<li>Part 7 - 介绍 B 树</li>
+<li>Part 8 - B 树叶子接口格式化</li>
+<li>Part 9 - 二分查找和重复键</li>
+<li>Part 10 - 拆分叶子节点</li>
+<li>Part 11 - 递归搜索 B 树</li>
+<li>Part 12 - 扫描多层级的 B 树</li>
+<li>Part 13 - 拆分后更新父节点</li>
+</ul>
+<blockquote>
+<p>“What I cannot create, I do not understand.” – <a href="https://en.m.wikiquote.org/wiki/Richard_Feynman" target="_blank" rel="noopener">Richard Feynman</a></p>
+</blockquote>
+<h3 id="Sqlite-架构图"><a href="#Sqlite-架构图" class="headerlink" title="Sqlite 架构图"></a>Sqlite 架构图</h3><p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="Sqlite 架构图"></p>
+<p>Sqlite 架构图: <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" data-id="cjzv7ordv005q3gs67ag8oks2" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/database/">database</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/db原理/">db原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-build_own_x/data_base/build_simple_database_task" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database_task/" class="article-date">
+  <time datetime="2019-01-26T07:23:30.094Z" itemprop="datePublished">2019-01-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h2><p>one weak one Part</p>
+<h3 id="1-翻译原文"><a href="#1-翻译原文" class="headerlink" title="1. 翻译原文"></a>1. 翻译原文</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 0 - Index readme</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="2-基础总结"><a href="#2-基础总结" class="headerlink" title="2. 基础总结"></a>2. 基础总结</h3><ul>
+<li style="list-style: none"><input type="checkbox"> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox"> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+<h3 id="3-follow-it-write-a-simple-DB"><a href="#3-follow-it-write-a-simple-DB" class="headerlink" title="3. follow it write a simple DB"></a>3. follow it write a simple DB</h3><ul>
+<li style="list-style: none"><input type="checkbox" checked> Part 1 - Introduction and Setting up the REPL</li>
+<li style="list-style: none"><input type="checkbox" checked> Part 2 - World’s Simplest SQL Compiler and Virtual Machine</li>
+<li style="list-style: none"><input type="checkbox"> Part 3 - An In-Memory, Append-Only, Single-Table Database</li>
+<li style="list-style: none"><input type="checkbox"> Part 4 - Our First Tests (and Bugs)</li>
+<li style="list-style: none"><input type="checkbox"> Part 5 - Persistence to Disk</li>
+<li style="list-style: none"><input type="checkbox"> Part 6 - The Cursor Abstraction</li>
+<li style="list-style: none"><input type="checkbox"> Part 7 - Introduction to the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 8 - B-Tree Leaf Node Format</li>
+<li style="list-style: none"><input type="checkbox"> Part 9 - Binary Search and Duplicate Keys</li>
+<li style="list-style: none"><input type="checkbox"> Part 10 - Splitting a Leaf Node</li>
+<li style="list-style: none"><input type="checkbox"> Part 11 - Recursively Searching the B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 12 - Scanning a Multi-Level B-Tree</li>
+<li style="list-style: none"><input type="checkbox"> Part 13 - Updating Parent Node After a Split</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/" data-id="cjzv7orca002v3gs6ecv1e89t" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-alg/raft/raft_think" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/alg/raft/raft_think/" class="article-date">
+  <time datetime="2018-12-10T11:54:15.000Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/alg/">alg</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/10/alg/raft/raft_think/">关于 Raft 的 think</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="日志复制问题"><a href="#日志复制问题" class="headerlink" title="日志复制问题"></a>日志复制问题</h2><p>由 leader 发送日志给 follower </p>
+<p>心跳和日志拷贝是在一起的.</p>
+<p>TK: 日志复制的二段提交问题????</p>
+<p>日志复制是二段提交的: 发送日志给各个 follower, 超过一半的 follower 接收成功了, 就发起一个 commit 提交.</p>
+<p>如果leader的任期到期后会自动转换成 follower 等待下次选举的开始.</p>
+<p>应该做个时序图??</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/alg/raft/raft_think/" data-id="cjzv7orbz00213gs61oymz5hd" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/raft-think/">raft think</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-alg/raft/ReadRaft" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/09/alg/raft/ReadRaft/" class="article-date">
@@ -101,7 +309,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjzhtscjy001ty3s633g4jeci" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjzv7orbx001y3gs6c35aoyo3" class="article-share-link">分享</a>
       
       
       
@@ -156,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjzhtscih000cy3s6odjku2cr" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjzv7ora700093gs6urowtwzl" class="article-share-link">分享</a>
       
       
       
@@ -205,7 +413,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjzhtsckk002zy3s6jp3o241r" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjzv7orcf00343gs69svgs042" class="article-share-link">分享</a>
       
       
       
@@ -278,7 +486,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjzhtscib0009y3s69x4gelve" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjzv7ora500083gs6u2tcjqp3" class="article-share-link">分享</a>
       
       
       
@@ -331,7 +539,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjzhtscii000dy3s6pkqoa73p" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjzv7oraj000j3gs6l2q0vqip" class="article-share-link">分享</a>
       
       
       
@@ -365,7 +573,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjzhtsclh004ay3s6qvek5pr1" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjzv7ord6004g3gs6d42716ec" class="article-share-link">分享</a>
       
       
       
@@ -401,141 +609,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjzhtscli004dy3s6vtb6e6h5" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/cron/cron_source_code_read" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/29/backend/go/cron/cron_source_code_read/" class="article-date">
-  <time datetime="2018-11-29T02:48:10.074Z" itemprop="datePublished">2018-11-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="cron-source-code-read"><a href="#cron-source-code-read" class="headerlink" title="cron source code read"></a>cron source code read</h1><p>github: <a href="https://github.com/jakecoffman/cron" target="_blank" rel="noopener">https://github.com/jakecoffman/cron</a></p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>Cron</strong></p>
-<p>​    控制板, 保存了所有的任务,有停止,添加,移除,snapshot 等操作通道.</p>
-<p><strong>Entry</strong></p>
-<p>​    任务项: 包含了一个 schedule 和一个需要执行的 func</p>
-<p><strong>Schedule</strong></p>
-<p>​    日程表: 描述了工作周期</p>
-<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><p>步骤:</p>
-<blockquote>
-<ol>
-<li>new 控制板</li>
-<li>添加任务项</li>
-<li>启动任务</li>
-</ol>
-</blockquote>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. new 控制板</span></span><br><span class="line">c := cron.New()</span><br><span class="line"><span class="comment">// 2. 添加任务项</span></span><br><span class="line">c.AddFunc(<span class="string">"0 5 * * * *"</span>,  <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every 5 minutes"</span>) &#125;, <span class="string">"Often"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@hourly"</span>,      <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour"</span>) &#125;, <span class="string">"Frequent"</span>)</span><br><span class="line">c.AddFunc(<span class="string">"@every 1h30m"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every hour thirty"</span>) &#125;, <span class="string">"Less Frequent"</span>)</span><br><span class="line"><span class="comment">// 3. 启动任务</span></span><br><span class="line">c.Start()</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Funcs are invoked in their own goroutine, asynchronously.</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">// Funcs may also be added to a running Cron</span></span><br><span class="line">c.AddFunc(<span class="string">"@daily"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(<span class="string">"Every day"</span>) &#125;, <span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Inspect the cron job entries' next and previous run times.</span></span><br><span class="line">inspect(c.Entries())</span><br><span class="line">..</span><br><span class="line"><span class="comment">// Remove an entry from the cron by name.</span></span><br><span class="line">c.RemoveJob(<span class="string">"My Job"</span>)</span><br><span class="line">..</span><br><span class="line">c.Stop()  <span class="comment">// Stop the scheduler (does not stop any jobs already running).</span></span><br></pre></td></tr></table></figure>
-<h2 id="详细解析"><a href="#详细解析" class="headerlink" title="详细解析"></a>详细解析</h2><h3 id="newCron"><a href="#newCron" class="headerlink" title="newCron"></a>newCron</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">()</span> *<span class="title">Cron</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Cron&#123;</span><br><span class="line">		entries:  <span class="literal">nil</span>,</span><br><span class="line">		add:      <span class="built_in">make</span>(<span class="keyword">chan</span> *Entry),</span><br><span class="line">		remove:   <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>),</span><br><span class="line">		stop:     <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;),</span><br><span class="line">		snapshot: <span class="built_in">make</span>(<span class="keyword">chan</span> entries),</span><br><span class="line">		running:  <span class="literal">false</span>,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="AddFunc"><a href="#AddFunc" class="headerlink" title="AddFunc"></a>AddFunc</h3><p>AddFunc -&gt; AddJob</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">AddJob</span><span class="params">(spec <span class="keyword">string</span>, cmd Job, name <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	c.Schedule(Parse(spec), cmd, name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Parse</code> 功能: 解析 <code>spec</code> 生成 <code>schedule</code> ,<strong>生成的<code>schedule</code>很有意思哦!!</strong></p>
-<p><code>Schedule</code>主要职能:</p>
-<blockquote>
-<ol>
-<li>new Entry</li>
-<li>添加 entry 到 cron 的 entries 中</li>
-</ol>
-</blockquote>
-<h3 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h3><p>go 程启动</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	c.running = <span class="literal">true</span></span><br><span class="line">	<span class="keyword">go</span> c.run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// for 中 select 了解下</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Cron)</span> <span class="title">run</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Figure out the next activation times for each entry.</span></span><br><span class="line">	now := time.Now().Local()</span><br><span class="line">	<span class="keyword">for</span> _, entry := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">		entry.Next = entry.Schedule.Next(now)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// Determine the next entry to run.</span></span><br><span class="line">		sort.Sort(byTime(c.entries))</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> effective time.Time</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(c.entries) == <span class="number">0</span> || c.entries[<span class="number">0</span>].Next.IsZero() &#123;</span><br><span class="line">			<span class="comment">// If there are no entries yet, just sleep - it still handles new entries</span></span><br><span class="line">			<span class="comment">// and stop requests.</span></span><br><span class="line">			effective = now.AddDate(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			effective = c.entries[<span class="number">0</span>].Next</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> now = &lt;-time.After(effective.Sub(now)):</span><br><span class="line">			<span class="comment">// Run every entry whose next time was this effective time.</span></span><br><span class="line">			<span class="keyword">for</span> _, e := <span class="keyword">range</span> c.entries &#123;</span><br><span class="line">				<span class="keyword">if</span> e.Next != effective &#123;</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">go</span> e.Job.Run()</span><br><span class="line">				e.Prev = e.Next</span><br><span class="line">				e.Next = e.Schedule.Next(effective)</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> newEntry := &lt;-c.add:</span><br><span class="line">			i := c.entries.pos(newEntry.Name)</span><br><span class="line">			<span class="keyword">if</span> i != <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			c.entries = <span class="built_in">append</span>(c.entries, newEntry)</span><br><span class="line">			newEntry.Next = newEntry.Schedule.Next(time.Now().Local())</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> name := &lt;-c.remove:</span><br><span class="line">			i := c.entries.pos(name)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> i == <span class="number">-1</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			c.entries = c.entries[:i+<span class="built_in">copy</span>(c.entries[i:], c.entries[i+<span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.snapshot:</span><br><span class="line">			c.snapshot &lt;- c.entrySnapshot()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> &lt;-c.stop:</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 'now' should be updated after newEntry and snapshot cases.</span></span><br><span class="line">		now = time.Now().Local()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h2><p>位比较来筛选出下一个执行的时间点, 了解下?</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/cron/cron_source_code_read/" data-id="cjzhtscla0042y3s68xld8m2o" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-backend/go/goStandardLib/REDEME" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/10/backend/go/goStandardLib/REDEME/" class="article-date">
-  <time datetime="2018-11-10T01:46:46.584Z" itemprop="datePublished">2018-11-10</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="golang-Standard-library"><a href="#golang-Standard-library" class="headerlink" title="golang Standard library"></a><a href="https://golang.org/pkg/#stdlib" target="_blank" rel="noopener">golang Standard library</a></h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/10/backend/go/goStandardLib/REDEME/" data-id="cjzhtsclf0047y3s6gdu6v337" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-alg/raft/3_raft领导选取" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/25/alg/raft/3_raft领导选取/" class="article-date">
-  <time datetime="2018-10-25T10:35:09.100Z" itemprop="datePublished">2018-10-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h2 id="leader选取问题"><a href="#leader选取问题" class="headerlink" title="leader选取问题"></a>leader选取问题</h2><p><strong>触发条件：</strong></p>
-<ol>
-<li>一般情况下，追随者接到领导者的心跳时，把ElectionTimeout清零，不会触发；</li>
-<li>领导者故障，追随者的ElectionTimeout超时发生时，会变成候选者，触发领导人选取；</li>
-</ol>
-<p><strong>候选操作过程：</strong></p>
-<blockquote>
-<p>追随者自增当前任期，转换为Candidate，对自己投票，并发起RequestVote RPC，等待下面三种情形发生；</p>
-</blockquote>
-<ol>
-<li>获得超过半数服务器的投票，赢得选举，成为领导者；</li>
-<li>另一台服务器赢得选举，并接收到对应的心跳，成为追随者；</li>
-<li>选举超时，没有任何一台服务器赢得选举，自增当前任期，重新发起选举；</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/alg/raft/3_raft领导选取/" data-id="cjzhtscjw001py3s6bgmq351v" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjzv7ordb004p3gs6gxsagt42" class="article-share-link">分享</a>
       
       
       
@@ -573,23 +647,23 @@
       <ul>
         
           <li>
+            <a href="/2019/08/28/self_doc/blog-迁移计划/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/24/build_own_x/emacs/undo-tree/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/21/basic/diff_learn/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2019/08/18/backend/elisp/elisp_learn_x_in_y_minutes/">(no title)</a>
           </li>
         
           <li>
             <a href="/2019/08/16/ide/emacs/hack_emacs/tutorial/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/backend/rust/项目结构/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/ide/emacs/hack_emacs/hack_emacs/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/08/15/alg/sorting/go_sort/">(no title)</a>
           </li>
         
       </ul>
