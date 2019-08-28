@@ -69,9 +69,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-build_own_x/data_base/build_simple_database/Readme_Index" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" class="article-date">
+    <a href="/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/" class="article-date">
   <time datetime="2019-01-26T08:11:20.000Z" itemprop="datePublished">2019-01-26</time>
 </a>
     
@@ -87,7 +87,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/">Let&#39;s Build a Simple Database</a>
+      <a class="article-title" href="/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/">Part 2 - 世上最简单的 SQL 编译器和虚拟机</a>
     </h1>
   
 
@@ -97,44 +97,38 @@
       
         <!-- Table of Contents -->
         
-        <h1 id="Let’s-Build-a-Simple-Database"><a href="#Let’s-Build-a-Simple-Database" class="headerlink" title="Let’s Build a Simple Database"></a>Let’s Build a Simple Database</h1><p>原文: <a href="https://cstack.github.io/db_tutorial/" target="_blank" rel="noopener">https://cstack.github.io/db_tutorial/</a></p>
-<p>从 C 重新开始写 Sqlite</p>
-<h2 id="数据库是如何工作的"><a href="#数据库是如何工作的" class="headerlink" title="数据库是如何工作的?"></a>数据库是如何工作的?</h2><ul>
-<li>在内存和磁盘上, 数据保存的格式是啥?</li>
-<li>什么时候会从内存中移动到硬盘上?</li>
-<li>为什么每个表仅有一个主键呢?</li>
-<li>事务回滚是如何工作的呢?</li>
-<li>索引是如何格式化? FIXME(Jx)  (How are indexes formatted?)</li>
-<li>啥时候全表扫描会发生呢?</li>
-<li>保存前的预准备格式是啥样的呢? FIXME(Jx) (What format is a prepared statement saved in?)</li>
+        <h1 id="Part-2-世上最简单的-SQL-编译器和虚拟机"><a href="#Part-2-世上最简单的-SQL-编译器和虚拟机" class="headerlink" title="Part 2 - 世上最简单的 SQL 编译器和虚拟机"></a>Part 2 - 世上最简单的 SQL 编译器和虚拟机</h1><p>sqlite 的前端是一个 SQL 编辑器, 解析一个字符串和输出一个内部的字节编码. </p>
+<p>这个字节编码通过虚拟机执行它.</p>
+<p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="SQLite Architecture"><br>SQLite Architecture (<a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a>)</p>
+<p>将整件事情分解为两步主要有两个优点:</p>
+<ul>
+<li>减少每一块的复杂度(例如: 虚拟机不用去考虑语法的错误)</li>
+<li>允许编译常见错误,并且缓存字节码以提高效率.</li>
 </ul>
-<p>总而言之, 数据库是如何工作的呢?</p>
-<p>为了理解这个, 我将会用 C 重新构建一个 Sqlite , 并且会记录其过程.</p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
-<li>Part 1 - 介绍和设置 REPL</li>
-<li>Part 2 - 世上最简单的 SQL 编译器和虚拟机</li>
-<li>Part 3 - 一个在内存, 仅追加的 单表数据库</li>
-<li>Part 4 - 第一个单元测试类(和一些Bugs)</li>
-<li>Part 5 - 持久化到硬盘</li>
-<li>Part 6 - 游标的抽象化</li>
-<li>Part 7 - 介绍 B 树</li>
-<li>Part 8 - B 树叶子接口格式化</li>
-<li>Part 9 - 二分查找和重复键</li>
-<li>Part 10 - 拆分叶子节点</li>
-<li>Part 11 - 递归搜索 B 树</li>
-<li>Part 12 - 扫描多层级的 B 树</li>
-<li>Part 13 - 拆分后更新父节点</li>
-</ul>
-<blockquote>
-<p>“What I cannot create, I do not understand.” – <a href="https://en.m.wikiquote.org/wiki/Richard_Feynman" target="_blank" rel="noopener">Richard Feynman</a></p>
-</blockquote>
-<h3 id="Sqlite-架构图"><a href="#Sqlite-架构图" class="headerlink" title="Sqlite 架构图"></a>Sqlite 架构图</h3><p><img src="https://cstack.github.io/db_tutorial/assets/images/arch2.gif" alt="Sqlite 架构图"></p>
-<p>Sqlite 架构图: <a href="https://www.sqlite.org/arch.html" target="_blank" rel="noopener">https://www.sqlite.org/arch.html</a></p>
+<p>顺着这个思路, 让我重构一下主函数, 并且让其支持两个新的关键词:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">   <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">     print_prompt();</span><br><span class="line">     read_input(input_buffer);</span><br><span class="line"></span><br><span class="line">-    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">-      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">-    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">-      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+    <span class="keyword">if</span> (input_buffer-&gt;buffer[<span class="number">0</span>] == <span class="string">'.'</span>) &#123;</span><br><span class="line">+      <span class="keyword">switch</span> (do_meta_command(input_buffer)) &#123;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_SUCCESS):</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_UNRECOGNIZED_COMMAND):</span><br><span class="line">+          <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">+</span><br><span class="line">+    Statement statement;</span><br><span class="line">+    <span class="keyword">switch</span> (prepare_statement(input_buffer, &amp;statement)) &#123;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_SUCCESS):</span><br><span class="line">+        <span class="keyword">break</span>;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_UNRECOGNIZED_STATEMENT):</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"Unrecognized keyword at start of '%s'.\n"</span>,</span><br><span class="line">+               input_buffer-&gt;buffer);</span><br><span class="line">+        <span class="keyword">continue</span>;</span><br><span class="line">+    &#125;</span><br><span class="line">+</span><br><span class="line">+    execute_statement(&amp;statement);</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Executed.\n"</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>.exit</code> 不是 SQL 命令,被称为 “元命令”. 他们开始于 <code>.</code> 号, 所有我们需要先检查它们, 并在分离函数中处理他们.</p>
+<p>下一步,我们添加一步将输入的行转换成内部的 statement. 这是我们前端的 hacky 版本.</p>
+<p>最后,我们将预处理好的 statement 传给 <code>execute_statement</code> 函数, 这个函数最终将会变成我们的虚拟机.</p>
+<p>注意, 这个新的函数均返回 enums 来表示成功或者失败:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> MetaCommandResult_t &#123;</span><br><span class="line">  META_COMMAND_SUCCESS,</span><br><span class="line">  META_COMMAND_UNRECOGNIZED_COMMAND</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> MetaCommandResult_t MetaCommandResult;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> PrepareResult_t &#123; PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT &#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> PrepareResult_t PrepareResult;</span><br></pre></td></tr></table></figure></p>
+<p><code>do_meta_command</code> 函数仅仅是一个包装了退出函数,为更多的命令留下空间.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">MetaCommandResult <span class="title">do_meta_command</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> META_COMMAND_UNRECOGNIZED_COMMAND;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们的<code>prepared statement</code>枚举 现在仅包含两个值, 它将来将会包含更多的参数在声明中.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> StatementType_t &#123; STATEMENT_INSERT, STATEMENT_SELECT &#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> StatementType_t StatementType;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> &#123;</span></span><br><span class="line">  StatementType type;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> <span class="title">Statement</span>;</span></span><br></pre></td></tr></table></figure>
+<p><code>prepare_statement</code> (我们的 SQL 编译器) 现在并不能理解 SQL, 他现在仅仅能理解两个单词.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">PrepareResult <span class="title">prepare_statement</span><span class="params">(InputBuffer* input_buffer,</span></span></span><br><span class="line"><span class="function"><span class="params">                                Statement* statement)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strncmp</span>(input_buffer-&gt;buffer, <span class="string">"insert"</span>, <span class="number">6</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    statement-&gt;type = STATEMENT_INSERT;</span><br><span class="line">    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">"select"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">    statement-&gt;type = STATEMENT_SELECT;</span><br><span class="line">    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> PREPARE_UNRECOGNIZED_STATEMENT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意,我们现在使用 <code>strncmp</code> 以 insert 关键词来匹配 insert 其后将会跟随着要插入的数据(例如: insert 1 cstack <a href="mailto:foo@bar.com" target="_blank" rel="noopener">foo@bar.com</a>)</p>
+<p>最后 <code>execute_statement</code> 函数现在仅仅是打印了一些东西.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">execute_statement</span><span class="params">(Statement* statement)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (statement-&gt;type) &#123;</span><br><span class="line">    <span class="keyword">case</span> (STATEMENT_INSERT):</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"This is where we would do an insert.\n"</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> (STATEMENT_SELECT):</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"This is where we would do a select.\n"</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这里将不会返回任何错误码,因为这里没有啥错误可能产生</p>
+<p>随着代码的开发,我们可以发现两个新的单词了.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">~ ./db</span><br><span class="line">db &gt; insert foo bar</span><br><span class="line">This is <span class="built_in">where</span> we would <span class="keyword">do</span> an insert.</span><br><span class="line">Executed.</span><br><span class="line">db &gt; delete foo</span><br><span class="line">Unrecognized keyword at start of <span class="string">'delete foo'</span>.</span><br><span class="line">db &gt; select</span><br><span class="line">This is <span class="built_in">where</span> we would <span class="keyword">do</span> a select.</span><br><span class="line">Executed.</span><br><span class="line">db &gt; .tables</span><br><span class="line">Unrecognized <span class="built_in">command</span> <span class="string">'.tables'</span></span><br><span class="line">db &gt; .<span class="built_in">exit</span></span><br><span class="line">~</span><br></pre></td></tr></table></figure>
+<p>我们的数据库的架子正在形成… 如果能存储数据将会更加友好? 这是下一章节的内容, 我们将会实现插入和 select, 创建世界上最差的数据库存储, 下面是本章修改的代码对照:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">@@ <span class="number">-10</span>,<span class="number">6</span> +<span class="number">10</span>,<span class="number">23</span> @@ <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> &#123;</span></span><br><span class="line"> &#125;;</span><br><span class="line"> <span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">InputBuffer_t</span> <span class="title">InputBuffer</span>;</span></span><br><span class="line"> </span><br><span class="line">+<span class="keyword">enum</span> MetaCommandResult_t &#123;</span><br><span class="line">+  META_COMMAND_SUCCESS,</span><br><span class="line">+  META_COMMAND_UNRECOGNIZED_COMMAND</span><br><span class="line">+&#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> MetaCommandResult_t MetaCommandResult;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">enum</span> PrepareResult_t &#123; PREPARE_SUCCESS, PREPARE_UNRECOGNIZED_STATEMENT &#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> PrepareResult_t PrepareResult;</span><br><span class="line">+</span><br><span class="line">+<span class="keyword">enum</span> StatementType_t &#123; STATEMENT_INSERT, STATEMENT_SELECT &#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="keyword">enum</span> StatementType_t StatementType;</span><br><span class="line">+</span><br><span class="line">+<span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> &#123;</span></span><br><span class="line">+  StatementType type;</span><br><span class="line">+&#125;;</span><br><span class="line">+<span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Statement_t</span> <span class="title">Statement</span>;</span></span><br><span class="line">+</span><br><span class="line"> <span class="function">InputBuffer* <span class="title">new_input_buffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(InputBuffer));</span><br><span class="line">   input_buffer-&gt;buffer = <span class="literal">NULL</span>;</span><br><span class="line">@@ <span class="number">-35</span>,<span class="number">16</span> +<span class="number">52</span>,<span class="number">66</span> @@ <span class="function"><span class="keyword">void</span> <span class="title">read_input</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">   input_buffer-&gt;buffer[bytes_read - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">+<span class="function">MetaCommandResult <span class="title">do_meta_command</span><span class="params">(InputBuffer* input_buffer)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">+  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+    <span class="keyword">return</span> META_COMMAND_UNRECOGNIZED_COMMAND;</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function">PrepareResult <span class="title">prepare_statement</span><span class="params">(InputBuffer* input_buffer,</span></span></span><br><span class="line"><span class="function"><span class="params">+                                Statement* statement)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strncmp</span>(input_buffer-&gt;buffer, <span class="string">"insert"</span>, <span class="number">6</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    statement-&gt;type = STATEMENT_INSERT;</span><br><span class="line">+    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">+  &#125;</span><br><span class="line">+  <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">"select"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">+    statement-&gt;type = STATEMENT_SELECT;</span><br><span class="line">+    <span class="keyword">return</span> PREPARE_SUCCESS;</span><br><span class="line">+  &#125;</span><br><span class="line">+</span><br><span class="line">+  <span class="keyword">return</span> PREPARE_UNRECOGNIZED_STATEMENT;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line">+<span class="function"><span class="keyword">void</span> <span class="title">execute_statement</span><span class="params">(Statement* statement)</span> </span>&#123;</span><br><span class="line">+  <span class="keyword">switch</span> (statement-&gt;type) &#123;</span><br><span class="line">+    <span class="keyword">case</span> (STATEMENT_INSERT):</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"This is where we would do an insert.\n"</span>);</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+    <span class="keyword">case</span> (STATEMENT_SELECT):</span><br><span class="line">+      <span class="built_in">printf</span>(<span class="string">"This is where we would do a select.\n"</span>);</span><br><span class="line">+      <span class="keyword">break</span>;</span><br><span class="line">+  &#125;</span><br><span class="line">+&#125;</span><br><span class="line">+</span><br><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">   InputBuffer* input_buffer = new_input_buffer();</span><br><span class="line">   <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">     print_prompt();</span><br><span class="line">     read_input(input_buffer);</span><br><span class="line"> </span><br><span class="line">-    <span class="keyword">if</span> (<span class="built_in">strcmp</span>(input_buffer-&gt;buffer, <span class="string">".exit"</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">-      <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">-    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">-      <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'.\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+    <span class="keyword">if</span> (input_buffer-&gt;buffer[<span class="number">0</span>] == <span class="string">'.'</span>) &#123;</span><br><span class="line">+      <span class="keyword">switch</span> (do_meta_command(input_buffer)) &#123;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_SUCCESS):</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+        <span class="keyword">case</span> (META_COMMAND_UNRECOGNIZED_COMMAND):</span><br><span class="line">+          <span class="built_in">printf</span>(<span class="string">"Unrecognized command '%s'\n"</span>, input_buffer-&gt;buffer);</span><br><span class="line">+          <span class="keyword">continue</span>;</span><br><span class="line">+      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">+</span><br><span class="line">+    Statement statement;</span><br><span class="line">+    <span class="keyword">switch</span> (prepare_statement(input_buffer, &amp;statement)) &#123;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_SUCCESS):</span><br><span class="line">+        <span class="keyword">break</span>;</span><br><span class="line">+      <span class="keyword">case</span> (PREPARE_UNRECOGNIZED_STATEMENT):</span><br><span class="line">+        <span class="built_in">printf</span>(<span class="string">"Unrecognized keyword at start of '%s'.\n"</span>,</span><br><span class="line">+               input_buffer-&gt;buffer);</span><br><span class="line">+        <span class="keyword">continue</span>;</span><br><span class="line">+    &#125;</span><br><span class="line">+</span><br><span class="line">+    execute_statement(&amp;statement);</span><br><span class="line">+    <span class="built_in">printf</span>(<span class="string">"Executed.\n"</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Readme_Index/" data-id="cjzv7ordv005q3gs67ag8oks2" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database/Part2_worlds_simplest_sql_compiler_and_VM/" data-id="cjzv7q12700558ss6gnb7gh9g" class="article-share-link">分享</a>
       
       
       
@@ -213,7 +207,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/" data-id="cjzv7orca002v3gs6ecv1e89t" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/01/26/build_own_x/data_base/build_simple_database_task/" data-id="cjzv7q10s002w8ss6v4ryilqm" class="article-share-link">分享</a>
       
       
       
@@ -263,7 +257,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/10/alg/raft/raft_think/" data-id="cjzv7orbz00213gs61oymz5hd" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/10/alg/raft/raft_think/" data-id="cjzv7q10d00228ss665e44nte" class="article-share-link">分享</a>
       
       
       
@@ -309,7 +303,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjzv7orbx001y3gs6c35aoyo3" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/09/alg/raft/ReadRaft/" data-id="cjzv7q10a001y8ss6v93sipnm" class="article-share-link">分享</a>
       
       
       
@@ -364,7 +358,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjzv7ora700093gs6urowtwzl" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/07/devops/shadowsocks_server/" data-id="cjzv7q0yo000d8ss6mud437qi" class="article-share-link">分享</a>
       
       
       
@@ -413,7 +407,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjzv7orcf00343gs69svgs042" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/06/frontend/flutter/flutter_learn_plan/" data-id="cjzv7q10u00308ss63l586nel" class="article-share-link">分享</a>
       
       
       
@@ -486,7 +480,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjzv7ora500083gs6u2tcjqp3" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/12/03/devops/build_vpn_server/" data-id="cjzv7q0yj000a8ss6rq845mir" class="article-share-link">分享</a>
       
       
       
@@ -539,7 +533,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjzv7oraj000j3gs6l2q0vqip" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/30/mac/防火墙问题/" data-id="cjzv7q0ys000i8ss6b355b2pk" class="article-share-link">分享</a>
       
       
       
@@ -573,7 +567,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjzv7ord6004g3gs6d42716ec" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/log/" data-id="cjzv7q11z004n8ss6i686mozq" class="article-share-link">分享</a>
       
       
       
@@ -609,7 +603,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjzv7ordb004p3gs6gxsagt42" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/11/29/backend/go/goStandardLib/sort/" data-id="cjzv7q11p004e8ss634cspyed" class="article-share-link">分享</a>
       
       
       
